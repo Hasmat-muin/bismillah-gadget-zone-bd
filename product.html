@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Bismillah Gadget Zone BD</title>
+    <style>
+        :root {
+            --primary: #0f2635;
+            --accent: #c5a059;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; margin: 0; padding: 20px; color: var(--text-dark); }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .main-layout { display: flex; gap: 40px; flex-wrap: wrap; }
+        .left-panel { flex: 1; min-width: 320px; }
+        .right-panel { flex: 1; min-width: 320px; display: flex; flex-direction: column; }
+        .main-image-box { width: 100%; height: 400px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; }
+        .main-image-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .product-title { font-size: 24px; font-weight: 700; color: var(--primary); margin: 0 0 10px 0; }
+        .price-tag { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
+        .variant-section { margin-bottom: 25px; }
+        .variant-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; }
+        .variant-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .variant-card { border: 2px solid #e2e8f0; padding: 6px; border-radius: 8px; cursor: pointer; text-align: center; width: 70px; transition: 0.2s; position: relative; }
+        .variant-card img { width: 100%; height: 60px; object-fit: cover; border-radius: 4px; }
+        .variant-card .v-name { font-size: 11px; margin-top: 4px; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .variant-card.active { border-color: var(--primary); background: rgba(15, 38, 53, 0.02); }
+        .btn-group { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
+        .btn { flex: 1; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; text-align: center; border: none; }
+        .btn-cart { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-buy { background: var(--primary); color: var(--accent); }
+        .details-section { margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px; }
+        .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="main-layout">
+        <div class="left-panel">
+            <div class="main-image-box">
+                <img id="mainProdImage" src="" alt="Product Image">
+            </div>
+        </div>
+        <div class="right-panel">
+            <h1 class="product-title" id="prodTitle">Loading Product Title...</h1>
+            <div class="price-tag">৳ <span id="prodPrice">0.00</span></div>
+            <div class="variant-section">
+                <div class="variant-title">Select Color/Variant:</div>
+                <div class="variant-grid" id="variantGrid"></div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-cart" onclick="alert('অর্ডার করতে মেইন পেজের কার্ট বা বাই নাও ব্যবহার করুন।')">Add To Cart</button>
+                <button class="btn btn-buy" onclick="alert('অর্ডার করতে মেইন পেজের কার্ট বা বাই নাও ব্যবহার করুন।')">Buy Now</button>
+            </div>
+        </div>
+    </div>
+    <div class="details-section">
+        <div class="tab-title">Specification & Description</div>
+        <div id="prodDescription" style="line-height: 1.6; font-size: 14px; color: #475569;"></div>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products.json";
+
+    if (productId) {
+        fetch(dbURL)
+        .then(res => res.json())
+        .then(data => {
+            const product = data[productId];
+            if (product) {
+                document.getElementById('prodTitle').innerText = product.name;
+                document.getElementById('prodPrice').innerText = product.price;
+                document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
+                
+                let colorKeys = product.variants ? Object.keys(product.variants) : [];
+                let defaultImage = colorKeys.length > 0 ? product.variants[colorKeys[0]] : product.mainImage;
+                document.getElementById('mainProdImage').src = defaultImage;
+                
+                const variantGrid = document.getElementById('variantGrid');
+                if (colorKeys.length > 0) {
+                    variantGrid.innerHTML = "";
+                    colorKeys.forEach((color, idx) => {
+                        const isActive = idx === 0 ? 'active' : '';
+                        variantGrid.innerHTML += `
+                            <div class="variant-card ${isActive}" onclick="changeVariant('${product.variants[color]}', this)">
+                                <img src="${product.variants[color]}" alt="${color}">
+                                <span class="v-name">${color}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    document.querySelector('.variant-section').style.display = 'none';
+                }
+            } else {
+                document.getElementById('prodTitle').innerText = "প্রোডাক্টটি পাওয়া যায়নি!";
+            }
+        })
+        .catch(err => {
+            document.getElementById('prodTitle').innerText = "ডাটা লোড করতে সমস্যা হয়েছে।";
+        });
+    }
+    function changeVariant(imageUrl, element) {
+        document.getElementById('mainProdImage').src = imageUrl;
+        document.querySelectorAll('.variant-card').forEach(card => card.classList.remove('active'));
+        element.classList.add('active');
+    }
+</script>
+</body>
+</html>

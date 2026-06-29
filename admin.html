@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Bismillah Gadget Zone BD</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 30px; margin: 0; }
+        .admin-box, .login-box, .settings-box { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        h2 { color: #0f2635; margin-top: 0; border-bottom: 2px solid #0f2635; padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
+        input[type="text"], input[type="password"], input[type="number"], textarea, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        textarea { height: 100px; resize: vertical; }
+        .btn-submit { background: #0f2635; color: #c5a059; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-submit:hover { opacity: 0.9; }
+        .variant-group { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 15px; }
+        .variant-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .btn-add-variant { background: #c5a059; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        
+        .admin-products-section { max-width: 600px; margin: 40px auto 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .admin-prod-card { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .admin-prod-info { display: flex; align-items: center; gap: 15px; }
+        .admin-prod-img { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: white; border: 1px solid #e2e8f0; }
+        .admin-btn-group { display: flex; gap: 8px; }
+        .btn-edit { background: #0f2635; color: #c5a059; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
+        .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
+        
+        #adminContent { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="loginSection" class="login-box" style="margin-top: 100px;">
+    <h2>Admin Login (লগইন করুন)</h2>
+    <form id="loginForm" onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+            <label>Username (ইউজারনেম):</label>
+            <input type="text" id="adminUser" required placeholder="username">
+        </div>
+        <div class="form-group">
+            <label>Password (পাসওয়ার্ড):</label>
+            <input type="password" id="adminPass" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-submit" id="loginBtn">Login</button>
+    </form>
+</div>
+
+<div id="adminContent">
+    <div class="admin-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2>Add New Product</h2>
+            <button onclick="handleLogout()" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Logout</button>
+        </div>
+        <form id="productForm">
+            <div class="form-group">
+                <label>Product Name (প্রোডাক্টের নাম):</label>
+                <input type="text" id="prodName" required placeholder="e.g., T900 Ultra Smart Watch">
+            </div>
+
+            <div class="form-group">
+                <label>Price (দাম ৳):</label>
+                <input type="number" id="prodPrice" required placeholder="e.g., 1500">
+            </div>
+
+            <div class="form-group">
+                <label>Product Main Image (মেইন ছবি আপলোড করুন):</label>
+                <input type="file" id="prodMainImageFile" accept="image/*" required>
+            </div>
+
+            <div class="form-group">
+                <label>Video URL (ইউটিউব বা ভিডিও লিংক - অপশনাল):</label>
+                <input type="text" id="prodVideo" placeholder="https://youtube.com/...">
+            </div>
+
+            <div class="form-group">
+                <label>Specification & Description (পণ্যের বিবরণ):</label>
+                <textarea id="prodDetails" required placeholder="এখানে প্রোডাক্টের ডিটেইলস লিখুন..."></textarea>
+            </div>
+
+            <div class="variant-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="margin: 0;">Color Variants (কালার অপশন আপলোড করুন):</label>
+                    <button type="button" class="btn-add-variant" onclick="addVariantRow()">+ Add Color</button>
+                </div>
+                <div id="variantContainer"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 25px;">
+                <button type="submit" class="btn-submit" id="submitBtn">Save & Upload Product</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="settings-box" style="margin-top: 40px;">
+        <h2 style="border-color: #c5a059;">Admin Settings (ইউজারনেম ও পাসওয়ার্ড পরিবর্তন)</h2>
+        <form id="settingsForm" onsubmit="handleCredentialChange(event)">
+            <div class="form-group">
+                <label>Current Password (বর্তমান পাসওয়ার্ড):</label>
+                <input type="password" id="currentPass" required placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label>New Username (নতুন ইউজারনেম):</label>
+                <input type="text" id="newUsername" required placeholder="New Username">
+            </div>
+            <div class="form-group">
+                <label>New Password (নতুন পাসওয়ার্ড):</label>
+                <input type="password" id="newPassword" required placeholder="New Password">
+            </div>
+            <button type="submit" class="btn-submit" style="background:#c5a059; color:#0f2635;">Update Username & Password</button>
+        </form>
+    </div>
+
+    <div class="admin-products-section">
+        <h2 style="border-color: #c5a059;">Uploaded Products (আপলোড করা প্রোডাক্টসমূহ)</h2>
+        <div id="adminProductsGrid" style="margin-top: 20px;">
+            <p style="text-align: center; color: #64748b;">প্রোডাক্ট লোড হচ্ছে...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // পেজ লোড হলে চেক করবে সেশন আছে কিনা
+    window.addEventListener('DOMContentLoaded', () => {
+        if(sessionStorage.getItem("adminLoggedIn") === "true") {
+            showAdminPanel();
+        }
+    });
+
+    function showAdminPanel() {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        if(typeof fetchProducts === "function") {
+            fetchProducts();
+        }
+    }
+
+    function handleLogout() {
+        sessionStorage.removeItem("adminLoggedIn");
+        window.location.reload();
+    }
+
+    let variantCount = 0;
+    function addVariantRow() {
+        variantCount++;
+        const container = document.getElementById('variantContainer');
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        row.id = `v-row-${variantCount}`;
+        row.innerHTML = `
+            <input type="text" placeholder="Color Name" class="v-name" style="flex: 1; padding: 8px;" required>
+            <input type="file" accept="image/*" class="v-file" style="flex: 1.5; padding: 5px;" required>
+            <button type="button" onclick="document.getElementById('v-row-${variantCount}').remove()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">×</button>
+        `;
+        container.appendChild(row);
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = "Uploading Images... Please wait...";
+        submitBtn.disabled = true;
+
+        if (typeof uploadProductWithImages === "function") {
+            await uploadProductWithImages();
+        } else {
+            alert("Error: script.js file not connected properly!");
+            submitBtn.innerText = "Save & Upload Product";
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>
