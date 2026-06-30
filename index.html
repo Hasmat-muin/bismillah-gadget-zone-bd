@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bismillah Gadget Zone BD</title>
-    <link class="icon" type="image/jpeg" href="logo.JPG">
+    <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --primary: #0f2635;
@@ -33,6 +33,10 @@
             z-index: 100; 
             border-bottom: 3px solid var(--accent);
             box-shadow: 0 4px 20px rgba(15, 38, 53, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 4%;
         }
         
         /* 🛒 Sleek Modern Cart Button */
@@ -46,6 +50,7 @@
             display: flex; 
             align-items: center; 
             gap: 6px; 
+            padding: 8px 16px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2);
         }
@@ -72,12 +77,11 @@
             margin: 0 auto; 
         }
 
-        /* 🛍️ Floating Square Product Card (ভাসমান ইফেক্ট ও সফট শ্যাডো) */
+        /* 🛍️ Floating Square Product Card */
         .product-card { 
             background: var(--card-bg); 
             border-radius: 12px; 
             padding: 12px; 
-            /* ☁️ নিচ দিয়ে চমৎকার সফট ডার্ক শ্যাডো যা বক্সকে ভাসিয়ে রাখবে */
             box-shadow: 0 12px 24px rgba(15, 38, 53, 0.12), 0 4px 8px rgba(0, 0, 0, 0.04); 
             border: 1px solid rgba(15, 38, 53, 0.04);
             display: flex; 
@@ -85,20 +89,18 @@
             text-align: center; 
             position: relative; 
             cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* স্মুথ মুভমেন্ট */
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             aspect-ratio: 1 / 1; 
             justify-content: space-between;
             box-sizing: border-box;
         }
         
-        /* 🚀 হোভার করলে আরেকটু ওপরে উঠবে এবং শ্যাডো আরও গভীর হবে */
         .product-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 20px 38px rgba(15, 38, 53, 0.18), 0 6px 12px rgba(0, 0, 0, 0.06);
             border-color: rgba(197, 160, 89, 0.3);
         }
         
-        /* 🖼️ Square Image Container */
         .image-wrapper { 
             height: 50%; 
             background: #f8fafc; 
@@ -146,12 +148,10 @@
             margin: 0 0 6px 0; 
         }
 
-        /* ❌ কালার অপশন সম্পূর্ণ হাইড */
         .color-variants-wrapper, .color-variants-wrapper + span, .color-label {
             display: none !important;
         }
 
-        /* 📺 Video Link */
         .details-section {
             padding: 0 !important;
             margin-bottom: 6px !important;
@@ -163,7 +163,6 @@
             font-weight: 600;
         }
 
-        /* 🛒 Premium Minimal Buttons */
         .btn-group {
             display: flex;
             gap: 6px;
@@ -195,7 +194,6 @@
             opacity: 0.9;
         }
         
-        /* 🏪 Minimalist Glassmorphism Sidebar */
         .cart-sidebar { 
             position: fixed; 
             top: 0; 
@@ -223,4 +221,97 @@
         .remove-item { color: #ef4444; cursor: pointer; font-weight: bold; }
         .cart-total { font-size: 18px; font-weight: 700; border-top: 2px solid #f1f5f9; padding-top: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; color: var(--primary); }
         .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 14px; font-weight: bold; border: 1px solid var(--primary); border-radius: 10px; cursor: pointer; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 15px rgba(15, 38, 53, 0.2); }
-        .checkout-btn:hover { background: var(--accent); color: var(--primary);
+        .checkout-btn:hover { background: var(--accent); color: var(--primary); }
+
+        /* 🎨 ট্যাবগুলোর একটিভ গোল্ডেন কালার স্টাইল (CSS) */
+        .category-tabs {
+            display: flex; 
+            gap: 25px; 
+            padding: 15px 4%; 
+            background: #fff; 
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .tab-item {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b; /* ডিফল্ট কালার */
+            cursor: pointer;
+            padding-bottom: 8px;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-item.active {
+            color: #c5a059 !important; /* গোল্ডেন কালার */
+            border-bottom: 2px solid #c5a059 !important; /* গোল্ডেন আন্ডারলাইন */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <img class="site-logo" src="logo.JPG" alt="Logo">
+            <div class="brand-text-wrapper">
+                <span class="brand-top-name">Bismillah</span>
+                <span class="brand-name">Gadget Zone BD</span>
+            </div>
+        </div>
+        <button class="cart-btn" onclick="toggleCart()">
+            🛒 Cart <span class="cart-count" id="cart-count">0</span>
+        </button>
+    </header>
+
+    <div class="category-tabs">
+        <span class="tab-item active" onclick="switchCategory('All', this)">All Products</span>
+        <span class="tab-item" onclick="switchCategory('Smart Watch', this)">Smart Watch</span>
+        <span class="tab-item" onclick="switchCategory('Earbuds', this)">Earbuds</span>
+        <span class="tab-item" onclick="switchCategory('Power Bank', this)">Power Bank</span>
+        <span class="tab-item" onclick="switchCategory('Adapter', this)">Adapter</span>
+    </div>
+
+    <div class="products-grid" id="products-container">
+        </div>
+
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Shopping Cart</h3>
+            <button class="close-cart" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-items-list" id="cart-items-container">
+            </div>
+        <div class="cart-total">
+            <span>Total:</span>
+            <span>৳ <span id="cart-total-price">0</span></span>
+        </div>
+        <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
+    </div>
+
+    <div class="bottom-modal" id="order-modal">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h3>Confirm Order via WhatsApp</h3>
+                <span class="close-icon" onclick="closeOrderModal()">&times;</span>
+            </div>
+            <div class="selected-product-text" id="selected-products-summary">
+                </div>
+            <div class="input-box">
+                <label>আপনার নাম (Your Name)</label>
+                <input type="text" id="customer-name" placeholder="এখানে নাম লিখুন" required>
+            </div>
+            <div class="input-box">
+                <label>মোবাইল নাম্বার (Mobile Number)</label>
+                <input type="tel" id="customer-phone" placeholder="এখানে ১১ ডিজিটের নাম্বার দিন" required>
+            </div>
+            <div class="input-box">
+                <label>পূর্ণাঙ্গ ঠিকানা (Full Address)</label>
+                <textarea id="customer-address" placeholder="গ্রাম/রোড, থানা, জেলা উল্লেখ করুন" required></textarea>
+            </div>
+            <button class="submit-order-btn" onclick="sendOrderToWhatsApp()">Confirm Order on WhatsApp 🚀</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
