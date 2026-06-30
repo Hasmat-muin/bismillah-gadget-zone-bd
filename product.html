@@ -115,7 +115,6 @@
     </div>
 </div>
 
-<!-- Cart Sidebar -->
 <div class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
         <h3>Your Cart (শপিং কার্ট)</h3>
@@ -129,7 +128,6 @@
     <button class="checkout-btn" onclick="openCheckoutModal(false)">Order via WhatsApp</button>
 </div>
 
-<!-- Order Modal -->
 <div class="modal" id="orderModal">
     <div class="modal-content">
         <h3 id="modalTitle">Checkout Details (অর্ডার ফর্ম)</h3>
@@ -167,6 +165,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
     let currentSelectedColor = "Standard";
+    let currentPrice = 0; 
 
     if (productId) {
         fetch(dbURL)
@@ -175,29 +174,53 @@
             const product = data[productId];
             if (product) {
                 document.getElementById('prodTitle').innerText = product.name;
-                document.getElementById('prodPrice').innerText = product.price;
-                document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
+                document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
                 
                 if(product.video){
                     document.getElementById('videoContainer').innerHTML = `<a href="${product.video}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold; display:block; margin-bottom:10px;">📺 Watch Product Video</a>`;
                 }
 
                 let colorKeys = product.variants ? Object.keys(product.variants) : [];
-                let defaultImage = colorKeys.length > 0 ? product.variants[colorKeys[0]] : product.mainImage;
-                document.getElementById('mainProdImage').src = defaultImage;
                 
-                if(colorKeys.length > 0) {
+                // 🛠️ সেফ চেকিং: পুরাতন ও নতুন দুই ধরণের ভ্যারিয়েন্ট স্ট্রাকচারই সাপোর্ট করবে
+                if (colorKeys.length > 0) {
                     currentSelectedColor = colorKeys[0];
+                    let firstVariant = product.variants[colorKeys[0]];
+                    
+                    if (typeof firstVariant === 'object' && firstVariant !== null) {
+                        document.getElementById('mainProdImage').src = firstVariant.image || product.mainImage;
+                        currentPrice = firstVariant.price || product.price;
+                    } else {
+                        // যদি পুরাতন ডিরেক্ট ইমেজ লিঙ্ক স্ট্রিং হয়
+                        document.getElementById('mainProdImage').src = firstVariant;
+                        currentPrice = product.price;
+                    }
+                } else {
+                    document.getElementById('mainProdImage').src = product.mainImage;
+                    currentPrice = product.price;
                 }
-
+                
+                document.getElementById('prodPrice').innerText = currentPrice;
+                
                 const variantGrid = document.getElementById('variantGrid');
                 if (colorKeys.length > 0) {
                     variantGrid.innerHTML = "";
                     colorKeys.forEach((color, idx) => {
                         const isActive = idx === 0 ? 'active' : '';
+                        let vVariant = product.variants[color];
+                        let vImage = "";
+                        let vPrice = product.price; // ডিফল্ট মেইন প্রাইজ
+                        
+                        if (typeof vVariant === 'object' && vVariant !== null) {
+                            vImage = vVariant.image;
+                            vPrice = vVariant.price || product.price;
+                        } else {
+                            vImage = vVariant; // পুরাতন মেথড
+                        }
+                        
                         variantGrid.innerHTML += `
-                            <div class="variant-card ${isActive}" onclick="changeVariantLocal('${color}', '${product.variants[color]}', this)">
-                                <img src="${product.variants[color]}" alt="${color}">
+                            <div class="variant-card ${isActive}" onclick="changeVariantLocal('${color}', '${vImage}', ${vPrice}, this)">
+                                <img src="${vImage}" alt="${color}">
                                 <span class="v-name">${color}</span>
                             </div>
                         `;
@@ -206,26 +229,35 @@
                     document.querySelector('.variant-section').style.display = 'none';
                 }
 
-                // বাটন অ্যাকশন কানেক্ট করা
                 document.getElementById('pageCartBtn').onclick = function() {
-                    selectedVariantsGlobal[productId] = currentSelectedColor;
-                    addToCart(productId, product.name, product.price);
+                    if (typeof selectedVariantsGlobal !== 'undefined') {
+                        selectedVariantsGlobal[productId] = currentSelectedColor;
+                    }
+                    addToCart(productId, product.name, currentPrice); 
                 };
 
                 document.getElementById('pageBuyBtn').onclick = function() {
-                    selectedVariantsGlobal[productId] = currentSelectedColor;
-                    buyNow(productId, product.name, product.price);
+                    if (typeof selectedVariantsGlobal !== 'undefined') {
+                        selectedVariantsGlobal[productId] = currentSelectedColor;
+                    }
+                    buyNow(productId, product.name, currentPrice); 
                 };
 
             } else {
-                document.getElementById('prodTitle').innerText = "প্রোডাক্টটি পাওয়া যায়নি!";
+                document.getElementById('prodTitle').innerText = "প্রোডাক্টটি পাওয়া যায়নি!";
             }
+        }).catch(err => {
+            console.error(err);
+            document.getElementById('prodTitle').innerText = "ডাটা লোড করতে সমস্যা হয়েছে!";
         });
     }
 
-    function changeVariantLocal(colorName, imageUrl, element) {
+    function changeVariantLocal(colorName, imageUrl, vPrice, element) {
         document.getElementById('mainProdImage').src = imageUrl;
         currentSelectedColor = colorName;
+        currentPrice = vPrice; 
+        document.getElementById('prodPrice').innerText = vPrice; 
+        
         document.querySelectorAll('.variant-card').forEach(card => card.classList.remove('active'));
         element.classList.add('active');
     }
