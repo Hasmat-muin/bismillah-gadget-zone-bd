@@ -1,4 +1,4 @@
-/* --- MOBILE FIRST BASE STYLES --- */
+/* --- GLOBAL RESET & BASE --- */
 * {
     margin: 0;
     padding: 0;
@@ -9,10 +9,10 @@
 
 body {
     background-color: #f5f7f9;
-    color: #0f2635; /* Navy Blue from Logo */
+    color: #0f2635;
 }
 
-/* Header Tailored exact like sdsdsdsdsdsdsds.JPG */
+/* --- HEADER PRESTIGE --- */
 header {
     display: flex;
     justify-content: space-between;
@@ -47,17 +47,15 @@ header {
 .brand-top-name {
     font-size: 15px;
     font-weight: bold;
-    color: #c5a059; /* Gold color top text */
-    letter-spacing: 0.5px;
+    color: #c5a059;
 }
 
 .brand-name {
     font-size: 18px;
     font-weight: 700;
-    color: #fff; /* White main brand name */
+    color: #fff;
 }
 
-/* Premium Gold Cart Button from Image */
 .cart-box-premium {
     color: #0f2635;
     font-size: 13px;
@@ -70,11 +68,9 @@ header {
     align-items: center;
     gap: 4px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    border: none;
-    cursor: pointer;
 }
 
-/* --- TEXT CATEGORY BAR (As per image) --- */
+/* --- CATEGORY NAV BAR --- */
 .category-nav-bar {
     display: flex;
     gap: 15px;
@@ -83,136 +79,181 @@ header {
     overflow-x: auto;
     white-space: nowrap;
     border-bottom: 1px solid #e2e8f0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    position: sticky;
+    top: 67px;
+    z-index: 999;
 }
 
 .category-nav-bar::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for clean aesthetic */
+    display: none;
 }
 
 .nav-item {
     text-decoration: none;
     color: #475569;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.5px;
     padding: 4px 2px;
-    transition: color 0.2s ease;
 }
 
 .nav-item.active {
-    color: #b59449; /* Active highlighted gold color */
+    color: #b59449;
     border-bottom: 2px solid #b59449;
 }
 
-/* 2-Column Mobile Responsive Grid */
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 12px;
+/* --- CONTAINER & SECTIONS --- */
+.category-section {
+    margin: 20px auto;
+    padding: 0 12px;
+    width: 100%;
+    max-width: 1200px;
 }
 
+.category-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f2635;
+    margin-bottom: 15px;
+    border-left: 4px solid #c5a059;
+    padding-left: 8px;
+}
+
+/* --- 📱 MOBILE VIEW BASE --- */
+.products-horizontal-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.products-horizontal-grid::-webkit-scrollbar {
+    height: 5px;
+}
+.products-horizontal-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* মোবাইলের কার্ড লেআউট */
 .product-card {
-    background: white;
-    border-radius: 8px;
+    flex: 0 0 260px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    border: 1px solid #eef2f5;
+    min-height: 440px;
+    position: relative;
 }
 
+/* ইমেজ রেপার */
 .image-wrapper {
     background: #f8fafc;
-    text-align: center;
+    width: 100%;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
 }
 
 .image-wrapper img {
     max-width: 100%;
-    height: auto;
+    max-height: 100%;
     object-fit: contain;
 }
 
+/* ইনফরমেশন রেপার */
 .info-wrapper {
-    padding: 10px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    justify-content: space-between;
 }
 
+/* প্রোডাক্টের টাইটেল */
 .product-title {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #0f2635;
-    line-height: 1.3;
-    height: 34px;
-    overflow: hidden;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    min-height: 40px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
+/* মূল্য */
 .price {
-    font-size: 15px;
-    color: #0f2635;
-    font-weight: 700;
-    margin: 5px 0;
-}
-
-.details-section {
-    font-size: 11px;
-    color: #627d93;
-    margin-bottom: 4px;
-}
-
-.specs {
-    height: 32px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-.video-btn {
-    display: inline-block;
-    margin-top: 4px;
+    font-size: 18px;
     color: #c5a059;
-    text-decoration: none;
-    font-weight: bold;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
-/* Premium Button Group inside Cards */
+/* ভিডিও বাটন */
+.video-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #ff0000;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* কালার ভ্যারিয়েন্ট ডটস */
+.variant-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.variant-dots button {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+}
+
+/* বাটন গ্রুপ */
 .btn-group {
     display: flex;
-    gap: 5px;
-    margin-top: 8px;
+    gap: 8px;
+    margin-top: auto;
+    width: 100%;
 }
 
 .add-to-cart-btn, .buy-now-btn {
     flex: 1;
-    padding: 8px 4px;
-    font-size: 11px;
+    padding: 12px 5px;
+    font-size: 12px;
     font-weight: bold;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     text-align: center;
 }
 
-.add-to-cart-btn { 
-    background: #e2e8f0; 
-    color: #0f2635; 
+.add-to-cart-btn {
+    background: #e2e8f0;
+    color: #0f2635;
 }
 
-.buy-now-btn { 
-    background: linear-gradient(90deg, #c5a059, #b59449); 
-    color: #0f2635; 
+.buy-now-btn {
+    background: linear-gradient(90deg, #c5a059, #b59449);
+    color: #0f2635;
 }
 
-/* --- MOBILE BOTTOM SHEET MODAL (অর্ডার ফর্মের জন্য) --- */
+/* --- BOTTOM SHEET MODAL --- */
 .bottom-modal {
     display: none;
     position: fixed;
@@ -220,7 +261,7 @@ header {
     background: rgba(15, 38, 53, 0.6);
     z-index: 2000;
     justify-content: center;
-    align-items: flex-end; /* Slides up from bottom on mobile */
+    align-items: flex-end;
 }
 
 .modal-body {
@@ -234,78 +275,78 @@ header {
     overflow-y: auto;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.modal-header h3 { font-size: 16px; color: #0f2635; }
 .close-icon { font-size: 24px; cursor: pointer; color: #aaa; }
-
-.selected-product-text {
-    font-size: 13px;
-    background: #f0f4f8;
-    padding: 8px;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    color: #b59449;
-    font-weight: 600;
-}
-
+.selected-product-text { font-size: 13px; background: #f0f4f8; padding: 8px; border-radius: 6px; margin-bottom: 15px; color: #b59449; font-weight: 600; }
 .input-box { margin-bottom: 12px; }
 .input-box label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
-.input-box input, .input-box textarea {
-    width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;
-}
-.input-box textarea { height: 50px; resize: none; }
+.input-box input, .input-box textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+.submit-order-btn { background: #25D366; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
-.submit-order-btn {
-    background: #25D366; color: white; border: none; padding: 12px;
-    width: 100%; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;
-}
 
-/* --- DESKTOP BREAKPOINT (Enlarges grid nicely on PCs) --- */
+/* --- 🖥️ PERFECT DESKTOP VIEW COMPATIBILITY (নিখুঁত বড় স্কয়ার লেআউট) --- */
 @media (min-width: 768px) {
-    .products-grid {
-        grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */
-        gap: 20px;
-        padding: 25px 8%;
-    }
-    .bottom-modal { align-items: center; } /* Centers the modal on PC */
-    .modal-body { border-radius: 12px; }
-}
-
-/* --- MOBILE 2-COLUMN SWIPE LAYOUT --- */
-@media (max-width: 767px) {
-    .products-grid {
-        display: flex !important;
-        gap: 12px;
-        align-items: flex-start;
-        padding: 10px;
-        overflow: visible;
+    .category-section {
+        padding: 0 20px !important;
     }
 
-    .product-column {
-        flex: 1;
-        width: 50%;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+    .category-title {
+        font-size: 22px !important;
+        margin-bottom: 25px !important;
     }
 
-    .product-column::-webkit-scrollbar {
-        display: none;
-    }
-
-    .product-card {
+    /* ৪ কলামে চমৎকারভাবে গ্রিড সেট করা */
+    .products-horizontal-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(220px, 1fr)) !important; /* সর্বনিম্ন ২২০ পিক্সেল চওড়া হবে, সংকুচিত হবে না */
+        gap: 24px !important;
+        overflow-x: visible !important;
+        white-space: normal !important;
         width: 100% !important;
-        min-width: 100% !important;
-        scroll-snap-align: start;
-        box-sizing: border-box;
+    }
+
+    /* ডেক্সটপ কার্ডকে বড় এবং চারকোনা স্কয়ার (Square) লুক দেওয়া */
+    .products-horizontal-grid .product-card {
+        flex: 1 1 auto !important; 
+        width: 100% !important;
+        min-width: 220px !important; /* ছোট হয়ে যাওয়ার রাস্তা বন্ধ */
+        max-width: 100% !important;
+        aspect-ratio: 1 / 1 !important; /* পারফেক্ট চারকোনা বর্গাকার */
+        min-height: 320px !important; /* উচ্চতা বজায় রাখবে */
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* স্কয়ার বক্সের ভেতর ইমেজ সাইজ */
+    .image-wrapper {
+        width: 100% !important;
+        height: 48% !important;
+    }
+
+    /* স্কয়ার বক্সের ভেতর টেক্সট ও বাটনের ব্যালেন্স */
+    .info-wrapper {
+        padding: 15px !important;
+        height: 52% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+    }
+
+    .product-title {
+        font-size: 14px !important;
+        min-height: auto !important;
+        margin-bottom: 4px !important;
+    }
+
+    .price {
+        font-size: 16px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .bottom-modal {
+        align-items: center !important;
+    }
+
+    .modal-body {
+        border-radius: 12px !important;
     }
 }
