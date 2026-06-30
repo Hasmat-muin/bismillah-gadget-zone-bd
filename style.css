@@ -12,14 +12,14 @@ body {
     color: #0f2635; /* Navy Blue from Logo */
 }
 
-/* Header tailored for Mobile view */
+/* Header Tailored exact like sdsdsdsdsdsdsds.JPG */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 4%;
+    padding: 12px 4%;
     background: #0f2635; 
-    border-bottom: 2.5px solid #c5a059; /* Gold from Logo */
+    border-bottom: 2.5px solid #c5a059;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -28,67 +28,84 @@ header {
 .logo-area {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .site-logo {
-    height: 36px;
-    width: 36px;
+    height: 40px;
+    width: 40px;
     border-radius: 50%;
     border: 1.5px solid #c5a059;
 }
 
-.brand-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #fff;
+.brand-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
 }
 
-.header-icons {
+.brand-top-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #c5a059; /* Gold color top text */
+    letter-spacing: 0.5px;
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff; /* White main brand name */
+}
+
+/* Premium Gold Cart Button from Image */
+.cart-box-premium {
+    color: #0f2635;
+    font-size: 13px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #c5a059, #b59449);
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: none;
+    cursor: pointer;
 }
 
-.chat-btn {
-    font-size: 12px;
-    color: #fff;
+/* --- TEXT CATEGORY BAR (As per image) --- */
+.category-nav-bar {
+    display: flex;
+    gap: 15px;
+    background: #ffffff;
+    padding: 10px 15px;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.category-nav-bar::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for clean aesthetic */
+}
+
+.nav-item {
     text-decoration: none;
-    background: #25D366;
-    padding: 5px 10px;
-    border-radius: 12px;
-    font-weight: bold;
-}
-
-.cart-box {
-    color: white;
-    font-size: 14px;
-    background: rgba(255,255,255,0.1);
-    padding: 5px 10px;
-    border-radius: 12px;
-}
-
-/* Mobile Banner */
-.hero-banner {
-    text-align: center;
-    padding: 25px 15px;
-    background: linear-gradient(135deg, #0f2635, #1a3a4f);
-    color: white;
-    border-bottom: 3px solid #c5a059;
-}
-
-.hero-banner h2 {
-    font-size: 20px;
-    color: #c5a059;
-    margin-bottom: 4px;
-}
-
-.hero-banner p {
+    color: #475569;
     font-size: 12px;
-    opacity: 0.8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 2px;
+    transition: color 0.2s ease;
 }
 
-/* 2-Column Mobile Responsive Grid (Daraz Style) */
+.nav-item.active {
+    color: #b59449; /* Active highlighted gold color */
+    border-bottom: 2px solid #b59449;
+}
+
+/* 2-Column Mobile Responsive Grid */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -107,10 +124,14 @@ header {
 }
 
 .image-wrapper {
-    font-size: 45px;
     background: #f8fafc;
     text-align: center;
-    padding: 20px 0;
+}
+
+.image-wrapper img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
 }
 
 .info-wrapper {
@@ -143,7 +164,7 @@ header {
 .details-section {
     font-size: 11px;
     color: #627d93;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .specs {
@@ -163,20 +184,35 @@ header {
     font-weight: bold;
 }
 
-/* Premium Gold Button */
-.buy-btn {
-    background: linear-gradient(90deg, #c5a059, #b59449);
-    color: #0f2635;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    width: 100%;
+/* Premium Button Group inside Cards */
+.btn-group {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
 }
 
-/* --- MOBILE BOTTOM SHEET MODAL --- */
+.add-to-cart-btn, .buy-now-btn {
+    flex: 1;
+    padding: 8px 4px;
+    font-size: 11px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.add-to-cart-btn { 
+    background: #e2e8f0; 
+    color: #0f2635; 
+}
+
+.buy-now-btn { 
+    background: linear-gradient(90deg, #c5a059, #b59449); 
+    color: #0f2635; 
+}
+
+/* --- MOBILE BOTTOM SHEET MODAL (অর্ডার ফর্মের জন্য) --- */
 .bottom-modal {
     display: none;
     position: fixed;
@@ -235,9 +271,41 @@ header {
     .products-grid {
         grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */
         gap: 20px;
-        padding: 40px 8%;
+        padding: 25px 8%;
     }
-    .brand-name { font-size: 18px; }
     .bottom-modal { align-items: center; } /* Centers the modal on PC */
     .modal-body { border-radius: 12px; }
+}
+
+/* --- MOBILE 2-COLUMN SWIPE LAYOUT --- */
+@media (max-width: 767px) {
+    .products-grid {
+        display: flex !important;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 10px;
+        overflow: visible;
+    }
+
+    .product-column {
+        flex: 1;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .product-column::-webkit-scrollbar {
+        display: none;
+    }
+
+    .product-card {
+        width: 100% !important;
+        min-width: 100% !important;
+        scroll-snap-align: start;
+        box-sizing: border-box;
+    }
 }
