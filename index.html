@@ -25,262 +25,145 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ✨ Modern Glow Header */
         header { 
             background: var(--primary); 
             position: sticky; 
             top: 0; 
-            z-index: 100; 
+            z-index: 1000; 
             border-bottom: 3px solid var(--accent);
             box-shadow: 0 4px 20px rgba(15, 38, 53, 0.15);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 4%;
+            padding: 12px 5%;
         }
-        
-        /* 🛒 Sleek Modern Cart Button */
+
+        .logo-area { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .site-logo { height: 40px; width: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        .brand-name { color: var(--accent); font-size: 18px; font-weight: 700; }
+
         .cart-btn { 
             background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
-            color: var(--primary); 
-            border: none; 
-            font-weight: 700; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            padding: 8px 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 10px rgba(197, 160, 89, 0.2);
+            color: var(--primary); border: none; font-weight: 700; border-radius: 8px; 
+            cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 10px 16px; font-size: 14px;
         }
-        .cart-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(197, 160, 89, 0.35);
-        }
-        .cart-count { 
-            background: var(--primary); 
-            color: white; 
-            padding: 2px 8px; 
-            border-radius: 20px; 
-            font-size: 11px; 
-            font-weight: bold;
-        }
-        
-        /* 📦 Premium Product Grid */
+        .cart-count { background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+
+        /* Navigation Tabs */
+        .category-tabs-container { background: white; padding: 10px 5%; border-bottom: 1px solid #e2e8f0; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; }
+        .tab-item { padding: 8px 16px; background: #f1f5f9; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .tab-item.active { background: var(--primary); color: var(--accent); }
+
+        /* Universal Container Fix */
+        #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
+        .category-section { width: 100%; margin-bottom: 20px; }
         .products-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-            gap: 20px; 
-            padding: 40px 20px; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-        }
-
-        /* 🛍️ Floating Square Product Card */
-        .product-card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 12px; 
-            box-shadow: 0 12px 24px rgba(15, 38, 53, 0.12), 0 4px 8px rgba(0, 0, 0, 0.04); 
-            border: 1px solid rgba(15, 38, 53, 0.04);
-            display: flex; 
-            flex-direction: column; 
-            text-align: center; 
-            position: relative; 
-            cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            aspect-ratio: 1 / 1; 
-            justify-content: space-between;
+            grid-template-columns: repeat(2, 1fr); /* Mobile default 2 columns */
+            gap: 12px; 
+            padding: 12px;
             box-sizing: border-box;
         }
-        
-        .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 38px rgba(15, 38, 53, 0.18), 0 6px 12px rgba(0, 0, 0, 0.06);
-            border-color: rgba(197, 160, 89, 0.3);
+
+        @media (min-width: 600px) {
+            .products-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 16px; }
         }
-        
-        .image-wrapper { 
-            height: 50%; 
-            background: #f8fafc; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            transition: background 0.3s;
-            margin-bottom: 8px;
-        }
-        .product-card:hover .image-wrapper {
-            background: #f1f5f9;
-        }
-        .image-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; 
+        @media (min-width: 900px) {
+            .products-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
         }
 
-        .info-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-grow: 1;
-        }
+        /* Responsive Product Cards */
+        .product-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+        .image-wrapper { width: 100%; aspect-ratio: 1/1; background: #f8fafc; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: contain; }
         
-        .product-title { 
-            font-size: 13px; 
-            margin: 0 0 4px 0; 
-            font-weight: 600; 
-            color: var(--primary);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.3;
-            height: 34px;
-        }
-        .price { 
-            font-size: 14px; 
-            font-weight: 700; 
-            color: var(--accent); 
-            margin: 0 0 6px 0; 
-        }
-
-        .color-variants-wrapper, .color-variants-wrapper + span, .color-label {
-            display: none !important;
-        }
-
-        .details-section {
-            padding: 0 !important;
-            margin-bottom: 6px !important;
-        }
-        .details-section a {
-            font-size: 11px;
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 6px;
-        }
-        .add-to-cart-btn, .buy-now-btn {
-            padding: 6px 4px;
-            font-size: 10px;
-            font-weight: 700;
-            border-radius: 6px;
-            flex: 1;
-            text-align: center;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s;
-        }
-        .add-to-cart-btn {
-            background: #f1f5f9;
-            color: var(--primary);
-            border: 1px solid #cbd5e1;
-        }
-        .add-to-cart-btn:hover {
-            background: #e2e8f0;
-        }
-        .buy-now-btn {
-            background: var(--primary);
-            color: var(--accent);
-        }
-        .buy-now-btn:hover {
-            opacity: 0.9;
-        }
+        .info-wrapper { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-title { font-size: 13px; font-weight: 600; margin: 0 0 6px 0; color: var(--primary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 36px; }
+        .price { font-size: 14px; font-weight: 700; color: #10b981; margin: 0 0 6px 0; }
         
-        .cart-sidebar { 
-            position: fixed; 
-            top: 0; 
-            right: -360px; 
-            width: 350px; 
-            height: 100%; 
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(10px);
-            box-shadow: -10px 0 30px rgba(15, 38, 53, 0.08); 
-            z-index: 200; 
-            transition: cubic-bezier(0.4, 0, 0.2, 1) 0.35s; 
-            padding: 24px; 
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box; 
-            border-left: 1px solid rgba(197, 160, 89, 0.2);
-        }
+        .variant-dots { display: flex; gap: 4px; margin-bottom: 8px; }
+        .variant-dots button { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; padding: 0; }
+
+        .btn-group { display: flex; gap: 6px; margin-top: auto; }
+        .add-to-cart-btn, .buy-now-btn { flex: 1; padding: 8px 2px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; text-align: center; border: none; }
+        .add-to-cart-btn { background: #f1f5f9; color: var(--primary); border: 1px solid var(--primary); }
+        .buy-now-btn { background: var(--primary); color: var(--accent); }
+
+        /* Sidebar Cart Panel */
+        .cart-sidebar { position: fixed; top: 0; right: -340px; width: 320px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: 0.3s ease; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; }
         .cart-sidebar.open { right: 0; }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; }
-        .cart-header h3 { margin: 0; font-weight: 700; color: var(--primary); }
-        .close-cart { font-size: 28px; cursor: pointer; background: none; border: none; color: var(--text-muted); transition: 0.2s; }
-        .close-cart:hover { color: red; }
-        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-top: 15px; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-        .remove-item { color: #ef4444; cursor: pointer; font-weight: bold; }
-        .cart-total { font-size: 18px; font-weight: 700; border-top: 2px solid #f1f5f9; padding-top: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; color: var(--primary); }
-        .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 14px; font-weight: bold; border: 1px solid var(--primary); border-radius: 10px; cursor: pointer; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 15px rgba(15, 38, 53, 0.2); }
-        .checkout-btn:hover { background: var(--accent); color: var(--primary); }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .close-cart { font-size: 24px; cursor: pointer; background: none; border: none; color: var(--text-muted); }
+        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-top: 10px; }
+        .cart-total { font-size: 16px; font-weight: bold; padding: 15px 0; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
 
-        /* 🎨 ট্যাবগুলোর একটিভ গোল্ডেন কালার স্টাইল (CSS) */
-        .category-tabs {
-            display: flex; 
-            gap: 25px; 
-            padding: 15px 4%; 
-            background: #fff; 
-            border-bottom: 1px solid #e2e8f0;
-            overflow-x: auto;
-            white-space: nowrap;
+        /* Floating Modern Order Modal Center Fix */
+        .order-modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 38, 53, 0.6); 
+            backdrop-filter: blur(4px);
+            z-index: 3000; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 10px;
+            box-sizing: border-box;
         }
-        .tab-item {
-            font-size: 14px;
-            font-weight: 600;
-            color: #64748b; /* ডিফল্ট কালার */
-            cursor: pointer;
-            padding-bottom: 8px;
-            transition: all 0.3s ease;
-            border-bottom: 2px solid transparent;
+        .modal-body { 
+            background: white; 
+            width: 100%; 
+            max-width: 420px; 
+            border-radius: 16px; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.25s ease-out;
         }
-        .tab-item.active {
-            color: #c5a059 !important; /* গোল্ডেন কালার */
-            border-bottom: 2px solid #c5a059 !important; /* গোল্ডেন আন্ডারলাইন */
-        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-header h3 { margin: 0; font-size: 16px; color: var(--primary); }
+        .close-icon { font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .selected-product-text { background: #f8fafc; border-left: 3px solid var(--accent); padding: 8px 12px; font-size: 12px; margin-bottom: 15px; border-radius: 4px; white-space: pre-line; color: var(--primary); font-weight: 500; }
+        
+        .input-box { margin-bottom: 12px; text-align: left; }
+        .input-box label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-dark); }
+        .input-box input, .input-box textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        .submit-order-btn { background: #25d366; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-area">
-            <img class="site-logo" src="logo.JPG" alt="Logo">
-            <div class="brand-text-wrapper">
-                <span class="brand-top-name">Bismillah</span>
-                <span class="brand-name">Gadget Zone BD</span>
-            </div>
+        <div class="logo-area" onclick="window.location.reload();">
+            <img src="logo.JPG" class="site-logo" alt="Logo">
+            <div class="brand-name">Bismillah Gadget Zone BD</div>
         </div>
         <button class="cart-btn" onclick="toggleCart()">
-            🛒 Cart <span class="cart-count" id="cart-count">0</span>
+            🛒 কার্ট <span class="cart-count" id="cart-count">0</span>
         </button>
     </header>
 
-    <div class="category-tabs">
-        <span class="tab-item active" onclick="switchCategory('All', this)">All Products</span>
-        <span class="tab-item" onclick="switchCategory('Smart Watch', this)">Smart Watch</span>
-        <span class="tab-item" onclick="switchCategory('Earbuds', this)">Earbuds</span>
-        <span class="tab-item" onclick="switchCategory('Power Bank', this)">Power Bank</span>
-        <span class="tab-item" onclick="switchCategory('Adapter', this)">Adapter</span>
+    <div class="category-tabs-container">
+        <button class="tab-item active" onclick="switchCategory('All', this)">⚡ All Items</button>
+        <button class="tab-item" onclick="switchCategory('Smart Watch', this)">Smart Watch</button>
+        <button class="tab-item" onclick="switchCategory('Earbuds', this)">Earbuds</button>
+        <button class="tab-item" onclick="switchCategory('Power Bank', this)">Power Bank</button>
+        <button class="tab-item" onclick="switchCategory('Adapter', this)">Adapter</button>
     </div>
 
-    <div class="products-grid" id="products-container">
-        </div>
+    <main id="products-container"></main>
 
     <div class="cart-sidebar" id="cart-sidebar">
         <div class="cart-header">
-            <h3>Your Shopping Cart</h3>
-            <button class="close-cart" onclick="toggleCart()">&times;</button>
+            <h3 style="margin:0; font-size:16px;">শপিং কার্ট</h3>
+            <button class="close-cart" onclick="toggleCart()">×</button>
         </div>
-        <div class="cart-items-list" id="cart-items-container">
-            </div>
+        <div class="cart-items-list" id="cart-items-container"></div>
         <div class="cart-total">
             <span>Total:</span>
             <span>৳ <span id="cart-total-price">0</span></span>
@@ -288,25 +171,25 @@
         <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
     </div>
 
-    <div class="bottom-modal" id="order-modal">
+    <div class="order-modal-overlay" id="order-modal">
         <div class="modal-body">
             <div class="modal-header">
                 <h3>Confirm Order via WhatsApp</h3>
                 <span class="close-icon" onclick="closeOrderModal()">&times;</span>
             </div>
-            <div class="selected-product-text" id="selected-products-summary">
-                </div>
+            <div class="selected-product-text" id="selected-products-summary"></div>
+            
             <div class="input-box">
                 <label>আপনার নাম (Your Name)</label>
                 <input type="text" id="customer-name" placeholder="এখানে নাম লিখুন" required>
             </div>
             <div class="input-box">
                 <label>মোবাইল নাম্বার (Mobile Number)</label>
-                <input type="tel" id="customer-phone" placeholder="এখানে ১১ ডিজিটের নাম্বার দিন" required>
+                <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের মোবাইল নম্বর" required>
             </div>
             <div class="input-box">
                 <label>পূর্ণাঙ্গ ঠিকানা (Full Address)</label>
-                <textarea id="customer-address" placeholder="গ্রাম/রোড, থানা, জেলা উল্লেখ করুন" required></textarea>
+                <textarea id="customer-address" placeholder="গ্রাম/রোড, থানা, জেলা উল্লেখ করুন" required rows="3"></textarea>
             </div>
             <button class="submit-order-btn" onclick="sendOrderToWhatsApp()">Confirm Order on WhatsApp 🚀</button>
         </div>
