@@ -25,7 +25,7 @@
             min-height: 100vh;
         }
 
-        /* 🔐 Login Card */
+        /* 🔐 Login Card Style */
         .login-container {
             background: var(--card-bg);
             padding: 40px;
@@ -37,53 +37,71 @@
             box-sizing: border-box;
         }
 
+        .login-container h2 {
+            margin-bottom: 25px;
+            color: var(--primary);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
         .input-group {
+            margin-bottom: 20px;
             text-align: left;
-            margin-bottom: 15px;
         }
 
         .input-group label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
             margin-bottom: 6px;
-            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
         }
 
-        .input-group input, .input-group select, .input-group textarea {
+        .input-group input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             box-sizing: border-box;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
         }
 
         .login-btn {
-            width: 100%;
-            padding: 12px;
             background: var(--primary);
             color: var(--accent);
             border: none;
-            border-radius: 8px;
+            width: 100%;
+            padding: 12px;
             font-size: 16px;
             font-weight: 700;
+            border-radius: 8px;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        /* 📊 Dashboard Panel */
-        .admin-panel {
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 🖥️ Main Admin Dashboard Panel (Hidden Default) */
+        #adminPanelMain {
             display: none;
             width: 100%;
-            max-width: 1100px;
-            margin: 20px;
-            background: var(--card-bg);
+            max-width: 1200px;
+            background: white;
             padding: 30px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin: 20px;
+            box-sizing: border-box;
         }
 
-        .panel-header {
+        .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -92,223 +110,157 @@
             margin-bottom: 25px;
         }
 
-        .grid-container {
+        .admin-header h1 {
+            font-size: 24px;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Forms Layout */
+        .admin-sections {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
         }
 
-        @media (max-width: 900px) {
-            .grid-container { grid-template-columns: 1fr; }
-        }
-
-        .form-section {
+        .admin-card {
             background: #f8fafc;
             padding: 20px;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
         }
 
-        .form-section h3 {
+        .admin-card h3 {
             margin-top: 0;
             color: var(--primary);
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 6px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 5px;
         }
 
         .variant-row {
             display: flex;
-            gap: 10px;
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
             align-items: center;
         }
-
+        
         .variant-row input {
             padding: 6px;
-            border: 1px solid #ccc;
+            border: 1px solid #cbd5e1;
             border-radius: 4px;
-            font-size: 12px;
         }
-
-        /* 🛠️ Modal Box for Edit */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .btn-success { background: #10b981; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
-        .btn-secondary { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-        .btn-danger { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="login-container" id="loginCard">
-        <h2>Admin Portal</h2>
-        <p>Bismillah Gadget Zone BD</p>
-        <form onsubmit="handleAdminLogin(event); return false;">
+        <h2>Admin Login Panel</h2>
+        <form onsubmit="handleAdminLogin(event);">
             <div class="input-group">
                 <label>Username</label>
-                <input type="text" id="adminUser" placeholder="ইউজারনেম দিন" required>
+                <input type="text" id="adminUser" placeholder="ইউজারনেম দিন" required autocomplete="username">
             </div>
             <div class="input-group">
                 <label>Password</label>
-                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন" required>
+                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন" required autocomplete="current-password">
             </div>
             <button type="submit" class="login-btn" id="loginBtn">Login</button>
         </form>
     </div>
 
-    <div class="admin-panel" id="adminPanelMain">
-        <div class="panel-header">
-            <h2>Dashboard Overview</h2>
-            <button class="btn-danger" onclick="adminLogout()">Logout 🔓</button>
+    <div id="adminPanelMain">
+        <div class="admin-header">
+            <h1>Bismillah Gadget Zone - Dashboard</h1>
+            <button class="logout-btn" onclick="adminLogout()">Logout 🔓</button>
         </div>
 
-        <div class="grid-container">
-            <div>
-                <div class="form-section" style="background:#fff;">
-                    <h3 style="margin-top:0;">📁 নতুন ক্যাটাগরি তৈরি করুন</h3>
-                    <form id="categoryForm" onsubmit="createNewCategory(event)">
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="newCategoryName" placeholder="ক্যাটাগরির নাম (যেমন: Gadget, Watch)" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;" required>
-                            <button type="submit" style="background: var(--primary); color: var(--accent); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px;">যোগ করুন</button>
-                        </div>
-                    </form>
+        <div class="admin-sections">
+            <div class="admin-card">
+                <h3>📁 Create Category</h3>
+                <form onsubmit="createNewCategory(event);">
+                    <div class="input-group">
+                        <label>New Category Name</label>
+                        <input type="text" id="newCategoryName" placeholder="যেমন: Smart Watch" required>
+                    </div>
+                    <button type="submit" class="btn-success">Save Category</button>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <h3>📦 Add New Product</h3>
+                <div class="input-group">
+                    <label>Product Title</label>
+                    <input type="text" id="prodName" placeholder="যেমন: T900 Ultra Smart Watch">
+                </div>
+                <div class="input-group">
+                    <label>Base Price (৳)</label>
+                    <input type="number" id="prodPrice" placeholder="যেমন: 1250">
+                </div>
+                <div class="input-group">
+                    <label>Category</label>
+                    <select id="prodCategory" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></select>
+                </div>
+                <div class="input-group">
+                    <label>Video URL (Optional)</label>
+                    <input type="url" id="prodVideo" placeholder="https://youtube.com/...">
+                </div>
+                <div class="input-group">
+                    <label>Description / Specification</label>
+                    <textarea id="prodDetails" placeholder="প্রোডাক্টের বিবরণ লিখুন..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" rows="3"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Main Showcase Image</label>
+                    <input type="file" id="prodMainImage" accept="image/*">
                 </div>
 
-                <div class="form-section">
-                    <h3>Upload New Product</h3>
-                    <div class="input-group">
-                        <label>Product Name</label>
-                        <input type="text" id="prodName" placeholder="নাম লিখুন">
-                    </div>
-                    <div class="input-group">
-                        <label>Base Price (৳) [ভ্যারিয়েন্ট না থাকলে এটিই মেইন দাম]</label>
-                        <input type="number" id="prodPrice" placeholder="মূল্য দিন">
-                    </div>
-                    <div class="input-group">
-                        <label>Category</label>
-                        <select id="prodCategory">
-                            <option value="Smart Watch">Smart Watch</option>
-                            <option value="Earbuds">Earbuds</option>
-                            <option value="Power Bank">Power Bank</option>
-                            <option value="Adapter">Adapter</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Main Image File</label>
-                        <input type="file" id="prodMainImageFile" accept="image/*">
-                    </div>
-                    <div class="input-group">
-                        <label>YouTube Video Link</label>
-                        <input type="text" id="prodVideo" placeholder="লিঙ্ক দিন">
-                    </div>
-                    <div class="input-group">
-                        <label>Product Details</label>
-                        <textarea id="prodDetails" rows="3" placeholder="বিবরণ লিখুন"></textarea>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: bold; font-size: 13px; color: var(--primary);">Product Variants (কালার অনুযায়ী আলাদা দাম ও ছবি)</label>
-                        <div id="variantContainer" style="margin-top: 10px;"></div>
-                        <button type="button" class="btn-secondary" style="font-size: 12px; margin-top: 5px;" onclick="addVariantRow()">+ Add Color Variant</button>
-                    </div>
-
-                    <button class="btn-success" id="submitBtn" onclick="uploadProductWithImages()">Save & Upload Product</button>
+                <div style="margin-top:15px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                    <label style="font-weight:bold; font-size:13px; color:var(--text-dark);">Product Variants (Optional)</label>
+                    <div id="variantContainer" style="margin-top:10px;"></div>
+                    <button type="button" class="btn-secondary" style="font-size:11px;" onclick="addVariantRow()">+ Add Color/Variant</button>
                 </div>
 
-                <div class="form-section">
-                    <h3>Admin Profile Settings</h3>
-                    <form onsubmit="handleCredentialChange(event); return false;">
-                        <div class="input-group">
-                            <label>Current Password</label>
-                            <input type="password" id="currentPass" placeholder="বর্তমান পাসওয়ার্ড দিন" required>
-                        </div>
-                        <div class="input-group">
-                            <label>New Username</label>
-                            <input type="text" id="newUsername" placeholder="নতুন ইউজারনেম" required>
-                        </div>
-                        <div class="input-group">
-                            <label>New Password</label>
-                            <input type="password" id="newPassword" placeholder="নতুন পাসওয়ার্ড" required>
-                        </div>
-                        <button type="submit" class="btn-success" style="background: var(--primary); color: var(--accent);">Update Profile Credentials</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h3>Manage Products</h3>
-                <div id="adminProductsGrid"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color: var(--primary);">Edit Product</h3>
-            <input type="hidden" id="editProductId">
-            <div class="input-group">
-                <label>Product Name</label>
-                <input type="text" id="editProdName">
-            </div>
-            <div class="input-group">
-                <label>Base Price (৳)</label>
-                <input type="number" id="editProdPrice">
-            </div>
-            <div class="input-group">
-                <label>Category</label>
-                <select id="editProdCategory">
-                    <option value="Smart Watch">Smart Watch</option>
-                    <option value="Earbuds">Earbuds</option>
-                    <option value="Power Bank">Power Bank</option>
-                    <option value="Adapter">Adapter</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>YouTube Video Link</label>
-                <input type="text" id="editProdVideo">
-            </div>
-            <div class="input-group">
-                <label>Product Details</label>
-                <textarea id="editProdDetails" rows="3"></textarea>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label style="font-weight: bold; font-size: 13px;">Edit Variants</label>
-                <div id="editVariantContainer" style="margin-top: 10px;"></div>
-                <button type="button" class="btn-secondary" style="font-size: 11px;" onclick="addEditVariantRow('', '', '')">+ Add Variant</button>
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-success" onclick="updateProductComplete()">Update Changes</button>
-                <button class="btn-secondary" style="background:#ef4444;" onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+                <button class="btn-success" onclick="uploadProductWithImages()" style="margin-top:15px; background:var(--primary); color:var(--accent);">Publish Product 🚀</button>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
     <script>
+        // Check session storage on window load
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem("adminLoggedIn") === "true") {
                 showAdminPanel();
@@ -317,7 +269,9 @@
 
         function showAdminPanel() {
             document.getElementById('loginCard').style.display = 'none';
-            document.getElementById('adminPanelMain').style.display = 'block';
+            // Flex design use na kore clear block use kora holo jeno design breakdown na hoy
+            document.getElementById('adminPanelMain').style.display = 'block'; 
+            document.body.style.alignItems = 'flex-start'; // dashboard frame view setup
             if (typeof fetchProducts === 'function') { fetchProducts(); }
         }
 
