@@ -17,7 +17,6 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-main); margin: 0; padding: 20px; color: var(--text-dark); }
         
-        /* Header Style */
         header { 
             background: var(--primary); 
             border-bottom: 3px solid var(--accent);
@@ -125,7 +124,7 @@
         <span>Total:</span>
         <span>৳ <span id="cartTotalAmount">0</span></span>
     </div>
-    <button class="checkout-btn" onclick="openCheckoutModal(false)">Order via WhatsApp</button>
+    <button class="checkout-btn" onclick="openCheckoutModal(false)">Proceed To Checkout</button>
 </div>
 
 <div class="modal" id="orderModal">
@@ -154,7 +153,7 @@
             </div>
             <div class="form-actions">
                 <button type="button" class="cancel-btn" onclick="closeCheckoutModal()">Cancel</button>
-                <button type="submit" class="confirm-btn">Confirm Order</button>
+                <button type="submit" class="confirm-btn">Confirm Order 🚀</button>
             </div>
         </form>
     </div>
@@ -166,6 +165,7 @@
     const productId = urlParams.get('id');
     let currentSelectedColor = "Standard";
     let currentPrice = 0; 
+    let globalProductName = ""; 
 
     if (productId) {
         fetch(dbURL)
@@ -173,6 +173,7 @@
         .then(data => {
             const product = data[productId];
             if (product) {
+                globalProductName = product.name;
                 document.getElementById('prodTitle').innerText = product.name;
                 document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
                 
@@ -182,7 +183,6 @@
 
                 let colorKeys = product.variants ? Object.keys(product.variants) : [];
                 
-                // 🛠️ সেফ চেকিং: পুরাতন ও নতুন দুই ধরণের ভ্যারিয়েন্ট স্ট্রাকচারই সাপোর্ট করবে
                 if (colorKeys.length > 0) {
                     currentSelectedColor = colorKeys[0];
                     let firstVariant = product.variants[colorKeys[0]];
@@ -191,7 +191,6 @@
                         document.getElementById('mainProdImage').src = firstVariant.image || product.mainImage;
                         currentPrice = firstVariant.price || product.price;
                     } else {
-                        // যদি পুরাতন ডিরেক্ট ইমেজ লিঙ্ক স্ট্রিং হয়
                         document.getElementById('mainProdImage').src = firstVariant;
                         currentPrice = product.price;
                     }
@@ -209,13 +208,13 @@
                         const isActive = idx === 0 ? 'active' : '';
                         let vVariant = product.variants[color];
                         let vImage = "";
-                        let vPrice = product.price; // ডিফল্ট মেইন প্রাইজ
+                        let vPrice = product.price;
                         
                         if (typeof vVariant === 'object' && vVariant !== null) {
                             vImage = vVariant.image;
                             vPrice = vVariant.price || product.price;
                         } else {
-                            vImage = vVariant; // পুরাতন মেথড
+                            vImage = vVariant;
                         }
                         
                         variantGrid.innerHTML += `
@@ -229,18 +228,17 @@
                     document.querySelector('.variant-section').style.display = 'none';
                 }
 
+                // 🛒 'Add To Cart' ক্লিক ইভেন্ট (গ্লোবাল ফাংশন কল করবে)
                 document.getElementById('pageCartBtn').onclick = function() {
-                    if (typeof selectedVariantsGlobal !== 'undefined') {
-                        selectedVariantsGlobal[productId] = currentSelectedColor;
-                    }
-                    addToCart(productId, product.name, currentPrice); 
+                    selectedVariantsGlobal[productId] = currentSelectedColor;
+                    addToCart(productId, globalProductName, currentPrice);
+                    toggleCart(); 
                 };
 
+                // 🚀 'Buy Now' ক্লিক ইভেন্ট (গ্লোবাল ফাংশন কল করবে)
                 document.getElementById('pageBuyBtn').onclick = function() {
-                    if (typeof selectedVariantsGlobal !== 'undefined') {
-                        selectedVariantsGlobal[productId] = currentSelectedColor;
-                    }
-                    buyNow(productId, product.name, currentPrice); 
+                    selectedVariantsGlobal[productId] = currentSelectedColor;
+                    buyNow(productId, globalProductName, currentPrice);
                 };
 
             } else {
@@ -248,7 +246,7 @@
             }
         }).catch(err => {
             console.error(err);
-            document.getElementById('prodTitle').innerText = "ডাটা লোড করতে সমস্যা হয়েছে!";
+            document.getElementById('prodTitle').innerText = "ডাটা লোড করতে সমস্যা হয়েছে!";
         });
     }
 
@@ -261,6 +259,10 @@
         document.querySelectorAll('.variant-card').forEach(card => card.classList.remove('active'));
         element.classList.add('active');
     }
+
+    window.onload = function() {
+        updateCartUI();
+    };
 </script>
 </body>
 </html>
