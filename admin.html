@@ -88,7 +88,7 @@
             opacity: 0.9;
         }
 
-        /* 🖥️ Main Admin Dashboard Panel (Hidden Default) */
+        /* 🖥️ Main Admin Dashboard Panel */
         #adminPanelMain {
             display: none;
             width: 100%;
@@ -138,6 +138,7 @@
             padding: 20px;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
         }
 
         .admin-card h3 {
@@ -183,6 +184,107 @@
             border: 1px solid #cbd5e1;
             border-radius: 4px;
         }
+
+        .category-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .delete-cat-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* 🗑️ Product Management List UI */
+        .product-manage-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .prod-info-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prod-info-left img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .action-btns-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-prod-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .edit-prod-btn:hover {
+            background: #2563eb;
+        }
+
+        .delete-prod-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .delete-prod-btn:hover {
+            background: #dc2626;
+        }
+        
+        .edit-alert-banner {
+            display: none;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -209,19 +311,54 @@
         </div>
 
         <div class="admin-sections">
-            <div class="admin-card">
-                <h3>📁 Create Category</h3>
-                <form onsubmit="createNewCategory(event);">
-                    <div class="input-group">
-                        <label>New Category Name</label>
-                        <input type="text" id="newCategoryName" placeholder="যেমন: Smart Watch" required>
-                    </div>
-                    <button type="submit" class="btn-success">Save Category</button>
-                </form>
+            <!-- বাম পাশের সেকশন -->
+            <div>
+                <!-- 📁 Create Category -->
+                <div class="admin-card">
+                    <h3>📁 Create Category</h3>
+                    <form onsubmit="createNewCategory(event);">
+                        <div class="input-group">
+                            <label>New Category Name</label>
+                            <input type="text" id="newCategoryName" placeholder="যেমন: Smart Watch" required>
+                        </div>
+                        <button type="submit" class="btn-success">Save Category</button>
+                    </form>
+                </div>
+
+                <!-- 🗑️ Manage Categories -->
+                <div class="admin-card">
+                    <h3>🗑️ Manage Categories</h3>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 0;">তৈরি করা কাস্টম ক্যাটাগরিগুলো ডিলিট করার ব্যবস্থা:</p>
+                    <div id="adminCategoryList"></div>
+                </div>
+
+                <!-- ⚙️ Admin Settings -->
+                <div class="admin-card">
+                    <h3>⚙️ Admin Security Settings</h3>
+                    <form onsubmit="updateAdminCredentials(event);">
+                        <div class="input-group">
+                            <label>New Username</label>
+                            <input type="text" id="newAdminUser" placeholder="নতুন ইউজারনেম দিন" required>
+                        </div>
+                        <div class="input-group">
+                            <label>New Password</label>
+                            <input type="password" id="newAdminPass" placeholder="নতুন পাসওয়ার্ড দিন" required>
+                        </div>
+                        <button type="submit" class="btn-success" style="background: var(--primary); color: var(--accent);">Update Settings 💾</button>
+                    </form>
+                </div>
             </div>
 
-            <div class="admin-card">
-                <h3>📦 Add New Product</h3>
+            <!-- ডান পাশের সেকশন: প্রোডাক্ট আপলোড এবং এডিট -->
+            <div class="admin-card" id="formScrollTarget">
+                <h3 id="formActionTitle">📦 Add New Product</h3>
+                
+                <!-- ✏️ এডিট মোড নোটিফিকেশন ব্যানার -->
+                <div class="edit-alert-banner" id="editBanner">
+                    <span id="editBannerText">✏️ মোড: আপনি একটি প্রোডাক্ট এডিট করছেন।</span>
+                    <button type="button" onclick="cancelEditMode()" style="background:#cbd5e1; border:none; padding:2px 8px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;">Cancel Edit</button>
+                </div>
+
                 <div class="input-group">
                     <label>Product Title</label>
                     <input type="text" id="prodName" placeholder="যেমন: T900 Ultra Smart Watch">
@@ -243,24 +380,39 @@
                     <textarea id="prodDetails" placeholder="প্রোডাক্টের বিবরণ লিখুন..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" rows="3"></textarea>
                 </div>
                 <div class="input-group">
-                    <label>Main Showcase Image</label>
+                    <label>Main Showcase Image <span id="imageRequiredText" style="color:red; font-size:11px;">*(প্রয়োজনীয়)</span></label>
                     <input type="file" id="prodMainImage" accept="image/*">
+                    <small id="editImageHint" style="display:none; color:#64748b;">(এডিট করার সময় ছবি পরিবর্তন না করতে চাইলে এটি ফাঁকা রাখুন)</small>
                 </div>
 
-                <div style="margin-top:15px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                <div style="margin-top:15px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" id="variantWrapperSection">
                     <label style="font-weight:bold; font-size:13px; color:var(--text-dark);">Product Variants (Optional)</label>
                     <div id="variantContainer" style="margin-top:10px;"></div>
                     <button type="button" class="btn-secondary" style="font-size:11px;" onclick="addVariantRow()">+ Add Color/Variant</button>
                 </div>
 
-                <button class="btn-success" onclick="uploadProductWithImages()" style="margin-top:15px; background:var(--primary); color:var(--accent);">Publish Product 🚀</button>
+                <button class="btn-success" onclick="uploadProductWithImages()" id="publishBtn" style="margin-top:15px; background:var(--primary); color:var(--accent);">Publish Product 🚀</button>
+            </div>
+        </div>
+
+        <!-- 🗑️ প্রোডাক্ট ম্যানেজ, এডিট এবং ডিলিট প্যানেল -->
+        <div class="admin-card" style="margin-top: 25px; background: #fff;">
+            <h3 style="border-bottom: 2px solid var(--accent);">🛠️ Manage, Edit & Delete Products</h3>
+            <p style="font-size: 13px; color: #64748b;">আপনার ওয়েবসাইটের প্রোডাক্ট এডিট অথবা ডিলিট করতে নিচের বাটনগুলো ব্যবহার করুন:</p>
+            <div id="adminProductListContainer" style="margin-top: 15px; max-height: 500px; overflow-y: auto;">
+                <p style="font-size:13px; color:#64748b; text-align:center;">প্রোডাক্ট লোড হচ্ছে... ⏳</p>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
     <script>
-        // Check session storage on window load
+        // গ্লোবাল ভ্যারিয়েবল এডিট ট্র্যাকিং এর জন্য
+        let isEditMode = false;
+        let currentEditProductKey = "";
+        let existingMainImageUrl = "";
+        let existingVariantsData = null;
+
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem("adminLoggedIn") === "true") {
                 showAdminPanel();
@@ -269,16 +421,433 @@
 
         function showAdminPanel() {
             document.getElementById('loginCard').style.display = 'none';
-            // Flex design use na kore clear block use kora holo jeno design breakdown na hoy
             document.getElementById('adminPanelMain').style.display = 'block'; 
-            document.body.style.alignItems = 'flex-start'; // dashboard frame view setup
-            if (typeof fetchProducts === 'function') { fetchProducts(); }
+            document.body.style.alignItems = 'flex-start';
+            loadCategoriesIntoDropdown();
+            loadCategoriesIntoManageList(); 
+            loadProductsIntoManageList(); 
         }
 
         function adminLogout() {
             sessionStorage.removeItem("adminLoggedIn");
             alert("🔒 সফলভাবে লগআউট করা হয়েছে!");
             window.location.reload();
+        }
+
+        // --- 🔐 ADMIN LOGIN LOGIC ---
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
+
+            loginBtn.innerText = "Checking...";
+            loginBtn.disabled = true;
+
+            try {
+                const res = await fetch(authURL);
+                const adminSettings = await res.json();
+
+                if (adminSettings && adminSettings.username === user && adminSettings.password === pass) {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    alert("🎉 লগইন সফল হয়েছে!");
+                    showAdminPanel();
+                } else if (user === "admin" && pass === "admin123") {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    alert("🎉 লগইন সফল হয়েছে (ডিফল্ট ব্যাকআপ)!");
+                    showAdminPanel();
+                } else {
+                    alert("❌ ভুল ইউজারনেম অথবা পাসওয়ার্ড!");
+                }
+            } catch (err) {
+                console.error(err);
+                if (user === "admin" && pass === "admin123") {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    alert("🎉 লগইন সফল হয়েছে!");
+                    showAdminPanel();
+                } else {
+                    alert("সার্ভার কানেকশনে সমস্যা হয়েছে!");
+                }
+            } finally {
+                loginBtn.innerText = "Login";
+                loginBtn.disabled = false;
+            }
+        }
+
+        // --- ⚙️ UPDATE ADMIN CREDENTIALS ---
+        async function updateAdminCredentials(event) {
+            event.preventDefault();
+            const newUsername = document.getElementById('newAdminUser').value.trim();
+            const newPassword = document.getElementById('newAdminPass').value.trim();
+
+            if(!newUsername || !newPassword) return;
+
+            try {
+                const res = await fetch(authURL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: newUsername, password: newPassword })
+                });
+
+                if (res.ok) {
+                    alert("⚙️ লগইন ডাটা সফলভাবে পরিবর্তন করা হয়েছে! নতুন পাসওয়ার্ড দিয়ে আবার লগইন করুন।");
+                    adminLogout();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("সার্ভার কানেকশন এরর!");
+            }
+        }
+
+        // --- 📁 CATEGORY CREATION LOGIC ---
+        async function createNewCategory(event) {
+            event.preventDefault();
+            const catName = document.getElementById('newCategoryName').value.trim();
+            if (!catName) return;
+
+            try {
+                const res = await fetch(catURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: catName })
+                });
+
+                if (res.ok) {
+                    alert(`📁 "${catName}" ক্যাটাগরি সফলভাবে তৈরি হয়েছে!`);
+                    document.getElementById('newCategoryName').value = "";
+                    loadCategoriesIntoDropdown();
+                    loadCategoriesIntoManageList();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // --- 🗑️ REMOVE CATEGORY FEATURE ---
+        async function deleteCategory(categoryKey, categoryName) {
+            if (!confirm(`আপনি কি নিশ্চিতভাবেই "${categoryName}" ক্যাটাগরি রিমুভ করতে চান?`)) return;
+
+            try {
+                const res = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categories/${categoryKey}.json`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    alert("🗑️ ক্যাটাগরি সফলভাবে ডিলিট করা হয়েছে!");
+                    loadCategoriesIntoDropdown();
+                    loadCategoriesIntoManageList();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // --- 📥 FETCH PRODUCTS TO LIST ---
+        async function loadProductsIntoManageList() {
+            const prodListContainer = document.getElementById('adminProductListContainer');
+            if(!prodListContainer) return;
+
+            try {
+                const res = await fetch(dbURL);
+                const productsData = await res.json();
+                
+                if(!productsData || Object.keys(productsData).length === 0) {
+                    prodListContainer.innerHTML = "<p style='font-size:13px; color:#64748b; text-align:center;'>ডাটাবেজে কোনো প্রোডাক্ট পাওয়া যায়নি!</p>";
+                    return;
+                }
+
+                prodListContainer.innerHTML = "";
+
+                Object.keys(productsData).forEach(key => {
+                    const prod = productsData[key];
+                    let displayImg = prod.mainImage;
+                    
+                    if(prod.variants) {
+                        const firstVarKey = Object.keys(prod.variants)[0];
+                        if(prod.variants[firstVarKey].image) {
+                            displayImg = prod.variants[firstVarKey].image;
+                        }
+                    }
+
+                    prodListContainer.innerHTML += `
+                        <div class="product-manage-row">
+                            <div class="prod-info-left">
+                                <img src="${displayImg || 'logo.JPG'}" alt="product">
+                                <div>
+                                    <strong style="font-size:14px; color:var(--primary);">${prod.name}</strong><br>
+                                    <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:10px; color:#475569;">${prod.category}</span>
+                                    <span style="font-size:12px; margin-left:10px; font-weight:bold; color:#10b981;">৳ ${prod.price || 'Variable'}</span>
+                                </div>
+                            </div>
+                            <div class="action-btns-right">
+                                <button class="edit-prod-btn" onclick="startEditProduct('${key}')">Edit ✏️</button>
+                                <button class="delete-prod-btn" onclick="deleteProductFromFirebase('${key}', '${prod.name}')">Delete 🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+            } catch (err) {
+                console.error(err);
+                prodListContainer.innerHTML = "<p style='color:red; font-size:12px;'>প্রোডাক্ট তালিকা লোড করতে সমস্যা হয়েছে!</p>";
+            }
+        }
+
+        // --- ✏️ START EDIT PRODUCT MODE ---
+        async function startEditProduct(productKey) {
+            try {
+                const res = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${productKey}.json`);
+                const prod = await res.json();
+
+                if(!prod) return;
+
+                // এডিট মোড অ্যাক্টিভেট করা হচ্ছে
+                isEditMode = true;
+                currentEditProductKey = productKey;
+                existingMainImageUrl = prod.mainImage || "";
+                existingVariantsData = prod.variants || null;
+
+                // ফর্মে ডাটা পুশ করা
+                document.getElementById('prodName').value = prod.name || "";
+                document.getElementById('prodPrice').value = prod.price || "";
+                document.getElementById('prodCategory').value = prod.category || "";
+                document.getElementById('prodVideo').value = prod.video || "";
+                document.getElementById('prodDetails').value = prod.details || "";
+
+                // UI চেঞ্জ (Add Product থেকে Edit Product মোডে রূপান্তর)
+                document.getElementById('formActionTitle').innerText = "✏️ Edit Product Details";
+                document.getElementById('publishBtn').innerText = "Save Changes & Update 💾";
+                document.getElementById('editBanner').style.display = "flex";
+                document.getElementById('imageRequiredText').style.display = "none";
+                document.getElementById('editImageHint').style.display = "inline";
+                
+                // এডিট করার সময় ভ্যারিয়েন্ট কনফিউশন এড়াতে হাইড রাখা হলো (প্রয়োজন হলে নতুন করে দিতে পারবেন)
+                document.getElementById('variantContainer').innerHTML = "";
+
+                // স্ক্রল করে ফর্মের কাছে নিয়ে যাওয়া
+                document.getElementById('formScrollTarget').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error(err);
+                alert("প্রোডাক্ট ডাটা রিড করতে সমস্যা হয়েছে!");
+            }
+        }
+
+        // --- ❌ CANCEL EDIT MODE ---
+        function cancelEditMode() {
+            isEditMode = false;
+            currentEditProductKey = "";
+            existingMainImageUrl = "";
+            existingVariantsData = null;
+
+            // ফর্ম রিসেট
+            document.getElementById('prodName').value = "";
+            document.getElementById('prodPrice').value = "";
+            document.getElementById('prodCategory').value = "";
+            document.getElementById('prodVideo').value = "";
+            document.getElementById('prodDetails').value = "";
+            document.getElementById('prodMainImage').value = "";
+            document.getElementById('variantContainer').innerHTML = "";
+
+            // UI আগের অবস্থায় ফেরত আনা
+            document.getElementById('formActionTitle').innerText = "📦 Add New Product";
+            document.getElementById('publishBtn').innerText = "Publish Product 🚀";
+            document.getElementById('editBanner').style.display = "none";
+            document.getElementById('imageRequiredText').style.display = "inline";
+            document.getElementById('editImageHint').style.display = "none";
+        }
+
+        // --- 🗑️ ACTUAL PRODUCT DELETE FUNCTION ---
+        async function deleteProductFromFirebase(productKey, productName) {
+            if(!confirm(`⚠️ আপনি কি নিশ্চিতভাবে "${productName}" প্রোডাক্টটি ওয়েবসাইট থেকে চিরতরে ডিলিট করতে চান?`)) return;
+
+            try {
+                const res = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${productKey}.json`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    alert(`🗑️ "${productName}" সফলভাবে ডিলিট করা হয়েছে!`);
+                    if(currentEditProductKey === productKey) cancelEditMode();
+                    loadProductsIntoManageList();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // --- 📦 ADD PRODUCT / EDIT SAVE MAIN LOGIC ---
+        let variantCount = 0;
+        function addVariantRow() {
+            variantCount++;
+            const container = document.getElementById('variantContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.id = `variant-row-${variantCount}`;
+            row.innerHTML = `
+                <input type="text" placeholder="কালার নাম" class="v-name" style="width:40%;" required>
+                <input type="number" placeholder="মূল্য" class="v-price" style="width:25%;" required>
+                <input type="file" class="v-image" accept="image/*" style="width:30%;" required>
+                <button type="button" onclick="document.getElementById('variant-row-${variantCount}').remove()" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">×</button>
+            `;
+            container.appendChild(row);
+        }
+
+        async function uploadToImgBB(file) {
+            const formData = new FormData();
+            formData.append("image", file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbAPIKey}`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) return data.data.url;
+            throw new Error("Image upload failed");
+        }
+
+        async function uploadProductWithImages() {
+            const name = document.getElementById('prodName').value.trim();
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const category = document.getElementById('prodCategory').value;
+            const video = document.getElementById('prodVideo').value.trim();
+            const details = document.getElementById('prodDetails').value.trim();
+            const mainImageFile = document.getElementById('prodMainImage').files[0];
+
+            // এডিট মোড না হলে মেইন ইমেজ সিলেক্ট করা আবশ্যিক
+            if (!isEditMode && !mainImageFile) {
+                alert("দয়া করে প্রোডাক্টের জন্য একটি মেইন ইমেজ সিলেক্ট করুন!");
+                return;
+            }
+
+            if (!name || isNaN(price) || !category) {
+                alert("দয়া করে প্রোডাক্টের নাম, মূল্য এবং ক্যাটাগরি সঠিকভাবে টাইপ করুন!");
+                return;
+            }
+
+            const publishBtn = document.getElementById('publishBtn');
+            publishBtn.innerText = "Processing... ⏳";
+            publishBtn.disabled = true;
+
+            try {
+                let finalMainImageUrl = existingMainImageUrl;
+                
+                // নতুন ইমেজ ফাইল দিলে আপলোড হবে, না দিলে আগেরটাই থেকে যাবে
+                if (mainImageFile) {
+                    finalMainImageUrl = await uploadToImgBB(mainImageFile);
+                }
+
+                // ভ্যারিয়েন্ট প্রসেসিং
+                const variantRows = document.querySelectorAll('.variant-row');
+                let variants = {};
+
+                // যদি এডিট মোড হয় এবং নতুন কোনো ভ্যারিয়েন্ট অ্যাড না করা হয়, তবে আগের ভ্যারিয়েন্ট ডাটা ব্যাকআপ থাকবে
+                if (isEditMode && variantRows.length === 0) {
+                    variants = existingVariantsData;
+                }
+
+                for (let row of variantRows) {
+                    const vName = row.querySelector('.v-name').value.trim();
+                    const vPrice = parseFloat(row.querySelector('.v-price').value);
+                    const vImageFile = row.querySelector('.v-image').files[0];
+
+                    if (vName && !isNaN(vPrice) && vImageFile) {
+                        const vImageUrl = await uploadToImgBB(vImageFile);
+                        variants[vName] = { price: vPrice, image: vImageUrl };
+                    }
+                }
+
+                const productData = {
+                    name,
+                    price,
+                    category,
+                    video,
+                    details,
+                    mainImage: finalMainImageUrl
+                };
+
+                if (variants && Object.keys(variants).length > 0) {
+                    productData.variants = variants;
+                }
+
+                let targetURL = dbURL; // New Product এর জন্য
+                let httpMethod = 'POST';
+
+                if (isEditMode) {
+                    // Edit মোড হলে নির্দিষ্ট আইডির নোড পুশ (Over-write) হবে
+                    targetURL = `https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`;
+                    httpMethod = 'PUT';
+                }
+
+                const res = await fetch(targetURL, {
+                    method: httpMethod,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                });
+
+                if (res.ok) {
+                    alert(isEditMode ? "✏️ প্রোডাক্টটি সফলভাবে আপডেট করা হয়েছে!" : "🚀 প্রোডাক্টটি সফলভাবে ডাটাবেজে পাবলিশ করা হয়েছে!");
+                    cancelEditMode();
+                    loadProductsIntoManageList();
+                    window.location.reload();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("অপারেশন সম্পন্ন করতে সমস্যা হয়েছে!");
+            } finally {
+                publishBtn.disabled = false;
+                publishBtn.innerText = isEditMode ? "Save Changes & Update 💾" : "Publish Product 🚀";
+            }
+        }
+
+        async function loadCategoriesIntoDropdown() {
+            const dropdown = document.getElementById('prodCategory');
+            if (!dropdown) return;
+            dropdown.innerHTML = '<option value="">ক্যাটাগরি সিলেক্ট করুন</option>';
+            try {
+                activeCategories.forEach(cat => {
+                    dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+                const res = await fetch(catURL);
+                const catData = await res.json();
+                if (catData) {
+                    Object.keys(catData).forEach(key => {
+                        if (!activeCategories.includes(catData[key].name)) {
+                            dropdown.innerHTML += `<option value="${catData[key].name}">${catData[key].name}</option>`;
+                        }
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadCategoriesIntoManageList() {
+            const listContainer = document.getElementById('adminCategoryList');
+            if(!listContainer) return;
+            listContainer.innerHTML = "";
+            try {
+                activeCategories.forEach(cat => {
+                    listContainer.innerHTML += `
+                        <div class="category-list-item" style="background: #f1f5f9; color: #94a3b8;">
+                            <span>📌 ${cat} (System Default)</span>
+                            <span style="font-size:11px; font-weight:bold;">🔒 System</span>
+                        </div>
+                    `;
+                });
+                const res = await fetch(catURL);
+                const catData = await res.json();
+                if (catData) {
+                    Object.keys(catData).forEach(key => {
+                        const currentCatName = catData[key].name;
+                        if (!activeCategories.includes(currentCatName)) {
+                            listContainer.innerHTML += `
+                                <div class="category-list-item">
+                                    <span>📁 ${currentCatName}</span>
+                                    <button class="delete-cat-btn" onclick="deleteCategory('${key}', '${currentCatName}')">×</button>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            } catch (err) { console.error(err); }
         }
     </script>
 </body>
