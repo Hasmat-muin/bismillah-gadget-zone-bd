@@ -104,20 +104,16 @@ function closeOrderModal() {
 }
 
 function sendOrderToWhatsApp() {
-    // index.html ফর্ম ফিল্ড (customer-name, customer-phone, customer-address)
     const nameFieldIndex = document.getElementById('customer-name');
-    // product.html ফর্ম ফিল্ড (name, phone, zilla, upazila, address)
     const nameFieldProduct = document.getElementById('name');
 
     let name, phone, address;
 
     if (nameFieldIndex) {
-        // index.html থেকে সাবমিট হয়েছে
         name = nameFieldIndex.value.trim();
         phone = document.getElementById('customer-phone').value.trim();
         address = document.getElementById('customer-address').value.trim();
     } else if (nameFieldProduct) {
-        // product.html থেকে সাবমিট হয়েছে
         name = nameFieldProduct.value.trim();
         phone = document.getElementById('phone').value.trim();
         const zilla = document.getElementById('zilla').value.trim();
@@ -207,10 +203,6 @@ function renderCategoryWiseColumns() {
                     <div class="info-wrapper">
                         <h3 class="product-title">${prod.name}</h3>
                         <p class="price" id="cust-price-${key}">৳ ${defaultPrice}</p>
-                        <div class="btn-group">
-                            <button class="add-to-cart-btn" onclick="addToCart('${key}', '${prod.name}', document.getElementById('cust-price-${key}').innerText); event.stopPropagation();">Add to Cart</button>
-                            <button class="buy-now-btn" onclick="buyNow('${key}', '${prod.name}', document.getElementById('cust-price-${key}').innerText); event.stopPropagation();">Buy Now</button>
-                        </div>
                     </div>
                 </div>`;
         });
@@ -218,9 +210,11 @@ function renderCategoryWiseColumns() {
         categoryHTML += `</div></div>`;
         if (hasProduct) mainGrid.innerHTML += categoryHTML;
     });
+
+    initScrollRollEffect();
+    initSwipeRollEffect();
 }
 
-// ⚡ ফিল্টারিং লজিক
 function switchCategory(categoryName, element) {
     const tabs = document.querySelectorAll('.tab-item');
     tabs.forEach(tab => tab.classList.remove('active'));
@@ -234,7 +228,6 @@ function switchCategory(categoryName, element) {
         }
     });
 
-    // সার্চ বক্স থাকলে খালি করে দাও, যাতে ক্যাটাগরি আর সার্চ একসাথে গোলমাল না করে
     const searchInput = document.getElementById('product-search-input');
     if (searchInput && searchInput.value) {
         searchInput.value = "";
@@ -242,14 +235,12 @@ function switchCategory(categoryName, element) {
     }
 }
 
-// 🔍 সার্চ ফাংশন — টাইপ করার সাথে সাথে প্রোডাক্ট ফিল্টার হবে
 function searchProducts(query) {
     query = query.trim().toLowerCase();
     const mainGrid = document.getElementById('products-container');
     if (!mainGrid) return;
 
     if (query === "") {
-        // সার্চ খালি হলে, বর্তমানে যেই ক্যাটাগরি ট্যাব active আছে সেটাই আবার দেখাও
         const activeTab = document.querySelector('.tab-item.active');
         const activeCategoryText = activeTab ? activeTab.innerText.replace('⚡ ', '') : 'All';
         document.querySelectorAll('.product-card').forEach(card => card.style.display = '');
@@ -264,7 +255,6 @@ function searchProducts(query) {
         return;
     }
 
-    // সার্চ করার সময় সব ক্যাটাগরির ভেতর খোঁজো, ট্যাব ফিল্টার সাময়িক বন্ধ থাকবে
     let totalMatches = 0;
     document.querySelectorAll('.category-section').forEach(sec => {
         let sectionHasMatch = false;
@@ -308,7 +298,6 @@ function removeNoResultsMsg() {
     if (existing) existing.remove();
 }
 
-// 🏠 সার্চ থেকে হোমে (সব প্রোডাক্টে) ফিরে যাওয়ার ফাংশন
 function goToHomeView() {
     const searchInput = document.getElementById('product-search-input');
     if (searchInput) searchInput.value = "";
@@ -320,6 +309,71 @@ function goToHomeView() {
     switchCategory('All', allTab);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function initScrollRollEffect() {
+    const sections = document.querySelectorAll('.category-section');
+    if (!sections.length) return;
+
+    const rollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('roll-in');
+            } else {
+                entry.target.classList.remove('roll-in');
+            }
+        });
+    }, { threshold: 0.12 });
+
+    sections.forEach(section => {
+        section.classList.add('scroll-roll');
+        rollObserver.observe(section);
+    });
+}
+
+function initSwipeRollEffect() {
+    const rows = document.querySelectorAll('.products-grid');
+    if (!rows.length) return;
+
+    rows.forEach(row => {
+        let ticking = false;
+
+        const updateRoll = () => {
+            ticking = false;
+
+            const isHorizontallyScrollable = row.scrollWidth > row.clientWidth + 5;
+            const cards = row.querySelectorAll('.product-card');
+
+            if (!isHorizontallyScrollable) {
+                cards.forEach(card => { card.style.transform = ''; });
+                return;
+            }
+
+            const rowRect = row.getBoundingClientRect();
+            const rowCenter = rowRect.left + rowRect.width / 2;
+
+            cards.forEach(card => {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenter = cardRect.left + cardRect.width / 2;
+                const offset = (cardCenter - rowCenter) / rowRect.width; 
+                const angle = Math.max(-26, Math.min(26, offset * 55));
+                const scale = 1 - Math.min(Math.abs(offset) * 0.22, 0.1);
+
+                card.style.transformOrigin = offset > 0 ? 'left center' : 'right center';
+                card.style.transform = `perspective(900px) rotateY(${angle}deg) scale(${scale})`;
+            });
+        };
+
+        row.addEventListener('scroll', () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(updateRoll);
+            }
+        }, { passive: true });
+
+        window.addEventListener('resize', updateRoll);
+        updateRoll();
+    });
 }
 
 function changeCustomerVariant(id, colorName, imgUrl, price) {
