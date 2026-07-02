@@ -136,9 +136,9 @@ header {
     border-radius: 10px;
 }
 
-/* মোবাইলের কার্ড লেআউট */
+/* মোবাইলের নতুন কার্ড লেআউট (বাটন ছাড়া পারফেক্ট সাইজ) */
 .product-card {
-    flex: 0 0 260px;
+    flex: 0 0 220px;
     background: #ffffff;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
@@ -146,7 +146,7 @@ header {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 440px;
+    min-height: 310px;
     position: relative;
 }
 
@@ -224,35 +224,6 @@ header {
     cursor: pointer;
 }
 
-/* বাটন গ্রুপ */
-.btn-group {
-    display: flex;
-    gap: 8px;
-    margin-top: auto;
-    width: 100%;
-}
-
-.add-to-cart-btn, .buy-now-btn {
-    flex: 1;
-    padding: 12px 5px;
-    font-size: 12px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.add-to-cart-btn {
-    background: #e2e8f0;
-    color: #0f2635;
-}
-
-.buy-now-btn {
-    background: linear-gradient(90deg, #c5a059, #b59449);
-    color: #0f2635;
-}
-
 /* --- BOTTOM SHEET MODAL --- */
 .bottom-modal {
     display: none;
@@ -283,7 +254,7 @@ header {
 .submit-order-btn { background: #25D366; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
 
-/* --- 🖥️ PERFECT DESKTOP VIEW COMPATIBILITY (নিখুঁত বড় স্কয়ার লেআউট) --- */
+/* --- 🖥️ PERFECT DESKTOP VIEW COMPATIBILITY --- */
 @media (min-width: 768px) {
     .category-section {
         padding: 0 20px !important;
@@ -294,41 +265,38 @@ header {
         margin-bottom: 25px !important;
     }
 
-    /* ৪ কলামে চমৎকারভাবে গ্রিড সেট করা */
     .products-horizontal-grid {
         display: grid !important;
-        grid-template-columns: repeat(4, minmax(220px, 1fr)) !important; /* সর্বনিম্ন ২২০ পিক্সেল চওড়া হবে, সংকুচিত হবে না */
+        grid-template-columns: repeat(4, minmax(220px, 1fr)) !important; 
         gap: 24px !important;
         overflow-x: visible !important;
         white-space: normal !important;
         width: 100% !important;
     }
 
-    /* ডেক্সটপ কার্ডকে বড় এবং চারকোনা স্কয়ার (Square) লুক দেওয়া */
     .products-horizontal-grid .product-card {
         flex: 1 1 auto !important; 
         width: 100% !important;
-        min-width: 220px !important; /* ছোট হয়ে যাওয়ার রাস্তা বন্ধ */
+        min-width: 220px !important;
         max-width: 100% !important;
-        aspect-ratio: 1 / 1 !important; /* পারফেক্ট চারকোনা বর্গাকার */
-        min-height: 320px !important; /* উচ্চতা বজায় রাখবে */
+        aspect-ratio: unset !important; 
+        min-height: 340px !important; 
         display: flex !important;
         flex-direction: column !important;
     }
     
-    /* স্কয়ার বক্সের ভেতর ইমেজ সাইজ */
     .image-wrapper {
         width: 100% !important;
-        height: 48% !important;
+        height: 200px !important;
     }
 
-    /* স্কয়ার বক্সের ভেতর টেক্সট ও বাটনের ব্যালেন্স */
     .info-wrapper {
-        padding: 15px !important;
-        height: 52% !important;
+        padding: 12px 15px !important;
+        height: auto !important;
+        flex-grow: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: flex-start !important;
     }
 
     .product-title {
