@@ -26,9 +26,27 @@
         .cart-btn { 
             background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
             color: var(--primary); border: none; font-weight: 700; border-radius: 8px; 
-            cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 13px;
+            cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 10px; font-size: 11px;
         }
-        .cart-count { background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .cart-count { background: var(--primary); color: white; padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+
+        .nav-arrow-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: var(--accent);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .nav-arrow-btn:active { background: rgba(197, 160, 89, 0.3); transform: scale(0.92); }
 
         .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .main-layout { display: flex; gap: 40px; flex-wrap: wrap; }
@@ -52,6 +70,51 @@
         .btn-buy { background: var(--primary); color: var(--accent); }
         .details-section { margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px; }
         .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+
+        /* 📱 MOBILE STANDARD SIZING */
+        @media (max-width: 768px) {
+            body { padding: 10px; padding-bottom: 90px; }
+            header { padding: 8px 12px; margin-bottom: 12px; border-radius: 10px; }
+            header > div:first-child { gap: 6px; }
+            header img { height: 32px !important; width: 32px !important; }
+            header span[style*="font-size: 16px"] { font-size: 12px !important; }
+            .brand-top-line { font-size: 9px !important; }
+            .nav-arrow-btn { width: 26px; height: 26px; font-size: 13px; }
+            .cart-btn { padding: 5px 8px !important; font-size: 10px !important; }
+            .container { padding: 14px; border-radius: 12px; }
+            .main-layout { gap: 16px; }
+            .left-panel, .right-panel { min-width: 100%; flex-basis: 100%; }
+            .main-image-box { height: 260px; border-radius: 10px; }
+            .product-title { font-size: 17px; margin: 4px 0 6px 0; }
+            .price-tag { font-size: 20px; margin-bottom: 14px; }
+            .variant-section { margin-bottom: 16px; }
+            .variant-title { font-size: 13px; margin-bottom: 8px; }
+            .variant-card { width: 58px; padding: 5px; }
+            .variant-card img { height: 46px; }
+            .variant-card .v-name { font-size: 10px; }
+            .details-section { margin-top: 24px; padding-top: 20px; }
+            .tab-title { font-size: 15px; }
+            #prodDescription { font-size: 13px !important; }
+
+            /* 📌 Sticky Add to Cart / Buy Now bar */
+            .btn-group {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                margin-top: 0;
+                padding: 10px 12px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
+                background: rgba(255, 255, 255, 0.97);
+                backdrop-filter: blur(8px);
+                box-shadow: 0 -6px 20px rgba(15, 38, 53, 0.12);
+                border-top: 1px solid #e2e8f0;
+                box-sizing: border-box;
+                z-index: 150;
+                gap: 10px;
+            }
+            .btn { padding: 12px; font-size: 14px; }
+        }
 
         /* Cart Sidebar & Modal Styles */
         .cart-sidebar { position: fixed; top: 0; right: -360px; width: 350px; height: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: -10px 0 30px rgba(15, 38, 53, 0.08); z-index: 200; transition: cubic-bezier(0.4, 0, 0.2, 1) 0.35s; padding: 24px; display: flex; flex-direction: column; box-sizing: border-box; border-left: 1px solid rgba(197, 160, 89, 0.2); }
@@ -78,9 +141,16 @@
 <body>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="window.location.href='index.html'">
-        <img src="logo.JPG" alt="Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);">
-        <div style="font-size: 16px; font-weight: 700; color: var(--accent);">Bismillah Gadget Zone BD</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="nav-arrow-btn" onclick="goBackPage()" title="আগের পেজে যান">←</button>
+        <button class="nav-arrow-btn" onclick="goForwardPage()" title="পরের পেজে যান">→</button>
+        <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-left: 6px;" onclick="window.location.href='index.html'">
+            <img src="logo.JPG" alt="Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);">
+            <div style="display:flex; flex-direction:column; line-height:1.2;">
+                <span class="brand-top-line" style="font-size:18px; font-weight:800; color:var(--accent);">Bismillah</span>
+                <span style="font-size: 11px; font-weight: 600; color: #e8d5b0;">Gadget Zone BD</span>
+            </div>
+        </div>
     </div>
     <button class="cart-btn" onclick="toggleCart()">
         🛒 কার্ট <span class="cart-count" id="cartCount">0</span>
@@ -124,7 +194,7 @@
         <span>Total:</span>
         <span>৳ <span id="cartTotalAmount">0</span></span>
     </div>
-    <button class="checkout-btn" onclick="openCheckoutModal()">Proceed To Checkout</button>
+    <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
 </div>
 
 <div class="modal" id="orderModal">
@@ -152,7 +222,7 @@
                 <textarea id="address" required placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন" rows="3"></textarea>
             </div>
             <div class="form-actions">
-                <button type="button" class="cancel-btn" onclick="closeCheckoutModal()">Cancel</button>
+                <button type="button" class="cancel-btn" onclick="closeOrderModal()">Cancel</button>
                 <button type="submit" class="confirm-btn">Confirm Order 🚀</button>
             </div>
         </form>
