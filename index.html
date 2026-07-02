@@ -81,7 +81,6 @@
         }
         .nav-arrow-btn:active { background: rgba(197, 160, 89, 0.3); transform: scale(0.92); }
 
-        /* Navigation Tabs (স্টিকি করা হয়েছে এখানে) */
         .category-tabs-container { 
             background: white; 
             padding: 10px 5%; 
@@ -105,29 +104,60 @@
             .cart-btn { padding: 5px 8px; font-size: 10px; }
         }
 
-        /* Universal Container Fix */
         #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
         .category-section { width: 100%; margin-bottom: 20px; }
+
         .products-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
+            display: flex; 
             gap: 12px; 
-            padding: 12px;
+            padding: 12px 12px 18px 12px;
             box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            perspective: 1200px;
+        }
+        .products-grid::-webkit-scrollbar { display: none; }
+
+        .products-grid .product-card {
+            flex: 0 0 52%; 
+            max-width: 200px;
+            scroll-snap-align: start;
         }
 
         @media (min-width: 600px) {
-            .products-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 16px; }
+            .products-grid { 
+                display: grid; 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 16px; 
+                padding: 16px; 
+                overflow-x: visible; 
+            }
+            .products-grid .product-card { flex: unset; max-width: none; }
         }
         @media (min-width: 900px) {
             .products-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
             .info-wrapper { padding: 12px; }
-            .product-title { font-size: 13px; }
-            .price { font-size: 15px; }
-            .add-to-cart-btn, .buy-now-btn { font-size: 11px; padding: 8px 4px; }
+            .product-title { font-size: 14px; margin-bottom: 6px; }
+            .price { font-size: 16px; font-weight: 700; }
         }
 
-        /* Responsive Product Cards */
+        .scroll-roll {
+            opacity: 0;
+            transform: perspective(1000px) rotateX(-62deg) translateY(46px);
+            transform-origin: top center;
+            transition: transform 0.75s cubic-bezier(.22,.9,.32,1), opacity 0.6s ease;
+            will-change: transform, opacity;
+        }
+        .scroll-roll.roll-in {
+            opacity: 1;
+            transform: perspective(1000px) rotateX(0deg) translateY(0);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-roll, .scroll-roll.roll-in { opacity: 1; transform: none; transition: none; }
+        }
+
         .product-card { 
             background: rgba(255, 255, 255, 0.55); 
             backdrop-filter: blur(14px) saturate(160%); 
@@ -144,7 +174,6 @@
             box-shadow: 0 8px 28px rgba(15, 38, 53, 0.08);
             transition: transform 0.35s ease, box-shadow 0.35s ease;
         }
-        /* 🖥️ ভাসমান (floating) অ্যানিমেশন শুধু ডেস্কটপ/মাউস ডিভাইসে — টাচ স্ক্রিনে এটা রাখলে ট্যাপ/ক্লিক ঠিকমতো কাজ করে না */
         @media (hover: hover) and (pointer: fine) {
             .product-card { animation: cardFloat 5s ease-in-out infinite; }
             .product-card:nth-child(2n) { animation-delay: -1.6s; }
@@ -171,12 +200,6 @@
         .variant-dots { display: flex; gap: 4px; margin-bottom: 6px; }
         .variant-dots button { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; padding: 0; }
 
-        .btn-group { display: flex; gap: 6px; margin-top: auto; }
-        .add-to-cart-btn, .buy-now-btn { flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; text-align: center; border: none; }
-        .add-to-cart-btn { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(6px); color: var(--primary); border: 1px solid var(--primary); }
-        .buy-now-btn { background: var(--primary); color: var(--accent); }
-
-        /* Sidebar Cart Panel */
         .cart-sidebar { position: fixed; top: 0; right: -340px; width: 320px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: 0.3s ease; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; }
         .cart-sidebar.open { right: 0; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
@@ -185,7 +208,6 @@
         .cart-total { font-size: 16px; font-weight: bold; padding: 15px 0; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
         .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
 
-        /* Floating Modern Order Modal Center Fix */
         .order-modal-overlay { 
             display: none; 
             position: fixed; 
@@ -221,7 +243,6 @@
         .input-box input, .input-box textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
         .submit-order-btn { background: #25d366; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 10px; }
 
-        /* 🔍 Search Bar */
         .search-bar-wrapper {
             background: var(--primary);
             padding: 12px 5% 14px 5%;
