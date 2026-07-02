@@ -15,6 +15,19 @@ function toggleCart() {
     if (sidebarProduct) sidebarProduct.classList.toggle('open');
 }
 
+// ⬅️➡️ পেজ নেভিগেশন (আগের/পরের পেজে যাওয়ার জন্য)
+function goBackPage() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+function goForwardPage() {
+    window.history.forward();
+}
+
 function addToCart(id, name, price) {
     let cleanPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : parseFloat(price);
     let variant = selectedVariantsGlobal[id] || "Standard";
@@ -91,9 +104,27 @@ function closeOrderModal() {
 }
 
 function sendOrderToWhatsApp() {
-    const name = document.getElementById('customer-name').value.trim();
-    const phone = document.getElementById('customer-phone').value.trim();
-    const address = document.getElementById('customer-address').value.trim();
+    // index.html ফর্ম ফিল্ড (customer-name, customer-phone, customer-address)
+    const nameFieldIndex = document.getElementById('customer-name');
+    // product.html ফর্ম ফিল্ড (name, phone, zilla, upazila, address)
+    const nameFieldProduct = document.getElementById('name');
+
+    let name, phone, address;
+
+    if (nameFieldIndex) {
+        // index.html থেকে সাবমিট হয়েছে
+        name = nameFieldIndex.value.trim();
+        phone = document.getElementById('customer-phone').value.trim();
+        address = document.getElementById('customer-address').value.trim();
+    } else if (nameFieldProduct) {
+        // product.html থেকে সাবমিট হয়েছে
+        name = nameFieldProduct.value.trim();
+        phone = document.getElementById('phone').value.trim();
+        const zilla = document.getElementById('zilla').value.trim();
+        const upazila = document.getElementById('upazila').value.trim();
+        const fullAddress = document.getElementById('address').value.trim();
+        address = `${fullAddress}, ${upazila}, ${zilla}`;
+    }
 
     if (!name || !phone || !address) { alert("দয়া করে সম্পূর্ণ তথ্য পূরণ করুন!"); return; }
 
@@ -169,7 +200,7 @@ function renderCategoryWiseColumns() {
             }
 
             categoryHTML += `
-                <div class="product-card" onclick="window.open('product.html?id=${key}', '_blank')">
+                <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${category.toLowerCase()}" onclick="window.open('product.html?id=${key}', '_blank')">
                     <div class="image-wrapper">
                         <img id="cust-img-${key}" src="${defaultImage}">
                     </div>
@@ -202,6 +233,93 @@ function switchCategory(categoryName, element) {
             sec.style.display = 'none';
         }
     });
+
+    // সার্চ বক্স থাকলে খালি করে দাও, যাতে ক্যাটাগরি আর সার্চ একসাথে গোলমাল না করে
+    const searchInput = document.getElementById('product-search-input');
+    if (searchInput && searchInput.value) {
+        searchInput.value = "";
+        removeNoResultsMsg();
+    }
+}
+
+// 🔍 সার্চ ফাংশন — টাইপ করার সাথে সাথে প্রোডাক্ট ফিল্টার হবে
+function searchProducts(query) {
+    query = query.trim().toLowerCase();
+    const mainGrid = document.getElementById('products-container');
+    if (!mainGrid) return;
+
+    if (query === "") {
+        // সার্চ খালি হলে, বর্তমানে যেই ক্যাটাগরি ট্যাব active আছে সেটাই আবার দেখাও
+        const activeTab = document.querySelector('.tab-item.active');
+        const activeCategoryText = activeTab ? activeTab.innerText.replace('⚡ ', '') : 'All';
+        document.querySelectorAll('.product-card').forEach(card => card.style.display = '');
+        document.querySelectorAll('.category-section').forEach(sec => {
+            if (activeCategoryText === 'All' || sec.id === `sec-${activeCategoryText.replace(/\s+/g, '-')}`) {
+                sec.style.display = 'block';
+            } else {
+                sec.style.display = 'none';
+            }
+        });
+        removeNoResultsMsg();
+        return;
+    }
+
+    // সার্চ করার সময় সব ক্যাটাগরির ভেতর খোঁজো, ট্যাব ফিল্টার সাময়িক বন্ধ থাকবে
+    let totalMatches = 0;
+    document.querySelectorAll('.category-section').forEach(sec => {
+        let sectionHasMatch = false;
+        sec.querySelectorAll('.product-card').forEach(card => {
+            const name = card.getAttribute('data-name') || '';
+            const category = card.getAttribute('data-category') || '';
+            if (name.includes(query) || category.includes(query)) {
+                card.style.display = '';
+                sectionHasMatch = true;
+                totalMatches++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        sec.style.display = sectionHasMatch ? 'block' : 'none';
+    });
+
+    if (totalMatches === 0) {
+        showNoResultsMsg(query);
+    } else {
+        removeNoResultsMsg();
+    }
+}
+
+function showNoResultsMsg(query) {
+    removeNoResultsMsg();
+    const mainGrid = document.getElementById('products-container');
+    const msg = document.createElement('div');
+    msg.className = 'no-results-msg';
+    msg.id = 'no-results-msg';
+    msg.innerHTML = `
+        😕 "${query}" এর সাথে মিলে এমন কোনো প্রোডাক্ট পাওয়া যায়নি।
+        <br>
+        <button class="home-btn" onclick="goToHomeView()">🏠 হোমে ফিরে যান</button>
+    `;
+    mainGrid.appendChild(msg);
+}
+
+function removeNoResultsMsg() {
+    const existing = document.getElementById('no-results-msg');
+    if (existing) existing.remove();
+}
+
+// 🏠 সার্চ থেকে হোমে (সব প্রোডাক্টে) ফিরে যাওয়ার ফাংশন
+function goToHomeView() {
+    const searchInput = document.getElementById('product-search-input');
+    if (searchInput) searchInput.value = "";
+
+    removeNoResultsMsg();
+    document.querySelectorAll('.product-card').forEach(card => card.style.display = '');
+
+    const allTab = document.querySelector('.tab-item');
+    switchCategory('All', allTab);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function changeCustomerVariant(id, colorName, imgUrl, price) {
