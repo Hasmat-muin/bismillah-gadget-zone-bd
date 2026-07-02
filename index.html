@@ -49,8 +49,19 @@
         }
         .cart-count { background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: bold; }
 
-        /* Navigation Tabs */
-        .category-tabs-container { background: white; padding: 10px 5%; border-bottom: 1px solid #e2e8f0; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; }
+        /* Navigation Tabs (স্টিকি করা হয়েছে এখানে) */
+        .category-tabs-container { 
+            background: white; 
+            padding: 10px 5%; 
+            border-bottom: 1px solid #e2e8f0; 
+            display: flex; 
+            gap: 10px; 
+            overflow-x: auto; 
+            white-space: nowrap;
+            position: sticky; 
+            top: 67px; 
+            z-index: 999; 
+        }
         .tab-item { padding: 8px 16px; background: #f1f5f9; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
         .tab-item.active { background: var(--primary); color: var(--accent); }
 
@@ -59,7 +70,7 @@
         .category-section { width: 100%; margin-bottom: 20px; }
         .products-grid { 
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* Mobile default 2 columns */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 12px; 
             padding: 12px;
             box-sizing: border-box;
@@ -148,12 +159,8 @@
         </button>
     </header>
 
-    <div class="category-tabs-container">
+    <div class="category-tabs-container" id="dynamic-category-tabs">
         <button class="tab-item active" onclick="switchCategory('All', this)">⚡ All Items</button>
-        <button class="tab-item" onclick="switchCategory('Smart Watch', this)">Smart Watch</button>
-        <button class="tab-item" onclick="switchCategory('Earbuds', this)">Earbuds</button>
-        <button class="tab-item" onclick="switchCategory('Power Bank', this)">Power Bank</button>
-        <button class="tab-item" onclick="switchCategory('Adapter', this)">Adapter</button>
     </div>
 
     <main id="products-container"></main>
