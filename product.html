@@ -53,7 +53,7 @@
         .details-section { margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px; }
         .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
 
-        /* Sidebar & Modal Styles */
+        /* Cart Sidebar & Modal Styles */
         .cart-sidebar { position: fixed; top: 0; right: -360px; width: 350px; height: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: -10px 0 30px rgba(15, 38, 53, 0.08); z-index: 200; transition: cubic-bezier(0.4, 0, 0.2, 1) 0.35s; padding: 24px; display: flex; flex-direction: column; box-sizing: border-box; border-left: 1px solid rgba(197, 160, 89, 0.2); }
         .cart-sidebar.open { right: 0; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; }
@@ -124,13 +124,13 @@
         <span>Total:</span>
         <span>৳ <span id="cartTotalAmount">0</span></span>
     </div>
-    <button class="checkout-btn" onclick="openCheckoutModal(false)">Proceed To Checkout</button>
+    <button class="checkout-btn" onclick="openCheckoutModal()">Proceed To Checkout</button>
 </div>
 
 <div class="modal" id="orderModal">
     <div class="modal-content">
         <h3 id="modalTitle">Checkout Details (অর্ডার ফর্ম)</h3>
-        <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+        <form onsubmit="sendOrderToWhatsApp(); return false;">
             <div class="form-group">
                 <label>Your Name (আপনার নাম):</label>
                 <input type="text" id="name" required placeholder="যেমন: হামিম হাসনাত">
@@ -186,14 +186,8 @@
                 if (colorKeys.length > 0) {
                     currentSelectedColor = colorKeys[0];
                     let firstVariant = product.variants[colorKeys[0]];
-                    
-                    if (typeof firstVariant === 'object' && firstVariant !== null) {
-                        document.getElementById('mainProdImage').src = firstVariant.image || product.mainImage;
-                        currentPrice = firstVariant.price || product.price;
-                    } else {
-                        document.getElementById('mainProdImage').src = firstVariant;
-                        currentPrice = product.price;
-                    }
+                    document.getElementById('mainProdImage').src = firstVariant.image || product.mainImage;
+                    currentPrice = firstVariant.price || product.price;
                 } else {
                     document.getElementById('mainProdImage').src = product.mainImage;
                     currentPrice = product.price;
@@ -207,19 +201,9 @@
                     colorKeys.forEach((color, idx) => {
                         const isActive = idx === 0 ? 'active' : '';
                         let vVariant = product.variants[color];
-                        let vImage = "";
-                        let vPrice = product.price;
-                        
-                        if (typeof vVariant === 'object' && vVariant !== null) {
-                            vImage = vVariant.image;
-                            vPrice = vVariant.price || product.price;
-                        } else {
-                            vImage = vVariant;
-                        }
-                        
                         variantGrid.innerHTML += `
-                            <div class="variant-card ${isActive}" onclick="changeVariantLocal('${color}', '${vImage}', ${vPrice}, this)">
-                                <img src="${vImage}" alt="${color}">
+                            <div class="variant-card ${isActive}" onclick="changeVariantLocal('${color}', '${vVariant.image}', ${vVariant.price}, this)">
+                                <img src="${vVariant.image}" alt="${color}">
                                 <span class="v-name">${color}</span>
                             </div>
                         `;
@@ -228,25 +212,18 @@
                     document.querySelector('.variant-section').style.display = 'none';
                 }
 
-                // 🛒 'Add To Cart' ক্লিক ইভেন্ট (গ্লোবাল ফাংশন কল করবে)
-                document.getElementById('pageCartBtn').onclick = function() {
+                document.getElementById('pageCartBtn').onclick = () => {
                     selectedVariantsGlobal[productId] = currentSelectedColor;
                     addToCart(productId, globalProductName, currentPrice);
                     toggleCart(); 
                 };
 
-                // 🚀 'Buy Now' ক্লিক ইভেন্ট (গ্লোবাল ফাংশন কল করবে)
-                document.getElementById('pageBuyBtn').onclick = function() {
+                document.getElementById('pageBuyBtn').onclick = () => {
                     selectedVariantsGlobal[productId] = currentSelectedColor;
                     buyNow(productId, globalProductName, currentPrice);
                 };
 
-            } else {
-                document.getElementById('prodTitle').innerText = "প্রোডাক্টটি পাওয়া যায়নি!";
             }
-        }).catch(err => {
-            console.error(err);
-            document.getElementById('prodTitle').innerText = "ডাটা লোড করতে সমস্যা হয়েছে!";
         });
     }
 
@@ -255,7 +232,6 @@
         currentSelectedColor = colorName;
         currentPrice = vPrice; 
         document.getElementById('prodPrice').innerText = vPrice; 
-        
         document.querySelectorAll('.variant-card').forEach(card => card.classList.remove('active'));
         element.classList.add('active');
     }
