@@ -197,12 +197,14 @@ function renderCategoryWiseColumns() {
 
             categoryHTML += `
                 <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${category.toLowerCase()}" onclick="window.open('product.html?id=${key}', '_blank')">
-                    <div class="image-wrapper">
-                        <img id="cust-img-${key}" src="${defaultImage}">
-                    </div>
-                    <div class="info-wrapper">
-                        <h3 class="product-title">${prod.name}</h3>
-                        <p class="price" id="cust-price-${key}">৳ ${defaultPrice}</p>
+                    <div class="card-body">
+                        <div class="image-wrapper">
+                            <img id="cust-img-${key}" src="${defaultImage}">
+                        </div>
+                        <div class="info-wrapper">
+                            <h3 class="product-title">${prod.name}</h3>
+                            <p class="price" id="cust-price-${key}">৳ ${defaultPrice}</p>
+                        </div>
                     </div>
                 </div>`;
         });
@@ -212,7 +214,8 @@ function renderCategoryWiseColumns() {
     });
 
     initScrollRollEffect();
-    initSwipeRollEffect();
+    // ❌ বেঁকে স্ক্রল হওয়ার ইফেক্টটি (initSwipeRollEffect) এখান থেকে রিমুভ করা হয়েছে
+    initJellyOnStopEffect();
 }
 
 function switchCategory(categoryName, element) {
@@ -331,48 +334,44 @@ function initScrollRollEffect() {
     });
 }
 
-function initSwipeRollEffect() {
-    const rows = document.querySelectorAll('.products-grid');
-    if (!rows.length) return;
+// 🍮 স্ক্রল বা সোয়াইপ থামলে প্রোডাক্ট কার্ড গুলো জেলি'র মতো শেক করবে
+function initJellyOnStopEffect() {
+    const playJelly = (card) => {
+        if (!card) return;
+        card.classList.remove('jelly-shake');
+        void card.offsetWidth; 
+        card.classList.add('jelly-shake');
+    };
 
-    rows.forEach(row => {
-        let ticking = false;
-
-        const updateRoll = () => {
-            ticking = false;
-
-            const isHorizontallyScrollable = row.scrollWidth > row.clientWidth + 5;
-            const cards = row.querySelectorAll('.product-card');
-
-            if (!isHorizontallyScrollable) {
-                cards.forEach(card => { card.style.transform = ''; });
-                return;
+    const jellyVisibleCards = (container) => {
+        const cards = container.querySelectorAll('.product-card');
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const inView = rect.right > 0 && rect.left < (window.innerWidth || document.documentElement.clientWidth);
+            if (inView) {
+                playJelly(card);
             }
+        });
+    };
 
-            const rowRect = row.getBoundingClientRect();
-            const rowCenter = rowRect.left + rowRect.width / 2;
+    // 🖐️ উলম্ব (vertical) পেজ স্ক্রল থামলে
+    let windowScrollTimer = null;
+    window.addEventListener('scroll', () => {
+        if (windowScrollTimer) clearTimeout(windowScrollTimer);
+        windowScrollTimer = setTimeout(() => {
+            jellyVisibleCards(document);
+        }, 140);
+    }, { passive: true });
 
-            cards.forEach(card => {
-                const cardRect = card.getBoundingClientRect();
-                const cardCenter = cardRect.left + cardRect.width / 2;
-                const offset = (cardCenter - rowCenter) / rowRect.width; 
-                const angle = Math.max(-26, Math.min(26, offset * 55));
-                const scale = 1 - Math.min(Math.abs(offset) * 0.22, 0.1);
-
-                card.style.transformOrigin = offset > 0 ? 'left center' : 'right center';
-                card.style.transform = `perspective(900px) rotateY(${angle}deg) scale(${scale})`;
-            });
-        };
-
+    // 👉 প্রতিটি প্রোডাক্ট সারি (horizontal swipe) থামলে
+    document.querySelectorAll('.products-grid, .products-horizontal-grid').forEach(row => {
+        let rowScrollTimer = null;
         row.addEventListener('scroll', () => {
-            if (!ticking) {
-                ticking = true;
-                requestAnimationFrame(updateRoll);
-            }
+            if (rowScrollTimer) clearTimeout(rowScrollTimer);
+            rowScrollTimer = setTimeout(() => {
+                jellyVisibleCards(row);
+            }, 140);
         }, { passive: true });
-
-        window.addEventListener('resize', updateRoll);
-        updateRoll();
     });
 }
 
