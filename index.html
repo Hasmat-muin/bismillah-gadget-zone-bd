@@ -159,11 +159,11 @@
         }
 
         .product-card { 
-            background: rgba(255, 255, 255, 0.55); 
-            backdrop-filter: blur(14px) saturate(160%); 
-            -webkit-backdrop-filter: blur(14px) saturate(160%); 
+            background: rgba(255, 255, 255, 0.32); 
+            backdrop-filter: blur(18px) saturate(180%); 
+            -webkit-backdrop-filter: blur(18px) saturate(180%); 
             border-radius: 16px; 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.55); 
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
@@ -171,8 +171,66 @@
             position: relative; 
             min-height: auto; 
             height: auto;
-            box-shadow: 0 8px 28px rgba(15, 38, 53, 0.08);
+            box-shadow: 0 8px 28px rgba(15, 38, 53, 0.10), inset 0 1px 0 rgba(255,255,255,0.5);
             transition: transform 0.35s ease, box-shadow 0.35s ease;
+            isolation: isolate;
+        }
+
+        /* 💧 জলের মতো চকচকে শাইন - কার্ডের উপর দিয়ে হালকা আলো বয়ে যায় */
+        .product-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(
+                115deg,
+                transparent 20%,
+                rgba(255,255,255,0.55) 42%,
+                rgba(255,255,255,0.08) 50%,
+                transparent 65%
+            );
+            background-size: 250% 250%;
+            background-position: 120% -20%;
+            animation: waterSheen 6s ease-in-out infinite;
+            mix-blend-mode: screen;
+        }
+        .product-card:nth-child(2n)::before { animation-delay: -1.5s; }
+        .product-card:nth-child(3n)::before { animation-delay: -3s; }
+        .product-card:nth-child(4n)::before { animation-delay: -4.4s; }
+
+        @keyframes waterSheen {
+            0%   { background-position: 130% -30%; }
+            50%  { background-position: -10% 120%; }
+            100% { background-position: 130% -30%; }
+        }
+
+        /* কার্ডের ছবি ও লেখা যেন সবসময় পরিষ্কার/স্বচ্ছ দেখা যায় (শাইনের উপরে থাকবে) */
+        .card-body {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            transform-origin: center center;
+        }
+
+        /* 🍮 জেলি শেক ইফেক্ট - স্ক্রল/সোয়াইপ থামলে চালু হবে */
+        @keyframes jellyWobble {
+            0%   { transform: scale3d(1, 1, 1); }
+            18%  { transform: scale3d(1.09, 0.91, 1) translateY(-1px); }
+            36%  { transform: scale3d(0.93, 1.08, 1); }
+            54%  { transform: scale3d(1.05, 0.95, 1); }
+            70%  { transform: scale3d(0.98, 1.02, 1); }
+            85%  { transform: scale3d(1.015, 0.985, 1); }
+            100% { transform: scale3d(1, 1, 1); }
+        }
+        .card-body.jelly-shake {
+            animation: jellyWobble 0.65s cubic-bezier(.36, 1.75, .4, 1) both;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .product-card::before { animation: none; display: none; }
+            .card-body.jelly-shake { animation: none; }
         }
         @media (hover: hover) and (pointer: fine) {
             .product-card { animation: cardFloat 5s ease-in-out infinite; }
@@ -190,10 +248,10 @@
             box-shadow: 0 20px 45px rgba(15, 38, 53, 0.18); 
             border-color: rgba(197, 160, 89, 0.5);
         }
-        .image-wrapper { width: 100%; aspect-ratio: 1/1; background: rgba(248, 250, 252, 0.35); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .image-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .image-wrapper { width: 100%; aspect-ratio: 1/1; background: rgba(248, 250, 252, 0.35); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; filter: none; }
         
-        .info-wrapper { padding: 8px 10px; display: flex; flex-direction: column; flex-grow: 1; background: rgba(255, 255, 255, 0.25); }
+        .info-wrapper { padding: 8px 10px; display: flex; flex-direction: column; flex-grow: 1; background: rgba(255, 255, 255, 0.4); position: relative; z-index: 2; }
         .product-title { font-size: 13px; line-height: 1.3; font-weight: 600; margin: 0 0 4px 0; color: var(--primary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .price { font-size: 14px; font-weight: 700; color: #10b981; margin: 0 0 6px 0; }
         
