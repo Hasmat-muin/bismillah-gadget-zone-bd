@@ -136,29 +136,46 @@ header {
     border-radius: 10px;
 }
 
-/* মোবাইলের নতুন কার্ড লেআউট (বাটন ছাড়া পারফেক্ট সাইজ) */
+/* মোবাইলের নতুন কার্ড লেআউট */
 .product-card {
     flex: 0 0 220px;
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-    overflow: hidden;
+    overflow: visible; /* জেলি বাউন্সের জন্য ভিজিবল রাখা হলো */
     display: flex;
     flex-direction: column;
     min-height: 310px;
     position: relative;
+    isolation: isolate;
+    background: transparent !important; /* মেইন ব্যাকগ্রাউন্ড ট্রান্সপারেন্ট */
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+}
+
+/* 🍮 ভিডিওর মতো রিয়েল জেলি বক্স তৈরি করার ব্যাকগ্রাউন্ড লেয়ার */
+.product-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    z-index: -1;
+    transform-origin: center bottom;
+    will-change: transform;
 }
 
 /* ইমেজ রেপার */
 .image-wrapper {
-    background: #f8fafc;
+    background: rgba(248, 250, 252, 0.6);
     width: 100%;
     height: 180px;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
 
 .image-wrapper img {
@@ -209,7 +226,7 @@ header {
     margin-bottom: 10px;
 }
 
-/* কালার ভ্যারিয়েন্ট ডটস */
+/* কালার ভ্যারিয়েন্ট ডটস */
 .variant-dots {
     display: flex;
     gap: 6px;
@@ -317,4 +334,21 @@ header {
     .modal-body {
         border-radius: 12px !important;
     }
+}
+
+/* ==========================================================================
+   💧 🍮 REAL LIQUID JELLY WOBBLE ANIMATION SYSTEM
+   ========================================================================== */
+.product-card.jelly-shake::before {
+    animation: elasticWaterJelly 0.75s cubic-bezier(0.25, 1.1, 0.5, 1) both;
+}
+
+@keyframes elasticWaterJelly {
+    0% { transform: scale3d(1, 1, 1) skewX(0deg); }
+    15% { transform: scale3d(1.14, 0.86, 1) skewX(-7deg); }   /* সোয়াইপ ব্রেক এ বামে হেলে যাবে */
+    30% { transform: scale3d(0.92, 1.08, 1) skewX(5deg); }    /* রিবাউন্ডে ডানে যাবে */
+    45% { transform: scale3d(1.05, 0.95, 1) skewX(-3deg); }   /* সেটেলিং ফেইজ */
+    60% { transform: scale3d(0.98, 1.02, 1) skewX(1.5deg); }
+    75% { transform: scale3d(1.01, 0.99, 1) skewX(-0.5deg); }
+    100% { transform: scale3d(1, 1, 1) skewX(0deg); }         /* নরমাল স্টেট */
 }
