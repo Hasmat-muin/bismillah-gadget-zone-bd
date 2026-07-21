@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bismillah Gadget Zone BD</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #0f2635;
+            --accent: #c5a059;
+            --accent-light: #e0be7a;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg-main); 
+            margin: 0; 
+            padding: 0; 
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 12% 15%, rgba(197, 160, 89, 0.16), transparent 42%),
+                radial-gradient(circle at 88% 25%, rgba(15, 38, 53, 0.10), transparent 45%),
+                radial-gradient(circle at 30% 85%, rgba(197, 160, 89, 0.12), transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(15, 38, 53, 0.08), transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header { 
+            background: var(--primary); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            border-bottom: 3px solid var(--accent);
+            box-shadow: 0 4px 20px rgba(15, 38, 53, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .site-logo { height: 40px; width: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        .brand-name { color: var(--accent); font-size: 18px; font-weight: 700; }
+
+        .cart-btn { 
+            background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
+            color: var(--primary); border: none; font-weight: 700; border-radius: 8px; 
+            cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 10px; font-size: 12px;
+        }
+        .cart-count { background: var(--primary); color: white; padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+
+        .nav-arrow-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: var(--accent);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .nav-arrow-btn:active { background: rgba(197, 160, 89, 0.3); transform: scale(0.92); }
+
+        .category-tabs-container { 
+            background: white; 
+            padding: 10px 5%; 
+            border-bottom: 1px solid #e2e8f0; 
+            display: flex; 
+            gap: 10px; 
+            overflow-x: auto; 
+            white-space: nowrap;
+            position: sticky; 
+            top: 133px; 
+            z-index: 999; 
+        }
+        .tab-item { padding: 8px 16px; background: #f1f5f9; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .tab-item.active { background: var(--primary); color: var(--accent); }
+
+        @media (max-width: 380px) {
+            .site-logo { height: 32px; width: 32px; }
+            .brand-top { font-size: 10px; }
+            .brand-name { font-size: 13px; }
+            .nav-arrow-btn { width: 26px; height: 26px; font-size: 13px; }
+            .cart-btn { padding: 5px 8px; font-size: 10px; }
+        }
+
+        #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
+        .category-section { width: 100%; margin-bottom: 20px; }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 15px 10px 15px;
+            position: relative;
+        }
+        .see-more-link {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            cursor: pointer;
+            white-space: nowrap;
+            background: rgba(197, 160, 89, 0.12);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            transition: 0.2s;
+        }
+        .see-more-link:active { transform: scale(0.95); background: rgba(197, 160, 89, 0.25); }
+
+        .products-grid.full-view {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 14px !important;
+            overflow: visible !important;
+            scroll-snap-type: none !important;
+            padding: 12px !important;
+        }
+        .products-grid.full-view .product-card {
+            flex: unset !important;
+            max-width: none !important;
+            scroll-snap-align: unset !important;
+        }
+        @media (min-width: 600px) {
+            .products-grid.full-view { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (min-width: 900px) {
+            .products-grid.full-view { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+
+        #back-to-all-wrap {
+            display: none;
+            background: #fff;
+            padding: 10px 5%;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 133px;
+            z-index: 999;
+        }
+        .back-to-all-btn {
+            background: var(--primary);
+            color: var(--accent);
+            border: none;
+            padding: 9px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .full-view-heading {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        .products-grid { 
+            display: flex; 
+            gap: 12px; 
+            padding: 12px 12px 18px 12px;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .products-grid::-webkit-scrollbar { display: none; }
+
+        .products-grid .product-card {
+            flex: 0 0 52%; 
+            max-width: 200px;
+            scroll-snap-align: start;
+        }
+
+        @media (min-width: 600px) {
+            .products-grid { 
+                display: grid; 
+                grid-template-columns: repeat(3, 1fr); 
+                gap: 16px; 
+                padding: 16px; 
+                overflow-x: visible; 
+            }
+            .products-grid .product-card { flex: unset; max-width: none; }
+        }
+        @media (min-width: 900px) {
+            .products-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
+        }
+
+        .cart-sidebar { position: fixed; top: 0; right: -340px; width: 320px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: 0.3s ease; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .close-cart { font-size: 24px; cursor: pointer; background: none; border: none; color: var(--text-muted); }
+        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-top: 10px; }
+        .cart-total { font-size: 16px; font-weight: bold; padding: 15px 0; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
+
+        .order-modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 38, 53, 0.6); 
+            z-index: 3000; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .modal-body { 
+            background: white; 
+            width: 100%; 
+            max-width: 420px; 
+            border-radius: 16px; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-header h3 { margin: 0; font-size: 16px; color: var(--primary); }
+        .close-icon { font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .selected-product-text { background: #f8fafc; border-left: 3px solid var(--accent); padding: 8px 12px; font-size: 12px; margin-bottom: 15px; border-radius: 4px; white-space: pre-line; color: var(--primary); font-weight: 500; }
+        
+        .input-box { margin-bottom: 12px; text-align: left; }
+        .input-box label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-dark); }
+        .input-box input, .input-box textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        .submit-order-btn { background: #25d366; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 10px; }
+
+        .search-bar-wrapper {
+            background: var(--primary);
+            padding: 12px 5% 14px 5%;
+            position: sticky;
+            top: 67px;
+            z-index: 998;
+        }
+        .search-bar-box {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-bar-box input {
+            width: 100%;
+            padding: 11px 40px 11px 16px;
+            border-radius: 24px;
+            border: 1.5px solid rgba(197, 160, 89, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+        .search-bar-box input::placeholder { color: rgba(255,255,255,0.55); }
+        .search-bar-box input:focus {
+            background: #ffffff;
+            color: var(--text-dark);
+            border-color: var(--accent);
+        }
+        .search-bar-box input:focus::placeholder { color: #94a3b8; }
+        .search-icon {
+            position: absolute;
+            right: 14px;
+            font-size: 15px;
+            color: var(--accent);
+            pointer-events: none;
+        }
+        .no-results-msg {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area" style="gap: 6px;">
+            <button class="nav-arrow-btn" onclick="goBackPage()" title="আগের পেজে যান">←</button>
+            <button class="nav-arrow-btn" onclick="goForwardPage()" title="পরের পেজে যান">→</button>
+            <div style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-left:4px;" onclick="window.location.reload();">
+                <img src="logo.JPG" class="site-logo" alt="Logo">
+                <div style="display:flex; flex-direction:column; line-height:1.2;">
+                    <span class="brand-top" style="font-size:18px; font-weight:800; color:var(--accent);">Bismillah</span>
+                    <span class="brand-name" style="font-size:11px; font-weight:600; color:#e8d5b0;">Gadget Zone BD</span>
+                </div>
+            </div>
+        </div>
+        <button class="cart-btn" onclick="toggleCart()">
+            🛒 কার্ট <span class="cart-count" id="cart-count">0</span>
+        </button>
+    </header>
+
+    <div class="search-bar-wrapper">
+        <div class="search-bar-box">
+            <input type="text" id="product-search-input" placeholder="প্রোডাক্ট খুঁজুন... (যেমন: earbuds, watch)" oninput="searchProducts(this.value)">
+            <span class="search-icon">🔍</span>
+        </div>
+    </div>
+
+    <div class="category-tabs-container" id="dynamic-category-tabs">
+        <button class="tab-item active" onclick="switchCategory('All', this)">⚡ All Items</button>
+    </div>
+
+    <div id="back-to-all-wrap">
+        <button class="back-to-all-btn" onclick="exitFullCategoryView()">⬅ সব ক্যাটাগরি দেখুন</button>
+        <span class="full-view-heading" id="full-view-heading-text"></span>
+    </div>
+
+    <main id="products-container"></main>
+
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3 style="margin:0; font-size:16px;">শপিং কার্ট</h3>
+            <button class="close-cart" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items-list" id="cart-items-container"></div>
+        <div class="cart-total">
+            <span>Total:</span>
+            <span>৳ <span id="cart-total-price">0</span></span>
+        </div>
+        <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
+    </div>
+
+    <div class="order-modal-overlay" id="order-modal">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h3>Confirm Order via WhatsApp</h3>
+                <span class="close-icon" onclick="closeOrderModal()">&times;</span>
+            </div>
+            <div class="selected-product-text" id="selected-products-summary"></div>
+            
+            <div class="input-box">
+                <label>আপনার নাম (Your Name)</label>
+                <input type="text" id="customer-name" placeholder="এখানে নাম লিখুন" required>
+            </div>
+            <div class="input-box">
+                <label>মোবাইল নাম্বার (Mobile Number)</label>
+                <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের মোবাইল নম্বর" required>
+            </div>
+            <div class="input-box">
+                <label>পূর্ণাঙ্গ ঠিকানা (Full Address)</label>
+                <textarea id="customer-address" placeholder="গ্রাম/রোড, থানা, জেলা উল্লেখ করুন" required rows="3"></textarea>
+            </div>
+            <button class="submit-order-btn" onclick="sendOrderToWhatsApp()">Confirm Order on WhatsApp 🚀</button>
+        </div>
+    </div>
+
+    <!-- 👆 Swipe Hand Cursor Animation Overlay -->
+    <div id="swipe-guide-overlay" class="swipe-guide-overlay" onclick="closeSwipeGuide()">
+        <div class="swipe-guide-content">
+            <div class="hand-icon">👆</div>
+            <p>অন্যান্য প্রোডাক্ট দেখতে বামে সোয়াইপ করুন</p>
+            <button class="got-it-btn">ঠিক আছে</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

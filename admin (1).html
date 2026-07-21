@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bismillah Gadget Zone BD</title>
+    <style>
+        :root {
+            --primary: #0f2635;
+            --accent: #c5a059;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-main);
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 38, 53, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .login-container h2 {
+            margin-bottom: 25px;
+            color: var(--primary);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .login-btn {
+            background: var(--primary);
+            color: var(--accent);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #adminPanelMain {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin: 20px;
+            box-sizing: border-box;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .admin-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .admin-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .admin-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 6px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .category-order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .move-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .product-manage-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .prod-info-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prod-info-left img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .edit-prod-btn, .delete-prod-btn, .delete-cat-btn {
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+        }
+        .edit-prod-btn { background: #3b82f6; margin-right: 6px; }
+        .delete-prod-btn, .delete-cat-btn { background: #ef4444; }
+
+        .variant-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+        .variant-row input { padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="loginCard">
+        <h2>Admin Login Panel</h2>
+        <form onsubmit="handleAdminLogin(event);">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="adminUser" placeholder="ইউজারনেম দিন" required autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
+        </form>
+    </div>
+
+    <div id="adminPanelMain">
+        <div class="admin-header">
+            <h1>Bismillah Gadget Zone - Dashboard</h1>
+            <button class="logout-btn" onclick="adminLogout()">Logout 🔓</button>
+        </div>
+
+        <div class="admin-sections">
+            <div>
+                <!-- 📁 Create Category -->
+                <div class="admin-card">
+                    <h3>📁 Create Category</h3>
+                    <form onsubmit="createNewCategory(event);">
+                        <div class="input-group">
+                            <label>New Category Name</label>
+                            <input type="text" id="newCategoryName" placeholder="যেমন: Men Shoes, T-Shirt" required>
+                        </div>
+                        <button type="submit" class="btn-success">Save Category</button>
+                    </form>
+                </div>
+
+                <!-- 🔄 Reorder Categories -->
+                <div class="admin-card">
+                    <h3>↕️ Reorder Categories (হোম পেজ পজিশন)</h3>
+                    <p style="font-size: 12px; color: #64748b; margin-top:0;">বাটন চেপে ক্যাটাগরিগুলো উপর-নিচে সাজান, তারপর সেভ করুন:</p>
+                    <div id="categoryOrderList"></div>
+                    <button class="btn-success" onclick="saveCategoryOrder()" style="background:var(--primary); color:var(--accent);">Save New Position 💾</button>
+                </div>
+
+                <!-- 🗑️ Manage Categories -->
+                <div class="admin-card">
+                    <h3>🗑️ Manage Categories</h3>
+                    <div id="adminCategoryList"></div>
+                </div>
+
+                <!-- ⚙️ Admin Security Settings -->
+                <div class="admin-card">
+                    <h3>⚙️ Admin Security Settings</h3>
+                    <form onsubmit="updateAdminCredentials(event);">
+                        <div class="input-group">
+                            <label>New Username</label>
+                            <input type="text" id="newAdminUser" placeholder="নতুন ইউজারনেম দিন" required>
+                        </div>
+                        <div class="input-group">
+                            <label>New Password</label>
+                            <input type="password" id="newAdminPass" placeholder="নতুন পাসওয়ার্ড দিন" required>
+                        </div>
+                        <button type="submit" class="btn-success" style="background: var(--primary); color: var(--accent);">Update Settings 💾</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 📦 Add/Edit Product -->
+            <div class="admin-card" id="formScrollTarget">
+                <h3 id="formActionTitle">📦 Add New Product</h3>
+                
+                <div class="input-group">
+                    <label>Product Title</label>
+                    <input type="text" id="prodName" placeholder="যেমন: Nike Shoe / T900 Ultra">
+                </div>
+                <div class="input-group">
+                    <label>Base Price (৳)</label>
+                    <input type="number" id="prodPrice" placeholder="যেমন: 1250">
+                </div>
+                <div class="input-group">
+                    <label>Category</label>
+                    <select id="prodCategory" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></select>
+                </div>
+                <div class="input-group">
+                    <label>Product Sizes (Optional)</label>
+                    <input type="text" id="prodSizes" placeholder="যেমন: 39, 40, 41, 42 বা S, M, L, XL">
+                </div>
+                <div class="input-group">
+                    <label>Video URL (Optional)</label>
+                    <input type="url" id="prodVideo" placeholder="https://youtube.com/...">
+                </div>
+                <div class="input-group">
+                    <label>Description / Specification</label>
+                    <textarea id="prodDetails" placeholder="প্রোডাক্টের বিবরণ..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" rows="3"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Main Showcase Image <small id="imgNote" style="color:red;"></small></label>
+                    <input type="file" id="prodMainImage" accept="image/*">
+                </div>
+
+                <div style="margin-top:15px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                    <label style="font-weight:bold; font-size:13px;">Color Variants (Optional)</label>
+                    <div id="variantContainer" style="margin-top:10px;"></div>
+                    <button type="button" class="btn-secondary" style="font-size:11px; margin-top:5px;" onclick="addVariantRow()">+ Add Color/Variant</button>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn-success" onclick="uploadProductWithImages()" id="publishBtn" style="background:var(--primary); color:var(--accent);">Publish Product 🚀</button>
+                    <button class="btn-secondary" onclick="resetFormToCreateMode()" id="cancelEditBtn" style="display:none; background:#ef4444;">Cancel Edit ✖</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🛠️ Manage Products -->
+        <div class="admin-card" style="margin-top: 25px; background: #fff;">
+            <h3>🛠️ Manage, Edit & Delete Products</h3>
+            <div id="adminProductListContainer" style="margin-top: 15px; max-height: 500px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let isEditMode = false;
+        let currentEditProductKey = "";
+        let existingMainImageUrl = "";
+        let existingVariantsData = null;
+        let draggableCategories = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem("adminLoggedIn") === "true") {
+                showAdminPanel();
+            }
+        });
+
+        function showAdminPanel() {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('adminPanelMain').style.display = 'block'; 
+            document.body.style.alignItems = 'flex-start';
+            loadCategoriesIntoDropdown();
+            loadCategoriesIntoManageList(); 
+            loadProductsIntoManageList(); 
+            loadCategoryOrderEditor();
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem("adminLoggedIn");
+            alert("🔒 সফলভাবে লগআউট করা হয়েছে!");
+            window.location.reload();
+        }
+
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
+
+            loginBtn.innerText = "Checking...";
+            loginBtn.disabled = true;
+
+            try {
+                const res = await fetch(authURL);
+                const adminSettings = await res.json();
+
+                if (adminSettings && adminSettings.username === user && adminSettings.password === pass) {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    alert("🎉 লগইন সফল হয়েছে!");
+                    showAdminPanel();
+                } else if (user === "admin" && pass === "admin123") {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    alert("🎉 লগইন সফল হয়েছে (ডিফল্ট ব্যাকআপ)!");
+                    showAdminPanel();
+                } else {
+                    alert("❌ ভুল ইউজারনেম অথবা পাসওয়ার্ড!");
+                }
+            } catch (err) {
+                console.error(err);
+                if (user === "admin" && pass === "admin123") {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    alert("🎉 লগইন সফল হয়েছে!");
+                    showAdminPanel();
+                } else {
+                    alert("সার্ভার কানেকশনে সমস্যা হয়েছে!");
+                }
+            } finally {
+                loginBtn.innerText = "Login";
+                loginBtn.disabled = false;
+            }
+        }
+
+        async function updateAdminCredentials(event) {
+            event.preventDefault();
+            const newUsername = document.getElementById('newAdminUser').value.trim();
+            const newPassword = document.getElementById('newAdminPass').value.trim();
+
+            if(!newUsername || !newPassword) return;
+
+            try {
+                const res = await fetch(authURL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: newUsername, password: newPassword })
+                });
+
+                if (res.ok) {
+                    alert("⚙️ লগইন ডাটা সফলভাবে পরিবর্তন করা হয়েছে! নতুন ইউজারনেম ও পাসওয়ার্ড দিয়ে আবার লগইন করুন।");
+                    adminLogout();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("সার্ভার কানেকশন এরর!");
+            }
+        }
+
+        async function loadCategoryOrderEditor() {
+            try {
+                await fetchProducts(); 
+                draggableCategories = [...activeCategories];
+                renderOrderList();
+            } catch(e){ console.error(e); }
+        }
+
+        function renderOrderList() {
+            const list = document.getElementById('categoryOrderList');
+            if(!list) return;
+            list.innerHTML = "";
+            draggableCategories.forEach((cat, index) => {
+                list.innerHTML += `
+                    <div class="category-order-item">
+                        <span>📁 ${cat}</span>
+                        <div>
+                            <button class="move-btn" onclick="moveCategory(${index}, -1)">⬆ Up</button>
+                            <button class="move-btn" onclick="moveCategory(${index}, 1)">⬇ Down</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function moveCategory(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= draggableCategories.length) return;
+            const temp = draggableCategories[index];
+            draggableCategories[index] = draggableCategories[newIndex];
+            draggableCategories[newIndex] = temp;
+            renderOrderList();
+        }
+
+        async function saveCategoryOrder() {
+            try {
+                const res = await fetch("https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categoryOrder.json", {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(draggableCategories)
+                });
+                if(res.ok) {
+                    alert("🎉 ক্যাটাগরির নতুন পজিশন সফলভাবে হোম পেজে সেভ করা হয়েছে!");
+                }
+            } catch(err) {
+                alert("সেভ করতে সমস্যা হয়েছে!");
+            }
+        }
+
+        async function createNewCategory(event) {
+            event.preventDefault();
+            const catName = document.getElementById('newCategoryName').value.trim();
+            if (!catName) return;
+            await fetch(catURL, { method: 'POST', body: JSON.stringify({ name: catName }) });
+            alert(`📁 "${catName}" তৈরি হয়েছে!`);
+            window.location.reload();
+        }
+
+        async function deleteCategory(categoryKey, categoryName) {
+            if (!confirm(`ক্যাটাগরি "${categoryName}" ডিলিট করতে চান?`)) return;
+            await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categories/${categoryKey}.json`, { method: 'DELETE' });
+            alert("🗑️ ডিলিট করা হয়েছে!");
+            window.location.reload();
+        }
+
+        async function loadProductsIntoManageList() {
+            const container = document.getElementById('adminProductListContainer');
+            const res = await fetch(dbURL);
+            const data = await res.json();
+            if(!data) { container.innerHTML = "<p>কোনো প্রোডাক্ট নেই!</p>"; return; }
+            container.innerHTML = "";
+            Object.keys(data).forEach(key => {
+                const prod = data[key];
+                container.innerHTML += `
+                    <div class="product-manage-row">
+                        <div class="prod-info-left">
+                            <img src="${prod.mainImage || 'logo.JPG'}">
+                            <div>
+                                <strong>${prod.name}</strong><br>
+                                <small>${prod.category} - ৳${prod.price}</small>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="edit-prod-btn" onclick="prepareEditProduct('${key}')">Edit ✏️</button>
+                            <button class="delete-prod-btn" onclick="deleteProductFromFirebase('${key}', '${prod.name}')">Delete 🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function prepareEditProduct(key) {
+            try {
+                const res = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${key}.json`);
+                const prod = await res.json();
+                if (!prod) return;
+
+                isEditMode = true;
+                currentEditProductKey = key;
+                existingMainImageUrl = prod.mainImage || "";
+                existingVariantsData = prod.variants || null;
+
+                document.getElementById('formActionTitle').innerText = "✏️ Edit Product (আপডেট করুন)";
+                document.getElementById('publishBtn').innerText = "Update Product 🔄";
+                document.getElementById('cancelEditBtn').style.display = 'block';
+
+                document.getElementById('prodName').value = prod.name || "";
+                document.getElementById('prodPrice').value = prod.price || "";
+                document.getElementById('prodCategory').value = prod.category || "";
+                document.getElementById('prodSizes').value = prod.sizes ? prod.sizes.join(', ') : "";
+                document.getElementById('prodVideo').value = prod.video || "";
+                document.getElementById('prodDetails').value = prod.details || "";
+                
+                document.getElementById('imgNote').innerText = "(নতুন ছবি না দিলে আগেরটি থাকবে)";
+
+                const vContainer = document.getElementById('variantContainer');
+                vContainer.innerHTML = "";
+                variantCount = 0;
+
+                if (prod.variants) {
+                    Object.keys(prod.variants).forEach(vColor => {
+                        variantCount++;
+                        const vData = prod.variants[vColor];
+                        const row = document.createElement('div');
+                        row.className = 'variant-row';
+                        row.id = `v-row-${variantCount}`;
+                        row.innerHTML = `
+                            <input type="text" value="${vColor}" placeholder="কালার" class="v-name" style="width:30%;">
+                            <input type="number" value="${vData.price || prod.price}" placeholder="মূল্য" class="v-price" style="width:20%;">
+                            <input type="file" class="v-image" accept="image/*" style="width:35%;">
+                            <input type="hidden" class="v-existing-img" value="${vData.image || ''}">
+                            <button type="button" onclick="document.getElementById('v-row-${variantCount}').remove()">×</button>
+                        `;
+                        vContainer.appendChild(row);
+                    });
+                }
+
+                document.getElementById('formScrollTarget').scrollIntoView({ behavior: 'smooth' });
+            } catch (e) {
+                alert("ডাটা আনতে সমস্যা হয়েছে!");
+            }
+        }
+
+        function resetFormToCreateMode() {
+            isEditMode = false;
+            currentEditProductKey = "";
+            existingMainImageUrl = "";
+            existingVariantsData = null;
+
+            document.getElementById('formActionTitle').innerText = "📦 Add New Product";
+            document.getElementById('publishBtn').innerText = "Publish Product 🚀";
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('imgNote').innerText = "";
+
+            document.getElementById('prodName').value = "";
+            document.getElementById('prodPrice').value = "";
+            document.getElementById('prodCategory').value = "";
+            document.getElementById('prodSizes').value = "";
+            document.getElementById('prodVideo').value = "";
+            document.getElementById('prodDetails').value = "";
+            document.getElementById('prodMainImage').value = "";
+            document.getElementById('variantContainer').innerHTML = "";
+        }
+
+        async function deleteProductFromFirebase(key, name) {
+            if(!confirm(`"${name}" ডিলিট করতে চান?`)) return;
+            await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${key}.json`, { method: 'DELETE' });
+            alert("ডিলিট করা হয়েছে!");
+            loadProductsIntoManageList();
+        }
+
+        let variantCount = 0;
+        function addVariantRow() {
+            variantCount++;
+            const container = document.getElementById('variantContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.id = `v-row-${variantCount}`;
+            row.innerHTML = `
+                <input type="text" placeholder="কালার" class="v-name" style="width:30%;">
+                <input type="number" placeholder="মূল্য" class="v-price" style="width:20%;">
+                <input type="file" class="v-image" accept="image/*" style="width:35%;">
+                <input type="hidden" class="v-existing-img" value="">
+                <button type="button" onclick="document.getElementById('v-row-${variantCount}').remove()">×</button>
+            `;
+            container.appendChild(row);
+        }
+
+        async function uploadToImgBB(file) {
+            const formData = new FormData();
+            formData.append("image", file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbAPIKey}`, { method: "POST", body: formData });
+            const data = await res.json();
+            return data.data.url;
+        }
+
+        // 🌟 ভ্যারিয়েন্ট ছবিসহ ফায়ারবেসে সম্পূর্ণ সেভ করার আসল লজিক
+        async function uploadProductWithImages() {
+            const name = document.getElementById('prodName').value.trim();
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const category = document.getElementById('prodCategory').value;
+            const sizesRaw = document.getElementById('prodSizes').value.trim();
+            const video = document.getElementById('prodVideo').value.trim();
+            const details = document.getElementById('prodDetails').value.trim();
+            const mainImageFile = document.getElementById('prodMainImage').files[0];
+
+            if (!name || isNaN(price) || !category) {
+                alert("দয়া করে নাম, মূল্য এবং ক্যাটাগরি সিলেক্ট করুন!");
+                return;
+            }
+
+            if (!isEditMode && !mainImageFile) {
+                alert("নতুন প্রোডাক্ট যোগ করতে মেইন ছবি আপলোড করতে হবে!");
+                return;
+            }
+
+            const publishBtn = document.getElementById('publishBtn');
+            publishBtn.innerText = "Uploading Images & Saving...";
+            publishBtn.disabled = true;
+
+            try {
+                let mainImage = existingMainImageUrl;
+                if (mainImageFile) {
+                    mainImage = await uploadToImgBB(mainImageFile);
+                }
+
+                let sizes = sizesRaw ? sizesRaw.split(',').map(s => s.trim()) : [];
+
+                // 🎨 ভ্যারিয়েন্ট ফেস করার কোড
+                let variants = {};
+                const variantRows = document.querySelectorAll('.variant-row');
+
+                for (let row of variantRows) {
+                    const vName = row.querySelector('.v-name')?.value.trim();
+                    const vPrice = parseFloat(row.querySelector('.v-price')?.value) || price;
+                    const vImageFile = row.querySelector('.v-image')?.files[0];
+                    const vExistingImg = row.querySelector('.v-existing-img')?.value;
+
+                    if (vName) {
+                        let vImgUrl = vExistingImg || "";
+                        if (vImageFile) {
+                            vImgUrl = await uploadToImgBB(vImageFile);
+                        }
+                        if (vImgUrl) {
+                            variants[vName] = {
+                                price: vPrice,
+                                image: vImgUrl
+                            };
+                        }
+                    }
+                }
+
+                const productData = { name, price, category, video, details, mainImage, sizes };
+                if (Object.keys(variants).length > 0) {
+                    productData.variants = variants;
+                }
+
+                if (isEditMode) {
+                    await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`, { 
+                        method: 'PUT', 
+                        body: JSON.stringify(productData) 
+                    });
+                    alert("🎉 প্রোডাক্ট সফলভাবে আপডেট করা হয়েছে!");
+                } else {
+                    await fetch(dbURL, { method: 'POST', body: JSON.stringify(productData) });
+                    alert("🚀 প্রোডাক্ট সফলভাবে পাবলিশ করা হয়েছে!");
+                }
+
+                window.location.reload();
+            } catch (err) {
+                console.error(err);
+                alert("ছবি আপলোড বা ডাটা সেভ করতে সমস্যা হয়েছে!");
+                publishBtn.innerText = "Publish Product 🚀";
+                publishBtn.disabled = false;
+            }
+        }
+
+        async function loadCategoriesIntoDropdown() {
+            const dropdown = document.getElementById('prodCategory');
+            dropdown.innerHTML = '<option value="">ক্যাটাগরি সিলেক্ট করুন</option>';
+            const res = await fetch(catURL);
+            const catData = await res.json();
+            if (catData) {
+                Object.keys(catData).forEach(key => {
+                    dropdown.innerHTML += `<option value="${catData[key].name}">${catData[key].name}</option>`;
+                });
+            }
+        }
+
+        async function loadCategoriesIntoManageList() {
+            const list = document.getElementById('adminCategoryList');
+            const res = await fetch(catURL);
+            const catData = await res.json();
+            if (catData) {
+                list.innerHTML = "";
+                Object.keys(catData).forEach(key => {
+                    list.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; background:#fff; padding:6px 10px; border-radius:4px;">
+                            <span>📁 ${catData[key].name}</span>
+                            <button class="delete-cat-btn" onclick="deleteCategory('${key}', '${catData[key].name}')">×</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
