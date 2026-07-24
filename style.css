@@ -1,0 +1,525 @@
+/* --- GLOBAL RESET & BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: #f5f7f9;
+    color: #0f2635;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* --- HEADER PRESTIGE --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 4%;
+    background: #0f2635; 
+    border-bottom: 2.5px solid #c5a059;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.site-logo {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 1.5px solid #c5a059;
+}
+
+.brand-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.brand-top-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #c5a059;
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cart-box-premium {
+    color: #0f2635;
+    font-size: 13px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #c5a059, #b59449);
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* --- CATEGORY NAV BAR --- */
+.category-nav-bar {
+    display: flex;
+    gap: 15px;
+    background: #ffffff;
+    padding: 10px 15px;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 67px;
+    z-index: 999;
+}
+
+.category-nav-bar::-webkit-scrollbar { display: none; }
+
+.nav-item {
+    text-decoration: none;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 2px;
+}
+
+.nav-item.active {
+    color: #b59449;
+    border-bottom: 2px solid #b59449;
+}
+
+/* --- CONTAINER & SECTIONS --- */
+.category-section {
+    margin: 15px auto;
+    padding: 0 8px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* 🎯 ক্যাটাগরি হেডার ও 'আরও দেখুন' সাইড-বাই-সাইড পজিশন */
+.category-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    margin: 10px 8px 8px 8px !important;
+    width: auto !important;
+}
+
+.category-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f2635 !important;
+    margin-bottom: 0 !important;
+    border-left: 4px solid #c5a059 !important;
+    padding-left: 8px !important;
+    line-height: 1.2 !important;
+}
+
+/* 🔘 'আরও দেখুন' বাটন ইফেক্ট */
+.see-more-link {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #c5a059 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    background: rgba(197, 160, 89, 0.12) !important;
+    padding: 5px 12px !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(197, 160, 89, 0.4) !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    user-select: none !important;
+}
+
+.see-more-link:hover, 
+.see-more-link:active {
+    background: #0f2635 !important;
+    color: #c5a059 !important;
+    border-color: #c5a059 !important;
+    box-shadow: 0 4px 12px rgba(15, 38, 53, 0.25) !important;
+    transform: scale(0.96) !important;
+}
+
+/* --- 📱 MOBILE SWIPE GRID (স্ক্রিনে একসাথে নিখুঁত ২টি প্রোডাক্ট) --- */
+.products-grid {
+    display: flex !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 8px 8px 14px 8px !important;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    user-select: none;
+}
+
+.products-grid:active { cursor: grabbing; }
+
+.products-grid::-webkit-scrollbar { height: 4px; }
+.products-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* ✂️ মোবাইল মোডে সোয়াইপ ঠিক রেখে ১০০% স্ক্রিন উইডথ থেকে ২টি সমান কার্ড তৈরি */
+.product-card,
+.products-grid .product-card {
+    flex: 0 0 calc(50% - 5px) !important;
+    max-width: calc(50% - 5px) !important;
+    min-width: calc(50% - 5px) !important;
+    scroll-snap-align: start !important;
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    height: auto !important;
+    position: relative;
+    background: #ffffff !important; 
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 12px rgba(15, 38, 53, 0.05) !important;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 20px rgba(15, 38, 53, 0.1) !important;
+    border-color: #cbd5e1 !important;
+}
+
+.card-badges-top {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.badge-discount {
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+}
+
+.image-wrapper {
+    background: #f8fafc;
+    width: 100%;
+    height: 135px; /* মোবাইলে সামঞ্জস্যপূর্ণ হাইট */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.image-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.info-wrapper {
+    padding: 8px 10px 10px 10px !important;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    position: relative;
+}
+
+.badge-stock {
+    font-size: 8.5px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.badge-stock.in-stock {
+    background: #e6f4ea;
+    color: #137333;
+    border: 1px solid #ceead6;
+}
+
+.badge-stock.out-stock {
+    background: #fce8e6;
+    color: #c5221f;
+    border: 1px solid #fad2cf;
+}
+
+.product-title {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #0f2635 !important;
+    line-height: 1.3 !important;
+    margin-bottom: 4px !important;
+    min-height: auto !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 4px;
+}
+
+.price-box {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.price {
+    font-size: 14px !important;
+    color: #0f2635 !important;
+    font-weight: 800 !important;
+    margin-bottom: 0px !important;
+}
+
+.old-price {
+    font-size: 10px;
+    color: #94a3b8;
+    text-decoration: line-through;
+    font-weight: 600;
+}
+
+/* 🚀 'আরও দেখুন' চাপলে ফুল ক্যাটালগ গ্রিড ভিউ */
+.products-grid.full-view {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    padding: 10px 8px !important;
+}
+
+.products-grid.full-view .product-card {
+    flex: unset !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    scroll-snap-align: unset !important;
+}
+
+/* --- 🖥️ DESKTOP MODE OPTIMIZATION (ডেক্সটপে ৪টি কার্ড সাইজ) --- */
+@media (min-width: 768px) {
+    .category-section {
+        padding: 0 16px;
+    }
+    
+    .products-grid {
+        gap: 16px !important;
+        padding: 12px 12px 18px 12px !important;
+    }
+
+    .product-card,
+    .products-grid .product-card {
+        flex: 0 0 220px !important;
+        max-width: 220px !important;
+        min-width: 220px !important;
+        border-radius: 16px !important;
+    }
+
+    .image-wrapper {
+        height: 170px;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .product-title {
+        font-size: 13px !important;
+    }
+
+    .price {
+        font-size: 15px !important;
+    }
+
+    .products-grid.full-view {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 16px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .products-grid.full-view {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+/* --- 💬 FLOATING WHATSAPP BUTTON --- */
+.floating-whatsapp {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: #25d366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    z-index: 1500;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.floating-whatsapp:hover { transform: scale(1.08); }
+
+/* --- 🔵 FOOTER --- */
+footer {
+    background: #0f2635;
+    color: #f8fafc;
+    padding: 40px 5% 20px 5%;
+    border-top: 3px solid #c5a059;
+    margin-top: 40px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
+}
+
+.footer-col h3 {
+    color: #c5a059;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.footer-col p, .footer-col ul {
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.7;
+    list-style: none;
+}
+
+.footer-col ul li { margin-bottom: 8px; }
+
+.footer-col ul li a {
+    color: #cbd5e1;
+    text-decoration: none;
+}
+
+.footer-col ul li a:hover { color: #c5a059; }
+
+.social-links { display: flex; gap: 12px; margin-top: 15px; }
+
+.social-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    color: #c5a059;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 30px;
+    padding-top: 20px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* --- 🎡 BILLBOARD --- */
+.billboard-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 10px auto 15px auto;
+    padding: 0 8px;
+    position: relative;
+}
+
+.billboard-track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+    cursor: grab;
+    user-select: none;
+}
+
+.billboard-track::-webkit-scrollbar { display: none; }
+
+.billboard-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0f2635;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    max-height: 380px;
+}
+
+.billboard-slide img,
+.billboard-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
+}
+
+.billboard-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.billboard-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #cbd5e1;
+    transition: all 0.3s ease;
+}
+
+.billboard-dot.active {
+    width: 20px;
+    border-radius: 10px;
+    background-color: #0f2635;
+}
