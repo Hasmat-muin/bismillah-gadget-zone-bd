@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Page - Bismillah Gadget Zone BD</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; margin: 0; padding: 20px; color: #1e293b; }
+        header { background: #0f2635; padding: 12px 5%; border-bottom: 3px solid #c5a059; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); min-height: 400px; }
+        h1 { color: #0f2635; border-bottom: 2px solid #c5a059; padding-bottom: 8px; font-size: 22px; }
+        .page-content { line-height: 1.8; color: #475569; font-size: 15px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="window.location.href='index.html'">
+        <img src="logo.JPG" alt="Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #c5a059;">
+        <span style="font-size: 18px; font-weight: 800; color: #c5a059;">Bismillah Gadget Zone BD</span>
+    </div>
+    <button onclick="window.location.href='index.html'" style="background:#c5a059; color:#0f2635; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer;">🏠 Home</button>
+</header>
+
+<div class="container">
+    <h1 id="pageTitle">Loading Page...</h1>
+    <div class="page-content" id="pageContent">তথ্য লোড হচ্ছে...</div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageType = urlParams.get('type') || 'refund';
+
+    const titles = {
+        'refund': '🔄 রিফান্ড ও রিটার্ন পলিসি (Refund Policy)',
+        'terms': '📜 টার্মস এবং কন্ডিশন (Terms & Conditions)',
+        'delivery': '🚚 ডেলিভারি সংক্রান্ত তথ্য (Delivery Info)'
+    };
+
+    document.getElementById('pageTitle').innerText = titles[pageType] || 'Policy Page';
+
+    fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/pages/${pageType}.json`)
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.content) {
+            document.getElementById('pageContent').innerHTML = data.content;
+        } else {
+            document.getElementById('pageContent').innerText = "এই পেজে এখনো কোনো তথ্য যুক্ত করা হয়নি। অ্যাডমিন প্যানেল থেকে তথ্য যুক্ত করতে পারবেন।";
+        }
+    });
+</script>
+</body>
+</html>

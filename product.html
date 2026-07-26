@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Bismillah Gadget Zone BD</title>
+    <link class="icon" type="image/jpeg" href="logo.JPG">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #0f2635;
+            --accent: #c5a059;
+            --accent-light: #e0be7a;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-main); margin: 0; padding: 20px; color: var(--text-dark); }
+        
+        header { 
+            background: var(--primary); 
+            border-bottom: 3px solid var(--accent);
+            padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;
+            border-radius: 12px; margin-bottom: 20px;
+        }
+        .cart-btn { 
+            background: linear-gradient(135deg, var(--accent), var(--accent-light)); 
+            color: var(--primary); border: none; font-weight: 700; border-radius: 8px; 
+            cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 10px; font-size: 11px;
+        }
+        .cart-count { background: var(--primary); color: white; padding: 1px 6px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+
+        .nav-arrow-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: var(--accent);
+            width: 30px; height: 30px; border-radius: 50%;
+            font-size: 15px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .main-layout { display: flex; gap: 40px; flex-wrap: wrap; }
+        .left-panel { flex: 1; min-width: 320px; }
+        .right-panel { flex: 1; min-width: 320px; display: flex; flex-direction: column; }
+        
+        .main-image-box { width: 100%; height: 380px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; }
+        .main-image-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .gallery-thumbnails { display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; padding-bottom: 5px; }
+        .thumb-img { width: 65px; height: 65px; border-radius: 8px; border: 2px solid #e2e8f0; cursor: pointer; object-fit: cover; transition: 0.2s; }
+        .thumb-img.active, .thumb-img:hover { border-color: var(--primary); transform: scale(1.05); }
+
+        .product-title { font-size: 24px; font-weight: 700; color: var(--primary); margin: 0 0 10px 0; }
+        .price-tag { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
+        
+        .variant-section, .size-section { margin-bottom: 20px; }
+        .variant-title, .size-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; }
+        .variant-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .variant-card { border: 2px solid #e2e8f0; padding: 6px; border-radius: 8px; cursor: pointer; text-align: center; width: 75px; transition: 0.2s; }
+        .variant-card img { width: 100%; height: 60px; object-fit: cover; border-radius: 4px; }
+        .variant-card.active { border-color: var(--primary); background: rgba(15, 38, 53, 0.05); }
+
+        .size-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .size-chip { padding: 6px 16px; border: 1.5px solid #cbd5e1; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; background: #f8fafc; }
+        .size-chip.active { border-color: var(--primary); background: var(--primary); color: var(--accent); }
+        
+        .btn-group { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
+        .btn { flex: 1; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; text-align: center; border: none; }
+        .btn-cart { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-buy { background: var(--primary); color: var(--accent); }
+        
+        .details-section { margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px; }
+        .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px; }
+
+        .cart-sidebar { position: fixed; top: 0; right: -360px; width: 350px; height: 100%; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); box-shadow: -10px 0 30px rgba(15, 38, 53, 0.1); z-index: 2000; transition: 0.35s; padding: 24px; display: flex; flex-direction: column; box-sizing: border-box; }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; }
+        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-top: 15px; }
+        .cart-total { font-size: 18px; font-weight: 700; border-top: 2px solid #f1f5f9; padding-top: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; color: var(--primary); }
+        .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 14px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="nav-arrow-btn" onclick="goBackPage()" title="আগের পেজে যান">←</button>
+        <button class="nav-arrow-btn" onclick="goForwardPage()" title="পরের পেজে যান">→</button>
+        <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-left: 6px;" onclick="window.location.href='index.html'">
+            <img src="logo.JPG" alt="Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);">
+            <div style="display:flex; flex-direction:column; line-height:1.2;">
+                <span class="brand-top-line" style="font-size:18px; font-weight:800; color:var(--accent);">Bismillah</span>
+                <span style="font-size: 11px; font-weight: 600; color: #e8d5b0;">Gadget Zone BD</span>
+            </div>
+        </div>
+    </div>
+    <button class="cart-btn" onclick="toggleCart()">
+        🛒 কার্ট <span class="cart-count" id="cartCount">0</span>
+    </button>
+</header>
+
+<div class="container">
+    <div class="main-layout">
+        <div class="left-panel">
+            <div class="main-image-box">
+                <img id="mainProdImage" src="" alt="Product Image">
+            </div>
+            <div class="gallery-thumbnails" id="galleryThumbnails"></div>
+        </div>
+        <div class="right-panel">
+            <h1 class="product-title" id="prodTitle">Loading Product...</h1>
+            <div class="price-tag">৳ <span id="prodPrice">0.00</span></div>
+            
+            <div class="size-section" id="sizeSectionWrapper" style="display:none;">
+                <div class="size-title">Select Size (সাইজ বাছুন):</div>
+                <div class="size-grid" id="sizeGrid"></div>
+            </div>
+
+            <div class="variant-section" id="variantSectionWrapper" style="display:none;">
+                <div class="variant-title">Select Color/Variant (কালার পছন্দ করুন):</div>
+                <div class="variant-grid" id="variantGrid"></div>
+            </div>
+
+            <div id="videoContainer" style="margin-bottom: 15px;"></div>
+            <div class="btn-group">
+                <button class="btn btn-cart" id="pageCartBtn">Add To Cart</button>
+                <button class="btn btn-buy" id="pageBuyBtn">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-section">
+        <div class="tab-title">Specification & Description</div>
+        <div id="prodDescription" style="line-height: 1.6; font-size: 14px; color: #475569;"></div>
+    </div>
+</div>
+
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3>Your Cart (শপিং কার্ট)</h3>
+        <button style="font-size:24px; border:none; background:none; cursor:pointer;" onclick="toggleCart()">×</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList"></div>
+    <div class="cart-total">
+        <span>Total:</span>
+        <span>৳ <span id="cartTotalAmount">0</span></span>
+    </div>
+    <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
+</div>
+
+<!-- 🛒 ORDER MODAL IN PRODUCT PAGE -->
+<div class="order-modal-overlay" id="order-modal" style="display:none; position:fixed; inset:0; background:rgba(15,38,53,0.6); z-index:3000; justify-content:center; align-items:center; padding:10px;">
+    <div class="modal-body" style="background:#fff; width:100%; max-width:420px; border-radius:16px; padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+            <h3 style="margin:0; font-size:16px; color:#0f2635;">Confirm Order via WhatsApp</h3>
+            <span style="font-size:24px; cursor:pointer;" onclick="closeOrderModal()">&times;</span>
+        </div>
+        
+        <div style="margin-bottom:10px;">
+            <label style="font-size:12px; font-weight:600;">আপনার নাম</label>
+            <input type="text" id="customer-name" placeholder="নাম লিখুন" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:12px; font-weight:600;">মোবাইল নম্বর</label>
+            <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের নম্বর" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:12px; font-weight:600;">পূর্ণাঙ্গ ঠিকানা</label>
+            <textarea id="customer-address" placeholder="ঠিকানা উল্লেখ করুন" rows="2" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;"></textarea>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
+            <select id="delivery-charge-select" onchange="calculateOrderTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <option value="80">ঢাকার ভেতরে (৳৮০)</option>
+                <option value="150">ঢাকার বাইরে (৳১৫০)</option>
+            </select>
+        </div>
+        <button class="submit-order-btn" onclick="sendOrderToWhatsApp()" style="background:#25d366; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">Confirm Order on WhatsApp 🚀</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    let currentSelectedColor = "Standard";
+    let currentSelectedSize = "";
+    let currentPrice = 0; 
+    let globalProductName = ""; 
+
+    if (productId) {
+        fetch(dbURL)
+        .then(res => res.json())
+        .then(data => {
+            const product = data[productId];
+            if (product) {
+                globalProductName = product.name;
+                document.getElementById('prodTitle').innerText = product.name;
+                document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
+                
+                if(product.video){
+                    document.getElementById('videoContainer').innerHTML = `<a href="${product.video}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold; display:block; margin-bottom:10px;">📺 Watch Product Video</a>`;
+                }
+
+                currentPrice = product.price;
+                const mainImg = document.getElementById('mainProdImage');
+                mainImg.src = product.mainImage || "";
+
+                const thumbsContainer = document.getElementById('galleryThumbnails');
+                thumbsContainer.innerHTML = `<img src="${product.mainImage}" class="thumb-img active" onclick="switchMainImage('${product.mainImage}', this)">`;
+
+                if (product.variants) {
+                    Object.keys(product.variants).forEach(color => {
+                        let vImg = product.variants[color].image;
+                        if(vImg) {
+                            thumbsContainer.innerHTML += `<img src="${vImg}" class="thumb-img" onclick="switchMainImage('${vImg}', this)">`;
+                        }
+                    });
+                }
+
+                if (product.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+                    document.getElementById('sizeSectionWrapper').style.display = 'block';
+                    const sizeGrid = document.getElementById('sizeGrid');
+                    sizeGrid.innerHTML = "";
+                    product.sizes.forEach((sz, idx) => {
+                        sizeGrid.innerHTML += `<div class="size-chip ${idx === 0 ? 'active' : ''}" onclick="selectSize('${sz}', this)">${sz}</div>`;
+                    });
+                    currentSelectedSize = product.sizes[0];
+                }
+
+                let colorKeys = product.variants ? Object.keys(product.variants) : [];
+                if (colorKeys.length > 0) {
+                    document.getElementById('variantSectionWrapper').style.display = 'block';
+                    currentSelectedColor = colorKeys[0];
+                    const variantGrid = document.getElementById('variantGrid');
+                    variantGrid.innerHTML = "";
+                    
+                    colorKeys.forEach((color, idx) => {
+                        let vVariant = product.variants[color];
+                        let vPrice = vVariant.price || currentPrice;
+                        let vImg = vVariant.image || product.mainImage;
+
+                        variantGrid.innerHTML += `
+                            <div class="variant-card ${idx === 0 ? 'active' : ''}" onclick="changeVariantLocal('${color}', '${vImg}', ${vPrice}, this)">
+                                <img src="${vImg}" alt="${color}">
+                                <span class="v-name" style="font-size:11px;">${color}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('prodPrice').innerText = currentPrice;
+
+                // 🛒 Add To Cart & Buy Now Button Listener Fix
+                document.getElementById('pageCartBtn').onclick = () => {
+                    selectedVariantsGlobal[productId] = currentSelectedColor;
+                    selectedSizesGlobal[productId] = currentSelectedSize;
+                    addToCart(productId, globalProductName, currentPrice);
+                    toggleCart(); 
+                };
+
+                document.getElementById('pageBuyBtn').onclick = () => {
+                    selectedVariantsGlobal[productId] = currentSelectedColor;
+                    selectedSizesGlobal[productId] = currentSelectedSize;
+                    buyNow(productId, globalProductName, currentPrice);
+                };
+            }
+        });
+    }
+
+    function switchMainImage(imgUrl, el) {
+        document.getElementById('mainProdImage').src = imgUrl;
+        document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function selectSize(sizeVal, element) {
+        currentSelectedSize = sizeVal;
+        document.querySelectorAll('.size-chip').forEach(chip => chip.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    function changeVariantLocal(colorName, imageUrl, vPrice, element) {
+        if(imageUrl) document.getElementById('mainProdImage').src = imageUrl;
+        currentSelectedColor = colorName;
+        currentPrice = vPrice; 
+        document.getElementById('prodPrice').innerText = vPrice; 
+        document.querySelectorAll('.variant-card').forEach(card => card.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    window.onload = function() { updateCartUI(); };
+</script>
+</body>
+</html>
