@@ -251,15 +251,15 @@
 
                         if (ytId) {
                             count++;
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
-                            // সরাসরি সোর্স দিয়ে ক্লিন লোড (Error 153 বাইপাস)
                             reelsHTML += `
                                 <div class="reel-item">
                                     <div class="reel-video-frame">
                                         <iframe 
-                                            src="https://www.youtube.com/embed/${ytId}" 
+                                            src="${embedUrl}" 
                                             title="${prod.name}" 
                                             frameborder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
