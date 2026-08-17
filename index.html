@@ -77,7 +77,9 @@
             transition: 0.2s;
             white-space: nowrap;
         }
-        .header-nav-links a:hover, .header-nav-links a.active { color: var(--accent); }
+        .header-nav-links a:hover, .header-nav-links a.active {
+            color: var(--accent);
+        }
 
         .center-logo-box {
             display: flex;
@@ -171,13 +173,66 @@
             box-shadow: 0 0 8px rgba(197, 160, 89, 0.8);
         }
 
+        /* 📱 FIXED REELS + SWIPEABLE CATEGORIES CONTAINER */
         .category-scroll-container {
             width: 100%;
-            max-width: 820px;
+            max-width: 900px;
             position: relative;
             display: flex;
             align-items: center;
             margin-top: 8px;
+            gap: 10px;
+            padding: 0 6px;
+        }
+
+        .pinned-reels-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            gap: 2px;
+            flex-shrink: 0;
+            padding: 2px 4px;
+            background: rgba(7, 30, 46, 0.95);
+            z-index: 10;
+            border-right: 1.5px solid rgba(197, 160, 89, 0.3);
+            padding-right: 10px;
+        }
+        .reels-story-ring {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            padding: 1.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 6px rgba(220, 39, 67, 0.4);
+            animation: storyPulse 2s infinite ease-in-out;
+        }
+        .reels-story-inner {
+            width: 100%;
+            height: 100%;
+            background: #071e2e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 8px;
+        }
+        .reels-badge-title {
+            font-size: 9.5px !important;
+            font-weight: 700 !important;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.2px;
+        }
+
+        @keyframes storyPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(220, 39, 67, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 10px rgba(220, 39, 67, 0.6); }
         }
 
         .icon-category-swipe-wrapper {
@@ -185,9 +240,10 @@
             overflow-x: auto;
             white-space: nowrap;
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 2px 24px 2px 8px;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 16px;
+            padding: 4px 24px 4px 4px;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
@@ -206,9 +262,15 @@
             padding: 2px 6px;
             border-radius: 6px;
         }
-        .cat-icon-item i { font-size: 18px; transition: 0.2s; }
+        .cat-icon-item i { font-size: 17px; transition: 0.2s; }
         .cat-icon-item span { font-size: 11px; font-weight: 500; letter-spacing: 0.2px; }
-        .cat-icon-item:hover, .cat-icon-item.active { color: var(--accent); transform: translateY(-2px); }
+        .cat-icon-item:hover, .cat-icon-item.active {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .cat-icon-item:hover i, .cat-icon-item.active i {
+            filter: drop-shadow(0 0 5px rgba(197, 160, 89, 0.8));
+        }
 
         .swipe-hint-arrow {
             position: absolute;
@@ -222,6 +284,13 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            pointer-events: auto;
+            animation: bounceRight 1.5s infinite;
+        }
+
+        @keyframes bounceRight {
+            0%, 100% { transform: translate(0, -50%); opacity: 0.7; }
+            50% { transform: translate(4px, -50%); opacity: 1; color: var(--accent-light); }
         }
 
         .header-search-box-mobile {
@@ -276,35 +345,30 @@
         }
         .search-icon-badge i { color: #7b8a97; font-size: 15px; }
 
-        /* 🎬 BOTTOM CENTER FLOATING REELS BUTTON */
-        .floating-reels-btn {
+        /* 💬 STANDALONE FLOATING WHATSAPP BUTTON */
+        .floating-whatsapp {
             position: fixed;
             bottom: 22px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 18px;
             z-index: 1500;
-            background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #25d366;
             color: #ffffff !important;
-            text-decoration: none;
-            padding: 10px 22px;
-            border-radius: 30px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 800;
-            box-shadow: 0 8px 25px rgba(255, 8, 68, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.4);
-            letter-spacing: 0.3px;
-            transition: all 0.3s ease;
-            animation: reelsFloat 2.5s infinite ease-in-out;
+            justify-content: center;
+            font-size: 26px;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .floating-reels-btn i { font-size: 18px; }
-
-        @keyframes reelsFloat {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-6px); }
+        .floating-whatsapp:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 24px rgba(37, 211, 102, 0.55);
         }
+        .floating-whatsapp:active { transform: scale(0.95); }
 
         @media (max-width: 768px) {
             .header-nav-links { display: none; }
@@ -322,7 +386,7 @@
             .center-brand-name { font-size: 15px; margin-top: 0; }
             .center-brand-sub { font-size: 10px; }
             .header-main-logo { height: 34px; width: 34px; }
-            .icon-category-swipe-wrapper { justify-content: flex-start; gap: 14px; }
+            .floating-whatsapp { width: 46px; height: 46px; font-size: 24px; bottom: 16px; right: 16px; }
         }
 
         #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
@@ -370,7 +434,7 @@
         <div class="header-top-row">
             <nav class="header-nav-links">
                 <a href="index.html" class="active">হোম</a>
-                <a href="reels.html" style="color: #ff6b81;"><i class="fas fa-play-circle"></i> ভিডিও / Reels</a>
+                <a href="reels.html" style="color: var(--accent);"><i class="fas fa-play-circle" style="color: #ff4e50;"></i> ভিডিও / Reels</a>
                 <a href="#" onclick="switchCategory('Gadget', this)">গ্যাজেট</a>
                 <a href="#" onclick="switchCategory('Accessories', this)">এক্সেসরিজ</a>
                 <a href="https://wa.me/8801922790663" target="_blank">যোগাযোগ</a>
@@ -398,6 +462,15 @@
         </div>
 
         <div class="category-scroll-container">
+            <a href="reels.html" class="pinned-reels-badge" title="Watch Shorts Reels">
+                <div class="reels-story-ring">
+                    <div class="reels-story-inner">
+                        <i class="fas fa-play" style="font-size: 8px;"></i>
+                    </div>
+                </div>
+                <span class="reels-badge-title">Reels</span>
+            </a>
+
             <div class="icon-category-swipe-wrapper" id="swipeCategoryBar">
                 <div class="cat-icon-item active" onclick="switchCategory('All', this)">
                     <i class="fas fa-bolt"></i>
@@ -447,6 +520,7 @@
         </div>
     </header>
 
+    <!-- 🎡 Dynamic Billboard Carousel (Added Back) -->
     <div class="billboard-container" id="billboard-container" style="display: none;">
         <div class="billboard-track" id="billboard-track"></div>
         <div class="billboard-dots" id="billboard-dots"></div>
@@ -459,91 +533,9 @@
 
     <main id="products-container"></main>
 
-    <!-- 🎬 BOTTOM CENTER FLOATING REELS BUTTON -->
-    <a href="reels.html" class="floating-reels-btn" title="শর্টস ভিডিও দেখুন">
-        <i class="fas fa-play-circle"></i>
-        <span>Watch Reels 🔥</span>
-    </a>
-
-    <!-- 💬 FLOATING WHATSAPP BUTTON -->
     <a href="https://wa.me/8801922790663" target="_blank" class="floating-whatsapp" title="WhatsApp-এ যোগাযোগ করুন">
         <i class="fab fa-whatsapp"></i>
     </a>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-col">
-                <h3>Bismillah Gadget Zone BD</h3>
-                <p>আমাদের কাছে পাচ্ছেন ১০০% প্রিমিয়াম ও অরিজিনাল গ্যাজেট, জুতা এবং ব্যাগ সামগ্রী। বিশ্বস্ততার সাথে সেরা দামে কেনাকাটা করুন।</p>
-                <div class="social-links">
-                    <a href="https://www.facebook.com/profile.php?id=61590909662011" target="_blank" class="social-btn"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.youtube.com/@pathofshine" target="_blank" class="social-btn"><i class="fab fa-youtube"></i></a>
-                    <a href="https://wa.me/8801922790663" target="_blank" class="social-btn"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h3>গুরুত্বপূর্ণ লিঙ্ক</h3>
-                <ul>
-                    <li><a href="index.html">হোম পেজ</a></li>
-                    <li><a href="reels.html">ভিডিও শোরুম (Reels)</a></li>
-                    <li><a href="page.html?type=refund">রিফান্ড ও রিটার্ন পলিসি</a></li>
-                    <li><a href="page.html?type=terms">টার্মস এবং কন্ডিশন</a></li>
-                    <li><a href="page.html?type=delivery">ডেলিভারি সংক্রান্ত তথ্য</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h3>যোগাযোগ</h3>
-                <p>📍 ঢাকা, বাংলাদেশ</p>
-                <p>📞 মোবাইল: +880 1922-790663</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Bismillah Gadget Zone BD. All Rights Reserved.</p>
-        </div>
-    </footer>
-
-    <div class="cart-sidebar" id="cart-sidebar">
-        <div class="cart-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0; font-size:16px;">শপিং কার্ট</h3>
-            <button style="font-size:24px; border:none; background:none; cursor:pointer;" onclick="toggleCart()">×</button>
-        </div>
-        <div class="cart-items-list" id="cart-items-container"></div>
-        <div class="cart-total" style="display:flex; justify-content:space-between; padding:15px 0; font-weight:bold;">
-            <span>Total:</span>
-            <span>৳ <span id="cart-total-price">0</span></span>
-        </div>
-        <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
-    </div>
-
-    <div class="order-modal-overlay" id="order-modal" style="display:none; position:fixed; inset:0; background:rgba(15,38,53,0.6); z-index:3000; justify-content:center; align-items:center; padding:10px;">
-        <div class="modal-body" style="background:#fff; width:100%; max-width:420px; border-radius:16px; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
-                <h3 style="margin:0; font-size:16px; color:#0f2635;">Confirm Order via WhatsApp</h3>
-                <span style="font-size:24px; cursor:pointer;" onclick="closeOrderModal()">&times;</span>
-            </div>
-            
-            <div style="margin-bottom:10px;">
-                <label style="font-size:12px; font-weight:600;">আপনার নাম</label>
-                <input type="text" id="customer-name" placeholder="নাম লিখুন" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
-            </div>
-            <div style="margin-bottom:10px;">
-                <label style="font-size:12px; font-weight:600;">মোবাইল নম্বর</label>
-                <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের নম্বর" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
-            </div>
-            <div style="margin-bottom:10px;">
-                <label style="font-size:12px; font-weight:600;">পূর্ণাঙ্গ ঠিকানা</label>
-                <textarea id="customer-address" placeholder="ঠিকানা উল্লেখ করুন" rows="2" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;"></textarea>
-            </div>
-            <div style="margin-bottom:10px;">
-                <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
-                <select id="delivery-charge-select" onchange="calculateOrderTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                    <option value="80">ঢাকার ভেতরে (৳৮০)</option>
-                    <option value="150">ঢাকার বাইরে (৳১৫০)</option>
-                </select>
-            </div>
-            <button class="submit-order-btn" onclick="sendOrderToWhatsApp()" style="background:#25d366; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">Confirm Order on WhatsApp 🚀</button>
-        </div>
-    </div>
 
     <script src="script.js"></script>
     <script>
@@ -555,7 +547,9 @@
 
         function scrollCategoryRight() {
             const bar = document.getElementById('swipeCategoryBar');
-            if (bar) bar.scrollBy({ left: 140, behavior: 'smooth' });
+            if (bar) {
+                bar.scrollBy({ left: 140, behavior: 'smooth' });
+            }
         }
     </script>
 </body>
