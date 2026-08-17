@@ -37,7 +37,7 @@
             align-items: center;
             z-index: 100;
             background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
-            pointer-events: auto;
+            pointer-events: none;
         }
 
         .back-btn {
@@ -54,6 +54,7 @@
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
+            pointer-events: auto;
         }
 
         .header-title {
@@ -64,6 +65,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            pointer-events: auto;
         }
 
         .reels-feed-container {
@@ -103,22 +105,20 @@
             width: 100% !important;
             height: 100% !important;
             border: none;
-            position: absolute;
-            top: 0;
-            left: 0;
         }
 
+        /* 🏷️ BOTTOM PRODUCT OVERLAY */
         .reel-bottom-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 16px 16px 20px 16px;
-            background: linear-gradient(to top, rgba(7, 30, 46, 0.95) 15%, rgba(7, 30, 46, 0.65) 60%, transparent);
+            padding: 12px 16px 18px 16px;
+            background: linear-gradient(to top, rgba(7, 30, 46, 0.95) 20%, rgba(7, 30, 46, 0.6) 70%, transparent);
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             pointer-events: none;
         }
 
@@ -130,8 +130,8 @@
         }
 
         .prod-thumb {
-            width: 46px;
-            height: 46px;
+            width: 44px;
+            height: 44px;
             border-radius: 8px;
             border: 1.5px solid var(--accent);
             object-fit: cover;
@@ -152,16 +152,16 @@
             color: var(--accent);
         }
 
+        /* 🛒 ACTION BUTTONS */
         .reel-action-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 2px;
             pointer-events: auto;
         }
 
         .btn-reel {
             flex: 1;
-            padding: 10px;
+            padding: 9px;
             border-radius: 30px;
             font-size: 13px;
             font-weight: 700;
@@ -255,8 +255,8 @@
 
                         if (ytId) {
                             count++;
-                            // 🚀 Autoplay + Muted (স্বয়ংক্রিয়ভাবে সরাসরি প্লে শুরু হবে এবং লুপ হতে থাকবে)
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=1&playsinline=1&rel=0`;
+                            // 🎛️ controls=1 (টাইমলাইন টানা, পজ/প্লে ও সাউন্ড কন্ট্রোল বার দৃশ্যমান থাকবে)
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
@@ -266,7 +266,6 @@
                                         <iframe 
                                             src="${embedUrl}" 
                                             title="${prod.name}" 
-                                            frameborder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                             allowfullscreen>
                                         </iframe>
