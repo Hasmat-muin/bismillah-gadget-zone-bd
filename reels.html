@@ -37,6 +37,7 @@
             align-items: center;
             z-index: 100;
             background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+            pointer-events: auto;
         }
 
         .back-btn {
@@ -102,6 +103,9 @@
             width: 100% !important;
             height: 100% !important;
             border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .reel-bottom-overlay {
@@ -251,7 +255,8 @@
 
                         if (ytId) {
                             count++;
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}`;
+                            // 🚀 Autoplay + Muted (স্বয়ংক্রিয়ভাবে সরাসরি প্লে শুরু হবে এবং লুপ হতে থাকবে)
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=1&playsinline=1&rel=0`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
