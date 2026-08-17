@@ -55,7 +55,6 @@
             border-bottom: 2px solid rgba(197, 160, 89, 0.4);
         }
 
-        /* 🏷️ TOP ROW (NAV - LOGO - SEARCH/CART) */
         .header-top-row {
             width: 100%;
             display: flex;
@@ -64,7 +63,6 @@
             gap: 12px;
         }
 
-        /* Left Navigation Links (Desktop) */
         .header-nav-links {
             display: flex;
             align-items: center;
@@ -79,11 +77,8 @@
             transition: 0.2s;
             white-space: nowrap;
         }
-        .header-nav-links a:hover, .header-nav-links a.active {
-            color: var(--accent);
-        }
+        .header-nav-links a:hover, .header-nav-links a.active { color: var(--accent); }
 
-        /* Center Logo Area */
         .center-logo-box {
             display: flex;
             flex-direction: column;
@@ -120,7 +115,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Right Actions */
         .header-right-actions {
             display: flex;
             align-items: center;
@@ -129,7 +123,6 @@
             flex: 1;
         }
 
-        /* 🔍 DESKTOP SEARCH BAR */
         .header-search-box-desktop {
             position: relative;
             display: flex;
@@ -155,7 +148,6 @@
             font-size: 12px;
         }
 
-        /* 🛒 GLOWING CART BUTTON */
         .glow-cart-btn {
             background: transparent;
             border: none;
@@ -179,7 +171,6 @@
             box-shadow: 0 0 8px rgba(197, 160, 89, 0.8);
         }
 
-        /* 📱 SWIPEABLE CATEGORIES BAR WITH HINT ARROW */
         .category-scroll-container {
             width: 100%;
             max-width: 820px;
@@ -215,22 +206,9 @@
             padding: 2px 6px;
             border-radius: 6px;
         }
-        .cat-icon-item i {
-            font-size: 18px;
-            transition: 0.2s;
-        }
-        .cat-icon-item span {
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-        }
-        .cat-icon-item:hover, .cat-icon-item.active {
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-        .cat-icon-item:hover i, .cat-icon-item.active i {
-            filter: drop-shadow(0 0 5px rgba(197, 160, 89, 0.8));
-        }
+        .cat-icon-item i { font-size: 18px; transition: 0.2s; }
+        .cat-icon-item span { font-size: 11px; font-weight: 500; letter-spacing: 0.2px; }
+        .cat-icon-item:hover, .cat-icon-item.active { color: var(--accent); transform: translateY(-2px); }
 
         .swipe-hint-arrow {
             position: absolute;
@@ -244,16 +222,8 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            pointer-events: auto;
-            animation: bounceRight 1.5s infinite;
         }
 
-        @keyframes bounceRight {
-            0%, 100% { transform: translate(0, -50%); opacity: 0.7; }
-            50% { transform: translate(4px, -50%); opacity: 1; color: var(--accent-light); }
-        }
-
-        /* 🎨 3D NEUMORPHIC SLIM SEARCH BAR (MOBILE) */
         .header-search-box-mobile {
             display: none;
             width: 95%;
@@ -293,12 +263,7 @@
             box-sizing: border-box;
         }
 
-        .mobile-search-inner input::placeholder {
-            color: #8c9ba5;
-            font-size: 13.5px;
-            font-weight: 400;
-        }
-
+        .mobile-search-inner input::placeholder { color: #8c9ba5; font-size: 13.5px; font-weight: 400; }
         .search-icon-badge {
             position: absolute;
             right: 12px;
@@ -309,11 +274,7 @@
             align-items: center;
             pointer-events: none;
         }
-
-        .search-icon-badge i {
-            color: #7b8a97;
-            font-size: 15px;
-        }
+        .search-icon-badge i { color: #7b8a97; font-size: 15px; }
 
         /* 🎬 BOTTOM CENTER FLOATING REELS BUTTON */
         .floating-reels-btn {
@@ -323,47 +284,28 @@
             transform: translateX(-50%);
             z-index: 1500;
             background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
-            color: #ffffff;
+            color: #ffffff !important;
             text-decoration: none;
-            padding: 10px 20px;
+            padding: 10px 22px;
             border-radius: 30px;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 800;
-            box-shadow: 0 8px 25px rgba(255, 8, 68, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 8, 68, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.4);
             letter-spacing: 0.3px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
             animation: reelsFloat 2.5s infinite ease-in-out;
         }
 
-        .floating-reels-btn i {
-            font-size: 17px;
-            animation: reelSpin 2s infinite ease-in-out;
-        }
-
-        .floating-reels-btn:hover {
-            transform: translateX(-50%) scale(1.06);
-            box-shadow: 0 10px 30px rgba(255, 8, 68, 0.7);
-            color: #ffffff;
-        }
-
-        .floating-reels-btn:active {
-            transform: translateX(-50%) scale(0.95);
-        }
+        .floating-reels-btn i { font-size: 18px; }
 
         @keyframes reelsFloat {
             0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-5px); }
+            50% { transform: translateX(-50%) translateY(-6px); }
         }
 
-        @keyframes reelSpin {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        /* 📱 RESPONSIVE ADJUSTMENTS */
         @media (max-width: 768px) {
             .header-nav-links { display: none; }
             .header-search-box-desktop { display: none; }
@@ -376,24 +318,11 @@
                 flex: unset;
                 text-align: left;
             }
-            .brand-text-block {
-                align-items: flex-start;
-            }
-            .center-brand-name {
-                font-size: 15px;
-                margin-top: 0;
-            }
-            .center-brand-sub {
-                font-size: 10px;
-            }
-            .header-main-logo {
-                height: 34px;
-                width: 34px;
-            }
-            .icon-category-swipe-wrapper {
-                justify-content: flex-start;
-                gap: 14px;
-            }
+            .brand-text-block { align-items: flex-start; }
+            .center-brand-name { font-size: 15px; margin-top: 0; }
+            .center-brand-sub { font-size: 10px; }
+            .header-main-logo { height: 34px; width: 34px; }
+            .icon-category-swipe-wrapper { justify-content: flex-start; gap: 14px; }
         }
 
         #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
@@ -401,7 +330,6 @@
         .cart-sidebar.open { right: 0; }
         .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
 
-        /* 🔘 ব্যাক বাটন র‌্যাপার */
         #back-to-all-wrap {
             display: none;
             background: #fff;
@@ -422,17 +350,11 @@
             font-size: 12px;
             cursor: pointer;
         }
-        .full-view-heading {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-left: 10px;
-        }
+        .full-view-heading { font-size: 12px; color: var(--text-muted); font-weight: 700; margin-left: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- 🔝 TOP SOCIAL & CONTACT BAR -->
     <div class="top-info-bar">
         <div class="top-social-links">
             <span>Follow Us:</span>
@@ -444,19 +366,16 @@
         </a>
     </div>
 
-    <!-- 👑 LUXURY CENTERED HEADER -->
     <header class="premium-header">
         <div class="header-top-row">
-            <!-- Left Side Links (Desktop) -->
             <nav class="header-nav-links">
                 <a href="index.html" class="active">হোম</a>
+                <a href="reels.html" style="color: #ff6b81;"><i class="fas fa-play-circle"></i> ভিডিও / Reels</a>
                 <a href="#" onclick="switchCategory('Gadget', this)">গ্যাজেট</a>
                 <a href="#" onclick="switchCategory('Accessories', this)">এক্সেসরিজ</a>
-                <a href="#" onclick="switchCategory('Deals', this)">ডিলস</a>
                 <a href="https://wa.me/8801922790663" target="_blank">যোগাযোগ</a>
             </nav>
 
-            <!-- Center/Left Logo & Name -->
             <div class="center-logo-box" onclick="window.location.reload();">
                 <img src="logo.JPG" class="header-main-logo" alt="Logo">
                 <div class="brand-text-block">
@@ -465,7 +384,6 @@
                 </div>
             </div>
 
-            <!-- Right Actions: Desktop Search & Cart -->
             <div class="header-right-actions">
                 <div class="header-search-box-desktop">
                     <input type="text" id="desktop-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'mobile-search')">
@@ -479,7 +397,6 @@
             </div>
         </div>
 
-        <!-- 📱 SWIPEABLE ICON CATEGORIES BAR WITH HINT ARROW -->
         <div class="category-scroll-container">
             <div class="icon-category-swipe-wrapper" id="swipeCategoryBar">
                 <div class="cat-icon-item active" onclick="switchCategory('All', this)">
@@ -515,13 +432,11 @@
                     <span>Bags</span>
                 </div>
             </div>
-            <!-- 👉 ডানপাশের ইন্ডিকেটর অ্যারো -->
             <div class="swipe-hint-arrow" onclick="scrollCategoryRight()" title="আরও দেখুন">
                 <i class="fas fa-chevron-right"></i>
             </div>
         </div>
 
-        <!-- 🔍 3D NEUMORPHIC SLIM SEARCH BAR (MOBILE) -->
         <div class="header-search-box-mobile">
             <div class="mobile-search-inner">
                 <input type="text" id="mobile-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'desktop-search')">
@@ -532,13 +447,11 @@
         </div>
     </header>
 
-    <!-- 🎡 Dynamic Billboard Carousel -->
     <div class="billboard-container" id="billboard-container" style="display: none;">
         <div class="billboard-track" id="billboard-track"></div>
         <div class="billboard-dots" id="billboard-dots"></div>
     </div>
 
-    <!-- ↩️ 'আরও দেখুন' ব্যাক বাটন -->
     <div id="back-to-all-wrap">
         <button class="back-to-all-btn" onclick="exitFullCategoryView()">⬅ সব ক্যাটাগরি দেখুন</button>
         <span class="full-view-heading" id="full-view-heading-text"></span>
@@ -557,22 +470,15 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- 🔵 PROFESSIONAL FOOTER -->
     <footer>
         <div class="footer-content">
             <div class="footer-col">
                 <h3>Bismillah Gadget Zone BD</h3>
                 <p>আমাদের কাছে পাচ্ছেন ১০০% প্রিমিয়াম ও অরিজিনাল গ্যাজেট, জুতা এবং ব্যাগ সামগ্রী। বিশ্বস্ততার সাথে সেরা দামে কেনাকাটা করুন।</p>
                 <div class="social-links">
-                    <a href="https://www.facebook.com/profile.php?id=61590909662011" target="_blank" class="social-btn" title="Facebook Page">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="https://www.youtube.com/@pathofshine" target="_blank" class="social-btn" title="YouTube Channel">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                    <a href="https://wa.me/8801922790663" target="_blank" class="social-btn" title="WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61590909662011" target="_blank" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.youtube.com/@pathofshine" target="_blank" class="social-btn"><i class="fab fa-youtube"></i></a>
+                    <a href="https://wa.me/8801922790663" target="_blank" class="social-btn"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
             <div class="footer-col">
@@ -596,7 +502,6 @@
         </div>
     </footer>
 
-    <!-- 🛒 CART SIDEBAR -->
     <div class="cart-sidebar" id="cart-sidebar">
         <div class="cart-header" style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="margin:0; font-size:16px;">শপিং কার্ট</h3>
@@ -610,7 +515,6 @@
         <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
     </div>
 
-    <!-- 🛒 ORDER MODAL -->
     <div class="order-modal-overlay" id="order-modal" style="display:none; position:fixed; inset:0; background:rgba(15,38,53,0.6); z-index:3000; justify-content:center; align-items:center; padding:10px;">
         <div class="modal-body" style="background:#fff; width:100%; max-width:420px; border-radius:16px; padding:20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
@@ -651,9 +555,7 @@
 
         function scrollCategoryRight() {
             const bar = document.getElementById('swipeCategoryBar');
-            if (bar) {
-                bar.scrollBy({ left: 140, behavior: 'smooth' });
-            }
+            if (bar) bar.scrollBy({ left: 140, behavior: 'smooth' });
         }
     </script>
 </body>
