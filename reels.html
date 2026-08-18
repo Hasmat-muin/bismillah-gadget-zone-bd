@@ -113,13 +113,13 @@
             left: 0;
         }
 
-        /* 🏷️ FIXED BOTTOM OVERLAY - বাটনগুলো আরও ওপরে সুন্দর অবস্থানে সেট করা হয়েছে */
+        /* 🏷️ FIXED BOTTOM OVERLAY - মোবাইল নেভিগেশন বার থেকে ওপরে তোলার জন্য প্যাডিং অ্যাড করা হয়েছে */
         .reel-bottom-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 16px 16px 22px 16px;
+            padding: 16px 16px calc(45px + env(safe-area-inset-bottom)) 16px;
             background: linear-gradient(to top, rgba(7, 30, 46, 0.98) 25%, rgba(7, 30, 46, 0.7) 75%, transparent);
             z-index: 10;
             display: flex;
