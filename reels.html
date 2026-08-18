@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch & Buy - Bismillah Gadget Zone BD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #071e2e;
+            --accent: #c5a059;
+            --accent-light: #e0be7a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .reels-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+            pointer-events: none;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: var(--accent);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            pointer-events: auto;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+        }
+
+        .reels-feed-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            background-color: #000;
+        }
+        .reels-feed-container::-webkit-scrollbar { display: none; }
+
+        .reel-item {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .reel-video-frame {
+            width: 100%;
+            height: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .reel-video-frame iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* 🏷️ FIXED BOTTOM OVERLAY - বাটনগুলো আরও ওপরে সুন্দর অবস্থানে সেট করা হয়েছে */
+        .reel-bottom-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 16px 16px 22px 16px;
+            background: linear-gradient(to top, rgba(7, 30, 46, 0.98) 25%, rgba(7, 30, 46, 0.7) 75%, transparent);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .prod-meta-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        .prod-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            border: 1.5px solid var(--accent);
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .prod-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .prod-price {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .reel-action-buttons {
+            display: flex;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .btn-reel {
+            flex: 1;
+            padding: 11px;
+            border-radius: 30px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-view-product {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-whatsapp-buy {
+            background: #25d366;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-reel:active { transform: scale(0.96); }
+
+        .reels-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: var(--accent);
+            gap: 12px;
+            text-align: center;
+            padding: 20px;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="reels-header">
+        <a href="index.html" class="back-btn" title="হোমে ফিরে যান">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="header-title">
+            <i class="fab fa-youtube" style="color:#ff0000; font-size:20px;"></i> Shorts Showcase
+        </div>
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="reels-feed-container" id="reelsFeedContainer">
+        <div class="reels-loading" id="reelsLoading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <span>ভিডিও লোড হচ্ছে...</span>
+        </div>
+    </div>
+
+    <script>
+        const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products.json";
+
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            url = url.trim();
+
+            const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|video\/|watch\?.+&v=))([\w-]{11})/;
+            const match = url.match(regExp);
+            return (match && match[1]) ? match[1] : null;
+        }
+
+        async function loadProductReels() {
+            const container = document.getElementById('reelsFeedContainer');
+            try {
+                const res = await fetch(dbURL);
+                const products = await res.json();
+
+                if (!products) {
+                    container.innerHTML = `<div class="reels-loading">কোনো প্রোডাক্ট ডাটা পাওয়া যায়নি!</div>`;
+                    return;
+                }
+
+                let reelsHTML = "";
+                let count = 0;
+
+                Object.keys(products).forEach(key => {
+                    const prod = products[key];
+                    if (prod.video && prod.video.trim() !== "") {
+                        const ytId = extractYouTubeId(prod.video);
+
+                        if (ytId) {
+                            count++;
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
+                            const cleanPrice = prod.price || "0";
+                            const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
+
+                            reelsHTML += `
+                                <div class="reel-item">
+                                    <div class="reel-video-frame">
+                                        <iframe 
+                                            src="${embedUrl}" 
+                                            title="${prod.name}" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                            allowfullscreen>
+                                        </iframe>
+                                        
+                                        <div class="reel-bottom-overlay">
+                                            <div class="prod-meta-box">
+                                                <img src="${prod.mainImage || 'logo.JPG'}" class="prod-thumb" alt="${prod.name}">
+                                                <div class="prod-info">
+                                                    <h3>${prod.name}</h3>
+                                                    <div class="prod-price">৳ ${cleanPrice}</div>
+                                                </div>
+                                            </div>
+                                            <div class="reel-action-buttons">
+                                                <a href="product.html?id=${key}" class="btn-reel btn-view-product">
+                                                    <i class="fas fa-eye"></i> Details
+                                                </a>
+                                                <a href="https://wa.me/8801922790663?text=${waMessage}" target="_blank" class="btn-reel btn-whatsapp-buy">
+                                                    <i class="fab fa-whatsapp"></i> Buy Now
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+
+                if (count === 0) {
+                    container.innerHTML = `<div class="reels-loading">⚠️ কোনো YouTube ভিডিও পাওয়া যায়নি। অ্যাডমিন থেকে সঠিক লিংক দিন।</div>`;
+                } else {
+                    container.innerHTML = reelsHTML;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="reels-loading">ভিডিও লোড করতে সমস্যা হয়েছে!</div>`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadProductReels);
+    </script>
+</body>
+</html>
