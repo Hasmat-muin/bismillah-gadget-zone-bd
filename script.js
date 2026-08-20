@@ -1,3 +1,10 @@
+// --- ✨ PAGE LOAD CONTROLLER ---
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartUI();
+    if (document.getElementById('products-container')) { fetchProducts(); }
+    fetchAndRenderBillboards();
+});
+
 const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products.json";
 const authURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminSettings.json";
 const catURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categories.json"; 
@@ -27,18 +34,16 @@ function toggleCart() {
 
 function goBackPage() {
     if (window.history.length > 1) window.history.back();
-    else window.location.href = 'index.html';
+    else window.location.href = 'shop.html';
 }
 
 function goForwardPage() { window.history.forward(); }
 
-// 🛒 কার্টে প্রোডাক্ট অ্যাড করার সময় ছবি যুক্ত করা হয়েছে
 function addToCart(id, name, price, image = "") {
     let cleanPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : parseFloat(price);
     let variant = selectedVariantsGlobal[id] || "Standard";
     let size = selectedSizesGlobal[id] || "";
     
-    // ছবি না পেলে ডাটাবেস থেকে ছবি নেওয়া
     if (!image && allProductsData[id]) {
         image = allProductsData[id].mainImage || "";
     }
@@ -130,7 +135,6 @@ function closeOrderModal() {
     if (modalIndex) modalIndex.style.display = 'none';
 }
 
-// 📲 WhatsApp মেসেজে প্রতিটি প্রোডাক্টের লাইভ ভিউ ও ফটো লিংক যুক্ত করা হয়েছে
 function sendOrderToWhatsApp() {
     const name = document.getElementById('customer-name')?.value;
     const phone = document.getElementById('customer-phone')?.value;
@@ -148,7 +152,6 @@ function sendOrderToWhatsApp() {
     message += `🚚 *ডেলিভারি:* ${deliveryText}\n\n`;
     message += `🛍️ *অর্ডারকৃত প্রোডাক্টসমূহ:*\n`;
     
-    // বর্তমান ওয়েবসাইটের বেজ URL বের করা
     const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
     cart.forEach((item, index) => {
@@ -550,9 +553,3 @@ function enableDesktopDragScroll() {
     const productGrids = document.querySelectorAll('.products-grid');
     productGrids.forEach(grid => makeDragScrollable(grid));
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    updateCartUI();
-    if (document.getElementById('products-container')) { fetchProducts(); }
-    fetchAndRenderBillboards();
-});

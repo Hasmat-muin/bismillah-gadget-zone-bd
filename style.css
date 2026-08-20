@@ -541,11 +541,11 @@ footer {
     scroll-snap-align: start;
     border-radius: 12px;
     overflow: hidden;
-    background: #071e2e; /* স্লাইডার ব্যাকগ্রাউন্ড হেডার কালারের সাথে ম্যাচ করা */
+    background: #071e2e;
     display: flex;
     align-items: center;
     justify-content: center;
-    aspect-ratio: 16 / 7; /* স্ট্যান্ডার্ড ব্যানার রেশিও */
+    aspect-ratio: 16 / 7;
     max-height: 280px;
 }
 
@@ -553,7 +553,7 @@ footer {
 .billboard-slide video {
     width: 100%;
     height: 100%;
-    object-fit: contain !important; /* লেখা বা কোনো অংশ না কেটে সম্পূর্ণ ব্যানার দৃশ্যমান হবে */
+    object-fit: contain !important;
     object-position: center;
     display: block;
     border-radius: 12px;
@@ -580,7 +580,6 @@ footer {
     background-color: #0f2635;
 }
 
-/* 📱 মোবাইলের জন্য রেসপনসিভ ব্যানার */
 @media (max-width: 768px) {
     .billboard-slide {
         aspect-ratio: 16 / 8;

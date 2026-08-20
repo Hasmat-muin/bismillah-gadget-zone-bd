@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bismillah Gadget Zone BD</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #071e2e;
+            --primary-dark: #04121c;
+            --accent: #c5a059;
+            --accent-light: #e0be7a;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg-main); 
+            margin: 0; padding: 0; color: var(--text-dark);
+            position: relative;
+        }
+
+        /* 🔝 TOP INFO BAR */
+        .top-info-bar {
+            background: #f1f5f9;
+            padding: 4px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .top-social-links { display: flex; align-items: center; gap: 10px; }
+        .top-social-links a { color: #0f2635; text-decoration: none; font-size: 13px; transition: 0.2s; }
+        .top-social-links a:hover { color: var(--accent); }
+        .top-phone-link { color: var(--accent); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+
+        /* 👑 MAIN HEADER CONTAINER */
+        .premium-header {
+            background: radial-gradient(circle at center top, #0f3047, #071e2e);
+            padding: 8px 4% 10px 4%;
+            box-shadow: 0 8px 20px rgba(4, 18, 28, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(197, 160, 89, 0.4);
+        }
+
+        .header-top-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+        .header-nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .header-nav-links a:hover, .header-nav-links a.active {
+            color: var(--accent);
+        }
+
+        .center-logo-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+        }
+        .header-main-logo {
+            height: 42px;
+            width: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            object-fit: cover;
+            box-shadow: 0 0 12px rgba(197, 160, 89, 0.35);
+        }
+        .brand-text-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .center-brand-name {
+            color: var(--accent);
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+            line-height: 1.1;
+        }
+        .center-brand-sub {
+            color: #e8d5b0;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: flex-end;
+            flex: 1;
+        }
+
+        .header-search-box-desktop {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 200px;
+        }
+        .header-search-box-desktop input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.2px solid rgba(197, 160, 89, 0.4);
+            border-radius: 20px;
+            padding: 6px 30px 6px 12px;
+            color: white;
+            font-size: 12.5px;
+            outline: none;
+        }
+        .header-search-box-desktop input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        .header-search-box-desktop i {
+            position: absolute;
+            right: 10px;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        .glow-cart-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            padding: 4px 8px;
+        }
+        .cart-glow-badge {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: #071e2e;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(197, 160, 89, 0.8);
+        }
+
+        /* 📱 FIXED REELS + SWIPEABLE CATEGORIES CONTAINER */
+        .category-scroll-container {
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            gap: 10px;
+            padding: 0 6px;
+        }
+
+        .pinned-reels-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            gap: 2px;
+            flex-shrink: 0;
+            padding: 2px 4px;
+            background: rgba(7, 30, 46, 0.95);
+            z-index: 10;
+            border-right: 1.5px solid rgba(197, 160, 89, 0.3);
+            padding-right: 10px;
+        }
+        .reels-story-ring {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            padding: 1.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 6px rgba(220, 39, 67, 0.4);
+            animation: storyPulse 2s infinite ease-in-out;
+        }
+        .reels-story-inner {
+            width: 100%;
+            height: 100%;
+            background: #071e2e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 8px;
+        }
+        .reels-badge-title {
+            font-size: 9.5px !important;
+            font-weight: 700 !important;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.2px;
+        }
+
+        @keyframes storyPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(220, 39, 67, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 10px rgba(220, 39, 67, 0.6); }
+        }
+
+        .icon-category-swipe-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 16px;
+            padding: 4px 24px 4px 4px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .icon-category-swipe-wrapper::-webkit-scrollbar { display: none; }
+
+        .cat-icon-item {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            gap: 3px;
+            flex-shrink: 0;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+        .cat-icon-item i { font-size: 17px; transition: 0.2s; }
+        .cat-icon-item span { font-size: 11px; font-weight: 500; letter-spacing: 0.2px; }
+        .cat-icon-item:hover, .cat-icon-item.active {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .cat-icon-item:hover i, .cat-icon-item.active i {
+            filter: drop-shadow(0 0 5px rgba(197, 160, 89, 0.8));
+        }
+
+        .swipe-hint-arrow {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, transparent, rgba(7, 30, 46, 0.95) 40%);
+            color: var(--accent);
+            padding: 4px 6px 4px 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            pointer-events: auto;
+            animation: bounceRight 1.5s infinite;
+        }
+
+        @keyframes bounceRight {
+            0%, 100% { transform: translate(0, -50%); opacity: 0.7; }
+            50% { transform: translate(4px, -50%); opacity: 1; color: var(--accent-light); }
+        }
+
+        .header-search-box-mobile {
+            display: none;
+            width: 95%;
+            max-width: 480px;
+            margin-top: 8px;
+            margin-bottom: 2px;
+            position: relative;
+            background: #ebf0f5;
+            border-radius: 40px;
+            padding: 2.5px;
+            box-shadow: 4px 4px 10px rgba(4, 18, 28, 0.35), 
+                       -2px -2px 6px rgba(255, 255, 255, 0.08);
+            box-sizing: border-box;
+        }
+
+        .mobile-search-inner {
+            width: 100%;
+            background: #eef2f7;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: inset 1.5px 1.5px 4px rgba(166, 175, 186, 0.4), 
+                        inset -1.5px -1.5px 4px rgba(255, 255, 255, 0.9);
+        }
+
+        .mobile-search-inner input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 7px 38px 7px 16px;
+            color: #475569;
+            font-size: 13.5px;
+            font-weight: 500;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .mobile-search-inner input::placeholder { color: #8c9ba5; font-size: 13.5px; font-weight: 400; }
+        .search-icon-badge {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+        .search-icon-badge i { color: #7b8a97; font-size: 15px; }
+
+        /* 💬 STANDALONE FLOATING WHATSAPP BUTTON */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 22px;
+            right: 18px;
+            z-index: 1500;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #25d366;
+            color: #ffffff !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            text-decoration: none;
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .floating-whatsapp:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 24px rgba(37, 211, 102, 0.55);
+        }
+        .floating-whatsapp:active { transform: scale(0.95); }
+
+        @media (max-width: 768px) {
+            .header-nav-links { display: none; }
+            .header-search-box-desktop { display: none; }
+            .header-search-box-mobile { display: block; }
+            
+            .center-logo-box {
+                flex-direction: row;
+                align-items: center;
+                gap: 7px;
+                flex: unset;
+                text-align: left;
+            }
+            .brand-text-block { align-items: flex-start; }
+            .center-brand-name { font-size: 15px; margin-top: 0; }
+            .center-brand-sub { font-size: 10px; }
+            .header-main-logo { height: 34px; width: 34px; }
+            .floating-whatsapp { width: 46px; height: 46px; font-size: 24px; bottom: 16px; right: 16px; }
+        }
+
+        #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
+        .cart-sidebar { position: fixed; top: 0; right: -340px; width: 320px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: 0.3s ease; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; }
+        .cart-sidebar.open { right: 0; }
+        .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
+
+        #back-to-all-wrap {
+            display: none;
+            background: #fff;
+            padding: 10px 5%;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 130px;
+            z-index: 999;
+            align-items: center;
+        }
+        .back-to-all-btn {
+            background: var(--primary);
+            color: var(--accent);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .full-view-heading { font-size: 12px; color: var(--text-muted); font-weight: 700; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-info-bar">
+        <div class="top-social-links">
+            <span>Follow Us:</span>
+            <a href="https://www.facebook.com/profile.php?id=61590909662011" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+        <a href="tel:+8801922790663" class="top-phone-link">
+            <i class="fas fa-phone-alt"></i> 01922-790663
+        </a>
+    </div>
+
+    <header class="premium-header">
+        <div class="header-top-row">
+            <nav class="header-nav-links">
+                <a href="shop.html" class="active">হোম</a>
+                <a href="reels.html" style="color: var(--accent);"><i class="fas fa-play-circle" style="color: #ff4e50;"></i> ভিডিও / Reels</a>
+                <a href="#" onclick="switchCategory('Gadget', this)">গ্যাজেট</a>
+                <a href="#" onclick="switchCategory('Accessories', this)">এক্সেসরিজ</a>
+                <a href="https://wa.me/8801922790663" target="_blank">যোগাযোগ</a>
+            </nav>
+
+            <div class="center-logo-box" onclick="window.location.reload();">
+                <img src="logo.JPG" class="header-main-logo" alt="Logo">
+                <div class="brand-text-block">
+                    <div class="center-brand-name">Bismillah</div>
+                    <div class="center-brand-sub">Gadget Zone BD</div>
+                </div>
+            </div>
+
+            <div class="header-right-actions">
+                <div class="header-search-box-desktop">
+                    <input type="text" id="desktop-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'mobile-search')">
+                    <i class="fas fa-search"></i>
+                </div>
+                <button class="glow-cart-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>কার্ট</span>
+                    <span class="cart-glow-badge" id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="category-scroll-container">
+            <a href="reels.html" class="pinned-reels-badge" title="Watch Shorts Reels">
+                <div class="reels-story-ring">
+                    <div class="reels-story-inner">
+                        <i class="fas fa-play" style="font-size: 8px;"></i>
+                    </div>
+                </div>
+                <span class="reels-badge-title">Reels</span>
+            </a>
+
+            <div class="icon-category-swipe-wrapper" id="swipeCategoryBar">
+                <div class="cat-icon-item active" onclick="switchCategory('All', this)">
+                    <i class="fas fa-bolt"></i>
+                    <span>All</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Earbuds', this)">
+                    <i class="fas fa-headphones-alt"></i>
+                    <span>Earbuds</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Smartwatch', this)">
+                    <i class="fas fa-clock"></i>
+                    <span>Smartwatches</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Laptop & PC', this)">
+                    <i class="fas fa-laptop"></i>
+                    <span>Laptop/PC</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Audio', this)">
+                    <i class="fas fa-headphones"></i>
+                    <span>Audio</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Accessories', this)">
+                    <i class="fas fa-plug"></i>
+                    <span>Accessories</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Shoes', this)">
+                    <i class="fas fa-shoe-prints"></i>
+                    <span>Shoes</span>
+                </div>
+                <div class="cat-icon-item" onclick="switchCategory('Bags', this)">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Bags</span>
+                </div>
+            </div>
+            <div class="swipe-hint-arrow" onclick="scrollCategoryRight()" title="আরও দেখুন">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+
+        <div class="header-search-box-mobile">
+            <div class="mobile-search-inner">
+                <input type="text" id="mobile-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'desktop-search')">
+                <div class="search-icon-badge">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 🎡 Dynamic Billboard Carousel (Added Back) -->
+    <div class="billboard-container" id="billboard-container" style="display: none;">
+        <div class="billboard-track" id="billboard-track"></div>
+        <div class="billboard-dots" id="billboard-dots"></div>
+    </div>
+
+    <div id="back-to-all-wrap">
+        <button class="back-to-all-btn" onclick="exitFullCategoryView()">⬅ সব ক্যাটাগরি দেখুন</button>
+        <span class="full-view-heading" id="full-view-heading-text"></span>
+    </div>
+
+    <main id="products-container"></main>
+
+    <a href="https://wa.me/8801922790663" target="_blank" class="floating-whatsapp" title="WhatsApp-এ যোগাযোগ করুন">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script src="script.js"></script>
+    <script>
+        function syncAndSearch(value, targetId) {
+            const target = document.getElementById(targetId);
+            if (target) target.value = value;
+            searchProducts(value);
+        }
+
+        function scrollCategoryRight() {
+            const bar = document.getElementById('swipeCategoryBar');
+            if (bar) {
+                bar.scrollBy({ left: 140, behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>
