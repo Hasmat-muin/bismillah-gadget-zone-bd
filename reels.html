@@ -111,8 +111,48 @@
             position: absolute;
             top: 0;
             left: 0;
+            z-index: 2;
         }
 
+        /* 🖼️ থাম্বনেইল ও লোডিং ওভারলে যা ব্ল্যাক স্ক্রিন ঢেকে রাখবে */
+        .reel-poster-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease;
+            cursor: pointer;
+        }
+
+        .reel-poster-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .play-pause-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(197, 160, 89, 0.85);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #071e2e;
+            font-size: 24px;
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.6);
+            animation: pulsePlay 2s infinite;
+        }
+
+        @keyframes pulsePlay {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(197, 160, 89, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 25px rgba(197, 160, 89, 0.9); }
+        }
+
+        /* 🏷️ FIXED BOTTOM OVERLAY */
         .reel-bottom-overlay {
             position: absolute;
             bottom: 0;
@@ -233,7 +273,6 @@
         function extractYouTubeId(url) {
             if (!url) return null;
             url = url.trim();
-
             const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|video\/|watch\?.+&v=))([\w-]{11})/;
             const match = url.match(regExp);
             return (match && match[1]) ? match[1] : null;
@@ -260,18 +299,23 @@
 
                         if (ytId) {
                             count++;
-                            const isFirst = (count === 1);
-                            const muteVal = isFirst ? "0" : "1";
-
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=${muteVal}&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
+                            const posterImg = prod.mainImage || 'logo.JPG';
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
                             reelsHTML += `
-                                <div class="reel-item" data-index="${count}">
+                                <div class="reel-item">
                                     <div class="reel-video-frame">
+                                        <!-- প্রোডাক্ট থাম্বনেইল ওভারলে যা ব্ল্যাক স্ক্রিন ঢেকে রাখবে -->
+                                        <div class="reel-poster-overlay" style="background-image: url('${posterImg}');" onclick="playReelVideo(this)">
+                                            <div class="play-pause-btn">
+                                                <i class="fas fa-play" style="margin-left: 3px;"></i>
+                                            </div>
+                                        </div>
+
                                         <iframe 
-                                            src="${embedUrl}" 
+                                            data-src="${embedUrl}" 
                                             title="${prod.name}" 
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                             allowfullscreen>
@@ -279,7 +323,7 @@
                                         
                                         <div class="reel-bottom-overlay">
                                             <div class="prod-meta-box">
-                                                <img src="${prod.mainImage || 'logo.JPG'}" class="prod-thumb" alt="${prod.name}">
+                                                <img src="${posterImg}" class="prod-thumb" alt="${prod.name}">
                                                 <div class="prod-info">
                                                     <h3>${prod.name}</h3>
                                                     <div class="prod-price">৳ ${cleanPrice}</div>
@@ -305,14 +349,24 @@
                     container.innerHTML = `<div class="reels-loading">⚠️ কোনো YouTube ভিডিও পাওয়া যায়নি। অ্যাডমিন থেকে সঠিক লিংক দিন।</div>`;
                 } else {
                     container.innerHTML = reelsHTML;
-                    initReelScrollObserver();
+                    initReelObserver();
                 }
             } catch (err) {
                 container.innerHTML = `<div class="reels-loading">ভিডিও লোড করতে সমস্যা হয়েছে!</div>`;
             }
         }
 
-        function initReelScrollObserver() {
+        function playReelVideo(overlayElement) {
+            const frame = overlayElement.closest('.reel-video-frame');
+            const iframe = frame.querySelector('iframe');
+            if (iframe && !iframe.getAttribute('src')) {
+                iframe.src = iframe.getAttribute('data-src');
+            }
+            overlayElement.classList.add('hidden');
+        }
+
+        // স্ক্রোল করার সময় অটো প্লে এবং থাম্বনেইল হ্যান্ডেল করার জন্য ইন্টারসেকশন অবজারভার
+        function initReelObserver() {
             const observerOptions = {
                 root: document.getElementById('reelsFeedContainer'),
                 threshold: 0.6
@@ -321,16 +375,23 @@
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const iframe = entry.target.querySelector('iframe');
-                    if (!iframe) return;
+                    const overlay = entry.target.querySelector('.reel-poster-overlay');
 
-                    let currentSrc = iframe.src;
                     if (entry.isIntersecting) {
-                        if (currentSrc.includes('mute=1')) {
-                            iframe.src = currentSrc.replace('mute=1', 'mute=0');
+                        if (iframe && !iframe.getAttribute('src')) {
+                            iframe.src = iframe.getAttribute('data-src');
                         }
+                        // ভিডিও লোড হওয়ার সামান্য সময় পরে ওভারলে হাইড হবে যাতে ব্ল্যাক স্ক্রিন না দেখা যায়
+                        setTimeout(() => {
+                            if (overlay) overlay.classList.add('hidden');
+                        }, 500);
                     } else {
-                        if (currentSrc.includes('mute=0')) {
-                            iframe.src = currentSrc.replace('mute=0', 'mute=1');
+                        // স্ক্রোল করে চলে গেলে ভিডিওর সোর্স রিসেট করে দেওয়া যাতে ব্যাকগ্রাউন্ডে অডিও বা ডাটা না চলে
+                        if (iframe) {
+                            iframe.removeAttribute('src');
+                        }
+                        if (overlay) {
+                            overlay.classList.remove('hidden');
                         }
                     }
                 });
