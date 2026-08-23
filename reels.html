@@ -113,7 +113,6 @@
             left: 0;
         }
 
-        /* 🏷️ FIXED BOTTOM OVERLAY - বাটনগুলো আরও ওপরে সুন্দর অবস্থানে সেট করা হয়েছে */
         .reel-bottom-overlay {
             position: absolute;
             bottom: 0;
@@ -261,12 +260,15 @@
 
                         if (ytId) {
                             count++;
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
+                            const isFirst = (count === 1);
+                            const muteVal = isFirst ? "0" : "1";
+
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=${muteVal}&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
                             reelsHTML += `
-                                <div class="reel-item">
+                                <div class="reel-item" data-index="${count}">
                                     <div class="reel-video-frame">
                                         <iframe 
                                             src="${embedUrl}" 
@@ -303,10 +305,40 @@
                     container.innerHTML = `<div class="reels-loading">⚠️ কোনো YouTube ভিডিও পাওয়া যায়নি। অ্যাডমিন থেকে সঠিক লিংক দিন।</div>`;
                 } else {
                     container.innerHTML = reelsHTML;
+                    initReelScrollObserver();
                 }
             } catch (err) {
                 container.innerHTML = `<div class="reels-loading">ভিডিও লোড করতে সমস্যা হয়েছে!</div>`;
             }
+        }
+
+        function initReelScrollObserver() {
+            const observerOptions = {
+                root: document.getElementById('reelsFeedContainer'),
+                threshold: 0.6
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const iframe = entry.target.querySelector('iframe');
+                    if (!iframe) return;
+
+                    let currentSrc = iframe.src;
+                    if (entry.isIntersecting) {
+                        if (currentSrc.includes('mute=1')) {
+                            iframe.src = currentSrc.replace('mute=1', 'mute=0');
+                        }
+                    } else {
+                        if (currentSrc.includes('mute=0')) {
+                            iframe.src = currentSrc.replace('mute=0', 'mute=1');
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reel-item').forEach(item => {
+                observer.observe(item);
+            });
         }
 
         document.addEventListener("DOMContentLoaded", loadProductReels);
