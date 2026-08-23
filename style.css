@@ -177,18 +177,17 @@ header {
     border-radius: 10px;
 }
 
-/* ✂️ ফিক্সড সাইজ প্রোডাক্ট কার্ড যাতে চ্যাপ্টা না হয় */
+/* ✂️ আদর্শ শেপ ও সাইজ ফিক্সড প্রোডাক্ট কার্ড (মোবাইলে চ্যাপ্টা হবে না) */
 .product-card,
 .products-grid .product-card {
-    flex: 0 0 calc(50% - 6px) !important;
-    max-width: calc(50% - 6px) !important;
-    min-width: calc(50% - 6px) !important;
+    flex: 0 0 160px !important;
+    max-width: 160px !important;
+    min-width: 160px !important;
+    flex-shrink: 0 !important;
     scroll-snap-align: start !important;
     overflow: hidden !important;
     display: flex;
     flex-direction: column;
-    height: auto !important;
-    position: relative;
     background: #ffffff !important; 
     border-radius: 14px !important;
     border: 1px solid rgba(226, 232, 240, 0.8) !important;
@@ -221,12 +220,13 @@ header {
     box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
 }
 
-/* 🖼️ ইমেজ র‍্যাপার (সাদা বর্ডার ও ওভারল্যাপ ফিক্সড) */
+/* 🖼️ ইমেজ র‍্যাপার (আদর্শ স্কয়ার শেপ নিশ্চিত করতে ফিক্সড হাইট) */
 .image-wrapper {
     background: #f8fafc;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    min-height: 160px;
+    width: 100% !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    max-height: 160px !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -235,12 +235,12 @@ header {
     border-top-right-radius: 14px;
     overflow: hidden;
     position: relative;
-    flex-shrink: 0;
+    flex-shrink: 0 !important;
 }
 
 .image-wrapper img {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: contain !important;
     object-position: center;
     display: block;
@@ -402,7 +402,9 @@ header {
     }
 
     .image-wrapper {
-        min-height: 200px;
+        height: 200px !important;
+        min-height: 200px !important;
+        max-height: 200px !important;
         padding: 8px;
         border-top-left-radius: 16px;
         border-top-right-radius: 16px;
