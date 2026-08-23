@@ -25,7 +25,7 @@
             position: relative;
         }
 
-        /* 🔝 TOP INFO BAR */
+        /* 🔝 TOP INFO BAR - ফিক্সড করা হয়েছে যাতে কোনো এলিমেন্ট ওভারল্যাপ না করে */
         .top-info-bar {
             background: #f1f5f9;
             padding: 4px 5%;
@@ -35,6 +35,8 @@
             font-size: 12px;
             color: #475569;
             border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            z-index: 1001;
         }
         .top-social-links { display: flex; align-items: center; gap: 10px; }
         .top-social-links a { color: #0f2635; text-decoration: none; font-size: 13px; transition: 0.2s; }
@@ -520,7 +522,7 @@
         </div>
     </header>
 
-    <!-- 🎡 Dynamic Billboard Carousel (Added Back) -->
+    <!-- 🎡 Dynamic Billboard Carousel -->
     <div class="billboard-container" id="billboard-container" style="display: none;">
         <div class="billboard-track" id="billboard-track"></div>
         <div class="billboard-dots" id="billboard-dots"></div>

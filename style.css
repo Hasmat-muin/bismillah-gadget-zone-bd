@@ -177,9 +177,10 @@ header {
     border-radius: 10px;
 }
 
-/* ✂️ আদর্শ শেপ ও সাইজ ফিক্সড প্রোডাক্ট কার্ড (মোবাইলে চ্যাপ্টা হবে না) */
+/* ✂️ আদর্শ শেপ ও সাইজ ফিক্সড প্রোডাক্ট কার্ড */
 .product-card,
 .products-grid .product-card {
+    position: relative !important;
     flex: 0 0 160px !important;
     max-width: 160px !important;
     min-width: 160px !important;
@@ -202,11 +203,15 @@ header {
     border-color: rgba(197, 160, 89, 0.5) !important;
 }
 
+/* 🏷️ ডিসকাউন্ট ট্যাগ সবসময় ফিক্সড ও দৃশ্যমান রাখার জন্য */
 .card-badges-top {
     position: absolute;
     top: 8px;
     left: 8px;
     z-index: 5;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
     pointer-events: none;
 }
 
@@ -220,7 +225,7 @@ header {
     box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
 }
 
-/* 🖼️ ইমেজ র‍্যাপার (আদর্শ স্কয়ার শেপ নিশ্চিত করতে ফিক্সড হাইট) */
+/* 🖼️ ইমেজ র‍্যাপার */
 .image-wrapper {
     background: #f8fafc;
     width: 100% !important;

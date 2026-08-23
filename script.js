@@ -268,8 +268,9 @@ function renderCategoryWiseColumns() {
             if (prod.category !== category) return;
             categoryProductsCount++;
 
-            const regPrice = parseFloat(prod.regularPrice) || parseFloat(prod.price);
-            const salePrice = parseFloat(prod.price);
+            const salePrice = parseFloat(prod.price) || 0;
+            const regPrice = parseFloat(prod.regularPrice) || salePrice;
+            
             let discountBadge = "";
             let priceCutHTML = `<span class="price">৳ ${salePrice}</span>`;
 
