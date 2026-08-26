@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bismillah Gadget Zone BD</title>
+    <!-- Favicon যোগ করা হয়েছে -->
+    <link rel="icon" type="image/png" href="public/favicon.png">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -25,7 +28,7 @@
             position: relative;
         }
 
-        /* 🔝 TOP INFO BAR - ফিক্সড করা হয়েছে যাতে কোনো এলিমেন্ট ওভারল্যাপ না করে */
+        /* 🔝 TOP INFO BAR */
         .top-info-bar {
             background: #f1f5f9;
             padding: 4px 5%;
@@ -392,10 +395,12 @@
         }
 
         #products-container { width: 100%; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
+        
+        /* Cart Sidebar & Checkout Modal CSS */
         .cart-sidebar { position: fixed; top: 0; right: -340px; width: 320px; height: 100%; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: 0.3s ease; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; }
         .cart-sidebar.open { right: 0; }
         .checkout-btn { background: var(--primary); color: var(--accent); width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
-
+        
         #back-to-all-wrap {
             display: none;
             background: #fff;
@@ -455,6 +460,7 @@
                     <input type="text" id="desktop-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'mobile-search')">
                     <i class="fas fa-search"></i>
                 </div>
+                <!-- Cart Button -->
                 <button class="glow-cart-btn" onclick="toggleCart()">
                     <i class="fas fa-shopping-cart"></i>
                     <span>কার্ট</span>
@@ -474,38 +480,7 @@
             </a>
 
             <div class="icon-category-swipe-wrapper" id="swipeCategoryBar">
-                <div class="cat-icon-item active" onclick="switchCategory('All', this)">
-                    <i class="fas fa-bolt"></i>
-                    <span>All</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Earbuds', this)">
-                    <i class="fas fa-headphones-alt"></i>
-                    <span>Earbuds</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Smartwatch', this)">
-                    <i class="fas fa-clock"></i>
-                    <span>Smartwatches</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Laptop & PC', this)">
-                    <i class="fas fa-laptop"></i>
-                    <span>Laptop/PC</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Audio', this)">
-                    <i class="fas fa-headphones"></i>
-                    <span>Audio</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Accessories', this)">
-                    <i class="fas fa-plug"></i>
-                    <span>Accessories</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Shoes', this)">
-                    <i class="fas fa-shoe-prints"></i>
-                    <span>Shoes</span>
-                </div>
-                <div class="cat-icon-item" onclick="switchCategory('Bags', this)">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span>Bags</span>
-                </div>
+                <!-- Dynamic Content injected via script.js -->
             </div>
             <div class="swipe-hint-arrow" onclick="scrollCategoryRight()" title="আরও দেখুন">
                 <i class="fas fa-chevron-right"></i>
@@ -533,8 +508,82 @@
         <span class="full-view-heading" id="full-view-heading-text"></span>
     </div>
 
+    <!-- Main Products Render Container -->
     <main id="products-container"></main>
 
+    <!-- Professional Footer with Policy Links -->
+    <footer style="background: var(--primary); color: white; padding: 40px 5%; margin-top: 40px; border-top: 3px solid var(--accent);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;">
+            <div style="flex: 1; min-width: 250px;">
+                <img src="logo.JPG" alt="Bismillah Gadget Zone BD" style="height: 60px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 15px;">
+                <h3 style="color: var(--accent); margin-bottom: 10px;">Bismillah Gadget Zone BD</h3>
+                <p style="font-size: 14px; color: #cbd5e1;">Original Mobile, Watch & Electronics — Best Price, Genuine Quality.</p>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="color: var(--accent-light); margin-bottom: 15px;">Important Links</h4>
+                <ul style="list-style: none; padding: 0; font-size: 14px; line-height: 2;">
+                    <li><a href="page.html?type=refund" style="color: #cbd5e1; text-decoration: none;">🔄 Refund & Return Policy</a></li>
+                    <li><a href="page.html?type=terms" style="color: #cbd5e1; text-decoration: none;">📜 Terms & Conditions</a></li>
+                    <li><a href="page.html?type=delivery" style="color: #cbd5e1; text-decoration: none;">🚚 Delivery Information</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            &copy; 2026 Bismillah Gadget Zone BD. All Rights Reserved.
+        </div>
+    </footer>
+
+    <!-- 🛒 Missing Cart Sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px;">
+            <h3 style="margin: 0; color: #0f2635;">Your Cart</h3>
+            <button style="font-size:24px; border:none; background:none; cursor:pointer;" onclick="toggleCart()">×</button>
+        </div>
+        <div id="cart-items-container" style="flex-grow: 1; overflow-y: auto; margin-top: 15px;"></div>
+        <div style="font-size: 18px; font-weight: 700; border-top: 2px solid #f1f5f9; padding-top: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; color: var(--primary);">
+            <span>Total:</span>
+            <span>৳ <span id="cart-total-price">0</span></span>
+        </div>
+        <button class="checkout-btn" onclick="openOrderModal()">Proceed To Checkout</button>
+    </div>
+
+    <!-- 📦 Missing Checkout Modal -->
+    <div class="order-modal-overlay" id="order-modal" style="display:none; position:fixed; inset:0; background:rgba(15,38,53,0.6); z-index:3000; justify-content:center; align-items:center; padding:10px;">
+        <div class="modal-body" style="background:#fff; width:100%; max-width:420px; border-radius:16px; padding:20px; max-height: 90vh; overflow-y: auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="margin:0; font-size:16px; color:#0f2635;">Confirm Order via WhatsApp</h3>
+                <span style="font-size:24px; cursor:pointer;" onclick="closeOrderModal()">&times;</span>
+            </div>
+            
+            <div style="margin-bottom:10px;">
+                <label style="font-size:12px; font-weight:600;">আপনার নাম</label>
+                <input type="text" id="customer-name" placeholder="নাম লিখুন" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-size:12px; font-weight:600;">মোবাইল নম্বর</label>
+                <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের নম্বর" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px; box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-size:12px; font-weight:600;">পূর্ণাঙ্গ ঠিকানা</label>
+                <textarea id="customer-address" placeholder="ঠিকানা উল্লেখ করুন" rows="2" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px; box-sizing:border-box;"></textarea>
+            </div>
+            <div style="margin-bottom:10px;">
+                <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
+                <select id="delivery-charge-select" onchange="calculateOrderTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
+                    <option value="80">ঢাকার ভেতরে (৳৮০)</option>
+                    <option value="150">ঢাকার বাইরে (৳১৫০)</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 14px; color: #0f2635; font-weight: bold;">
+                Subtotal: ৳<span id="modal-subtotal">0</span><br>
+                Delivery: ৳<span id="modal-delivery">80</span><br>
+                Total: <span style="color: #c5a059; font-size: 16px;">৳<span id="modal-final-total">0</span></span>
+            </div>
+            <button class="submit-order-btn" onclick="sendOrderToWhatsApp()" style="background:#25d366; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">Confirm Order on WhatsApp 🚀</button>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp CTA -->
     <a href="https://wa.me/8801922790663" target="_blank" class="floating-whatsapp" title="WhatsApp-এ যোগাযোগ করুন">
         <i class="fab fa-whatsapp"></i>
     </a>
