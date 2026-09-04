@@ -85,7 +85,6 @@
         .edit-prod-btn { background: #3b82f6; margin-right: 4px; }
         .delete-prod-btn, .delete-cat-btn { background: #ef4444; }
 
-        /* 🎨 কালার ভ্যারিয়েন্ট রো স্টাইল */
         .variant-row {
             display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; background: #ffffff; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;
         }
@@ -201,7 +200,7 @@
                 </div>
             </div>
 
-            <!-- 📦 Add/Edit Product (With Color Variant Option) -->
+            <!-- 📦 Add/Edit Product -->
             <div class="admin-card" id="formScrollTarget">
                 <h3 id="formActionTitle">📦 Add New Product</h3>
                 
@@ -242,10 +241,22 @@
                     <label>Sizes (Optional)</label>
                     <input type="text" id="prodSizes" placeholder="যেমন: 39, 40, 41, 42">
                 </div>
-                <div class="input-group">
-                    <label>Video URL (Optional)</label>
-                    <input type="url" id="prodVideo" placeholder="https://youtube.com/...">
+                
+                <!-- 🆕 নতুন ভিডিও লিংক সেকশন -->
+                <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 16px;">
+                    <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:10px;">🎥 Video Links (ভিডিও লিংক)</label>
+                    
+                    <div class="input-group" style="margin-bottom: 8px;">
+                        <label>General Video URL (প্রোডাক্ট পেজের জন্য - Optional)</label>
+                        <input type="url" id="prodVideo" placeholder="https://facebook.com/... বা যেকোনো লিংক">
+                    </div>
+                    
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label style="color: #ff0000;">YouTube Reels / Shorts Link (শুধুমাত্র Reels সেকশনের জন্য)</label>
+                        <input type="url" id="prodYoutubeVideo" placeholder="https://youtube.com/shorts/...">
+                    </div>
                 </div>
+
                 <div class="input-group">
                     <label>Description / Specification</label>
                     <textarea id="prodDetails" placeholder="প্রোডাক্টের বিবরণ..." rows="3"></textarea>
@@ -255,7 +266,7 @@
                     <input type="file" id="prodMainImage" accept="image/*">
                 </div>
 
-                <!-- 🎨 COLOR VARIANTS & DIFFERENT PRICES SECTION (পুনরায় যুক্ত করা হলো) -->
+                <!-- 🎨 COLOR VARIANTS -->
                 <div style="margin-top:15px; margin-bottom:15px; background:#fff; padding:12px; border-radius:8px; border:1px solid #cbd5e1;">
                     <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:8px;">🎨 Color Variants & Prices (কালার, দাম ও আলাদা ছবি)</label>
                     <div id="variantContainer"></div>
@@ -284,7 +295,6 @@
         let policyEditorInstance = null;
         let draggableCategories = [];
         let draggableBillboards = [];
-        let existingVariantsData = {}; // কালার ভ্যারিয়েন্ট ডাটা
 
         const billboardURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
         const authConfigURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminCredentials.json";
@@ -317,7 +327,6 @@
             loadCurrentAdminCredentials();
         }
 
-        /* 🎨 কালার ভ্যারিয়েন্ট ফিল্ড যোগ করার ফংশন */
         function addVariantRow(colorName = "", colorPrice = "", colorImage = "") {
             const container = document.getElementById('variantContainer');
             const rowId = 'vRow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
@@ -334,7 +343,6 @@
             container.innerHTML += rowHTML;
         }
 
-        /* 🔒 সিকিউরিটি ও পাসওয়ার্ড আপডেট */
         async function loadCurrentAdminCredentials() {
             try {
                 const res = await fetch(authConfigURL);
@@ -359,7 +367,6 @@
                 method: 'PUT',
                 body: JSON.stringify({ user, pass })
             });
-
             alert("🎉 পাসওয়ার্ড সেভ করা হয়েছে!");
         }
 
@@ -501,7 +508,6 @@
                 method: 'PUT',
                 body: JSON.stringify({ content, updatedAt: Date.now() })
             });
-
             alert("🎉 পলিসি পেজের বিষয়বস্তু সেভ করা হয়েছে!");
         }
 
@@ -690,11 +696,13 @@
             document.getElementById('prodStockQty').value = prod.stockQty !== undefined ? prod.stockQty : 10;
             document.getElementById('prodCategory').value = prod.category || "";
             document.getElementById('prodSizes').value = prod.sizes ? prod.sizes.join(', ') : "";
+            
+            // 🆕 লোড করার সময় নতুন ফিল্ডটি সেট করা
             document.getElementById('prodVideo').value = prod.video || "";
+            document.getElementById('prodYoutubeVideo').value = prod.youtubeVideo || "";
             
             if (editorInstance) editorInstance.setData(prod.details || "");
 
-            // 🎨 এডিটের সময় কালার ভ্যারিয়েন্ট লোড করা
             const vContainer = document.getElementById('variantContainer');
             vContainer.innerHTML = "";
             if (prod.variants) {
@@ -718,6 +726,11 @@
             document.getElementById('prodPrice').value = "";
             document.getElementById('prodStockStatus').value = "In Stock";
             document.getElementById('prodStockQty').value = "10";
+            
+            // 🆕 রিসেট করার সময় নতুন ফিল্ড ক্লিয়ার করা
+            document.getElementById('prodVideo').value = "";
+            document.getElementById('prodYoutubeVideo').value = "";
+            
             document.getElementById('variantContainer').innerHTML = "";
             if (editorInstance) editorInstance.setData("");
         }
@@ -736,7 +749,11 @@
             const stockQty = parseInt(document.getElementById('prodStockQty').value) || 0;
             const category = document.getElementById('prodCategory').value;
             const sizesRaw = document.getElementById('prodSizes').value.trim();
+            
+            // 🆕 দুটি ভিডিও লিংক ক্যাপচার করা
             const video = document.getElementById('prodVideo').value.trim();
+            const youtubeVideo = document.getElementById('prodYoutubeVideo').value.trim();
+            
             let details = editorInstance ? editorInstance.getData() : "";
 
             const mainImageFile = document.getElementById('prodMainImage').files[0];
@@ -753,7 +770,6 @@
 
                 let sizes = sizesRaw ? sizesRaw.split(',').map(s => s.trim()) : [];
 
-                // 🎨 কালার ভ্যারিয়েন্ট প্রসেসিং
                 let variants = {};
                 const variantRows = document.querySelectorAll('#variantContainer .variant-row');
                 
@@ -776,7 +792,8 @@
                     }
                 }
 
-                const productData = { name, regularPrice, price, stockStatus, stockQty, category, video, details, mainImage, sizes, variants };
+                // 🆕 ডাটাবেজে youtubeVideo যোগ করা
+                const productData = { name, regularPrice, price, stockStatus, stockQty, category, video, youtubeVideo, details, mainImage, sizes, variants };
 
                 if (isEditMode) {
                     await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`, { 
