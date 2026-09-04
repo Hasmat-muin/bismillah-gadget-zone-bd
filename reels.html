@@ -113,7 +113,6 @@
             left: 0;
         }
 
-        /* 🏷️ FIXED BOTTOM OVERLAY - বাটনগুলো আরও ওপরে সুন্দর অবস্থানে সেট করা হয়েছে */
         .reel-bottom-overlay {
             position: absolute;
             bottom: 0;
@@ -216,7 +215,7 @@
             <i class="fas fa-arrow-left"></i>
         </a>
         <div class="header-title">
-            <i class="fab fa-youtube" style="color:#ff0000; font-size:20px;"></i> Shorts Showcase
+            <i class="fab fa-facebook" style="color:#1877F2; font-size:20px;"></i> Reels Showcase
         </div>
         <div style="width: 36px;"></div>
     </div>
@@ -231,15 +230,6 @@
     <script>
         const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products.json";
 
-        function extractYouTubeId(url) {
-            if (!url) return null;
-            url = url.trim();
-
-            const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|video\/|watch\?.+&v=))([\w-]{11})/;
-            const match = url.match(regExp);
-            return (match && match[1]) ? match[1] : null;
-        }
-
         async function loadProductReels() {
             const container = document.getElementById('reelsFeedContainer');
             try {
@@ -253,122 +243,66 @@
 
                 let reelsHTML = "";
                 let count = 0;
-                let reelIndex = 0;
 
                 Object.keys(products).forEach(key => {
                     const prod = products[key];
+                    // Check if there is a video link
                     if (prod.video && prod.video.trim() !== "") {
-                        const ytId = extractYouTubeId(prod.video);
+                        count++;
+                        
+                        // Construct Facebook Embed URL
+                        const fbUrl = encodeURIComponent(prod.video.trim());
+                        const embedUrl = `https://www.facebook.com/plugins/video.php?href=${fbUrl}&show_text=false&width=500&autoplay=1`;
+                        
+                        const cleanPrice = prod.price || "0";
+                        const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
-                        if (ytId) {
-                            count++;
-                            const frameId = `reel-frame-${reelIndex}`;
-                            reelIndex++;
-                            // autoplay=0 rakha hocche - kon video cholbe seta niche IntersectionObserver thik korbe,
-                            // jate eksathe sobgular sound na baje. enablejsapi=1 diye postMessage diye control kora hobe.
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=0&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`;
-                            const cleanPrice = prod.price || "0";
-                            const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
-
-                            reelsHTML += `
-                                <div class="reel-item">
-                                    <div class="reel-video-frame">
-                                        <iframe 
-                                            id="${frameId}"
-                                            class="reel-yt-iframe"
-                                            src="${embedUrl}" 
-                                            title="${prod.name}" 
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                            allowfullscreen>
-                                        </iframe>
-                                        
-                                        <div class="reel-bottom-overlay">
-                                            <div class="prod-meta-box">
-                                                <img src="${prod.mainImage || 'logo.JPG'}" class="prod-thumb" alt="${prod.name}">
-                                                <div class="prod-info">
-                                                    <h3>${prod.name}</h3>
-                                                    <div class="prod-price">৳ ${cleanPrice}</div>
-                                                </div>
+                        reelsHTML += `
+                            <div class="reel-item" data-index="${count}">
+                                <div class="reel-video-frame">
+                                    <iframe 
+                                        src="${embedUrl}" 
+                                        style="border:none;overflow:hidden;width:100%;height:100%;"
+                                        scrolling="no" 
+                                        frameborder="0" 
+                                        allowfullscreen="true" 
+                                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+                                    </iframe>
+                                    
+                                    <div class="reel-bottom-overlay">
+                                        <div class="prod-meta-box">
+                                            <img src="${prod.mainImage || 'logo.JPG'}" class="prod-thumb" alt="${prod.name}">
+                                            <div class="prod-info">
+                                                <h3>${prod.name}</h3>
+                                                <div class="prod-price">৳ ${cleanPrice}</div>
                                             </div>
-                                            <div class="reel-action-buttons">
-                                                <a href="product.html?id=${key}" class="btn-reel btn-view-product">
-                                                    <i class="fas fa-eye"></i> Details
-                                                </a>
-                                                <a href="https://wa.me/8801922790663?text=${waMessage}" target="_blank" class="btn-reel btn-whatsapp-buy">
-                                                    <i class="fab fa-whatsapp"></i> Buy Now
-                                                </a>
-                                            </div>
+                                        </div>
+                                        <div class="reel-action-buttons">
+                                            <a href="product.html?id=${key}" class="btn-reel btn-view-product">
+                                                <i class="fas fa-eye"></i> Details
+                                            </a>
+                                            <a href="https://wa.me/8801922790663?text=${waMessage}" target="_blank" class="btn-reel btn-whatsapp-buy">
+                                                <i class="fab fa-whatsapp"></i> Buy Now
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            `;
-                        }
+                            </div>
+                        `;
                     }
                 });
 
                 if (count === 0) {
-                    container.innerHTML = `<div class="reels-loading">⚠️ কোনো YouTube ভিডিও পাওয়া যায়নি। অ্যাডমিন থেকে সঠিক লিংক দিন।</div>`;
+                    container.innerHTML = `<div class="reels-loading">⚠️ কোনো ফেসবুক ভিডিও পাওয়া যায়নি। অ্যাডমিন প্যানেল থেকে প্রোডাক্টে সঠিক লিংক দিন।</div>`;
                 } else {
                     container.innerHTML = reelsHTML;
-                    setupReelAutoPlayObserver();
                 }
             } catch (err) {
                 container.innerHTML = `<div class="reels-loading">ভিডিও লোড করতে সমস্যা হয়েছে!</div>`;
             }
         }
 
-        // Sudhu jei reel ekhon screen-e dekha jacche setai play+unmute hobe, baki sob pause+mute thakbe
-        function ytCommand(iframe, func, args = []) {
-            if (!iframe || !iframe.contentWindow) return;
-            iframe.contentWindow.postMessage(JSON.stringify({
-                event: 'command',
-                func: func,
-                args: args
-            }), '*');
-        }
-
-        function playReel(iframe) {
-            ytCommand(iframe, 'unMute');
-            ytCommand(iframe, 'playVideo');
-        }
-
-        function pauseReel(iframe) {
-            ytCommand(iframe, 'pauseVideo');
-            ytCommand(iframe, 'mute');
-        }
-
-        function setupReelAutoPlayObserver() {
-            const items = document.querySelectorAll('.reel-item');
-            let currentlyPlaying = null;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('.reel-yt-iframe');
-                    if (!iframe) return;
-
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
-                        if (currentlyPlaying && currentlyPlaying !== iframe) {
-                            pauseReel(currentlyPlaying);
-                        }
-                        currentlyPlaying = iframe;
-                        playReel(iframe);
-                    } else {
-                        pauseReel(iframe);
-                        if (currentlyPlaying === iframe) currentlyPlaying = null;
-                    }
-                });
-            }, { threshold: [0, 0.7, 1] });
-
-            items.forEach(item => observer.observe(item));
-
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    document.querySelectorAll('.reel-yt-iframe').forEach(f => pauseReel(f));
-                }
-            });
-        }
-
-                document.addEventListener("DOMContentLoaded", loadProductReels);
+        document.addEventListener("DOMContentLoaded", loadProductReels);
     </script>
 </body>
 </html>
