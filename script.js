@@ -263,10 +263,21 @@ function renderCategoryWiseColumns() {
                 </div>
                 <div class="products-grid" id="grid-${safeId}">`;
 
-        Object.keys(allProductsData).forEach(key => {
-            const prod = allProductsData[key];
-            if (prod.category !== category) return;
+        // 🆕 NEW LOGIC: Sort products by their custom position
+        let productsInCategory = Object.keys(allProductsData)
+            .map(key => ({ key, ...allProductsData[key] }))
+            .filter(prod => prod.category === category);
+
+        // Sort by position (ascending). If position doesn't exist, use 9999 to put them at the end.
+        productsInCategory.sort((a, b) => {
+            const posA = a.position !== undefined ? a.position : 9999;
+            const posB = b.position !== undefined ? b.position : 9999;
+            return posA - posB;
+        });
+
+        productsInCategory.forEach(prod => {
             categoryProductsCount++;
+            const key = prod.key;
 
             const salePrice = parseFloat(prod.price) || 0;
             const regPrice = parseFloat(prod.regularPrice) || salePrice;
@@ -453,7 +464,10 @@ async function fetchAndRenderBillboards() {
         track.innerHTML = "";
         if (dotsContainer) dotsContainer.innerHTML = "";
 
-        const sortedKeys = Object.keys(data);
+        const sortedKeys = Object.keys(data).sort((a, b) => {
+            return (data[b].createdAt || 0) - (data[a].createdAt || 0);
+        });
+
         sortedKeys.forEach((key, index) => {
             const item = data[key];
             const srcUrl = item.mediaUrl || item.imageUrl || "";
