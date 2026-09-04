@@ -113,6 +113,7 @@
             left: 0;
         }
 
+        /* 🏷️ FIXED BOTTOM OVERLAY - বাটনগুলো আরও ওপরে সুন্দর অবস্থানে সেট করা হয়েছে */
         .reel-bottom-overlay {
             position: absolute;
             bottom: 0;
@@ -230,7 +231,6 @@
     <script>
         const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products.json";
 
-        // YouTube ID বের করার ফাংশন
         function extractYouTubeId(url) {
             if (!url) return null;
             url = url.trim();
@@ -253,29 +253,32 @@
 
                 let reelsHTML = "";
                 let count = 0;
+                let reelIndex = 0;
 
                 Object.keys(products).forEach(key => {
                     const prod = products[key];
                     
-                    // 🆕 নতুন ফিল্ড youtubeVideo চেক করা হচ্ছে। যদি না থাকে, তাহলে আগের video ফিল্ডটি চেক করবে (যাতে পুরোনো ভিডিওগুলো ব্রেক না করে)।
+                    // 🆕 নতুন ফিল্ড youtubeVideo চেক করা হচ্ছে। যদি না থাকে, তাহলে আগের video ফিল্ডটি চেক করবে
                     const targetVideoUrl = prod.youtubeVideo || prod.video;
-                    
+
                     if (targetVideoUrl && targetVideoUrl.trim() !== "") {
                         const ytId = extractYouTubeId(targetVideoUrl);
 
                         if (ytId) {
                             count++;
-                            const isFirst = (count === 1);
-                            const muteVal = isFirst ? "0" : "1";
-
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=${muteVal}&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1`;
+                            const frameId = `reel-frame-${reelIndex}`;
+                            reelIndex++;
+                            // autoplay=0 rakha hocche - kon video cholbe seta niche IntersectionObserver thik korbe
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=0&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
                             reelsHTML += `
-                                <div class="reel-item" data-index="${count}">
+                                <div class="reel-item">
                                     <div class="reel-video-frame">
                                         <iframe 
+                                            id="${frameId}"
+                                            class="reel-yt-iframe"
                                             src="${embedUrl}" 
                                             title="${prod.name}" 
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -310,40 +313,61 @@
                     container.innerHTML = `<div class="reels-loading">⚠️ কোনো YouTube ভিডিও পাওয়া যায়নি। অ্যাডমিন থেকে সঠিক লিংক দিন।</div>`;
                 } else {
                     container.innerHTML = reelsHTML;
-                    initReelScrollObserver();
+                    setupReelAutoPlayObserver();
                 }
             } catch (err) {
                 container.innerHTML = `<div class="reels-loading">ভিডিও লোড করতে সমস্যা হয়েছে!</div>`;
             }
         }
 
-        // স্ক্রল করলে মিউট/আনমিউট করার অপশন
-        function initReelScrollObserver() {
-            const observerOptions = {
-                root: document.getElementById('reelsFeedContainer'),
-                threshold: 0.6
-            };
+        // Sudhu jei reel ekhon screen-e dekha jacche setai play+unmute hobe, baki sob pause+mute thakbe
+        function ytCommand(iframe, func, args = []) {
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: func,
+                args: args
+            }), '*');
+        }
+
+        function playReel(iframe) {
+            ytCommand(iframe, 'unMute');
+            ytCommand(iframe, 'playVideo');
+        }
+
+        function pauseReel(iframe) {
+            ytCommand(iframe, 'pauseVideo');
+            ytCommand(iframe, 'mute');
+        }
+
+        function setupReelAutoPlayObserver() {
+            const items = document.querySelectorAll('.reel-item');
+            let currentlyPlaying = null;
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    const iframe = entry.target.querySelector('iframe');
+                    const iframe = entry.target.querySelector('.reel-yt-iframe');
                     if (!iframe) return;
 
-                    let currentSrc = iframe.src;
-                    if (entry.isIntersecting) {
-                        if (currentSrc.includes('mute=1')) {
-                            iframe.src = currentSrc.replace('mute=1', 'mute=0');
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+                        if (currentlyPlaying && currentlyPlaying !== iframe) {
+                            pauseReel(currentlyPlaying);
                         }
+                        currentlyPlaying = iframe;
+                        playReel(iframe);
                     } else {
-                        if (currentSrc.includes('mute=0')) {
-                            iframe.src = currentSrc.replace('mute=0', 'mute=1');
-                        }
+                        pauseReel(iframe);
+                        if (currentlyPlaying === iframe) currentlyPlaying = null;
                     }
                 });
-            }, observerOptions);
+            }, { threshold: [0, 0.7, 1] });
 
-            document.querySelectorAll('.reel-item').forEach(item => {
-                observer.observe(item);
+            items.forEach(item => observer.observe(item));
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    document.querySelectorAll('.reel-yt-iframe').forEach(f => pauseReel(f));
+                }
             });
         }
 
