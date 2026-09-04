@@ -120,6 +120,29 @@
         .details-section { margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px; }
         .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px; }
 
+        /* 📋 Product Description Table Styles */
+        #prodDescription table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        #prodDescription th, 
+        #prodDescription td {
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        #prodDescription th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: var(--primary);
+            width: 40%;
+        }
+        #prodDescription tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
         .cart-sidebar { position: fixed; top: 0; right: -360px; width: 350px; height: 100%; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); box-shadow: -10px 0 30px rgba(15, 38, 53, 0.1); z-index: 2000; transition: 0.35s; padding: 24px; display: flex; flex-direction: column; box-sizing: border-box; }
         .cart-sidebar.open { right: 0; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; }
@@ -217,7 +240,7 @@
             <textarea id="customer-address" placeholder="ঠিকানা উল্লেখ করুন" rows="2" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;"></textarea>
         </div>
         <div style="margin-bottom:10px;">
-            <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
+            <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
             <select id="delivery-charge-select" onchange="calculateOrderTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <option value="80">ঢাকার ভেতরে (৳৮০)</option>
                 <option value="150">ঢাকার বাইরে (৳১৫০)</option>
@@ -246,7 +269,7 @@
                 globalProductName = product.name;
                 currentProductImage = product.mainImage || "";
                 document.getElementById('prodTitle').innerText = product.name;
-                document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
+                document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
                 
                 if(product.video){
                     document.getElementById('videoContainer').innerHTML = `<a href="${product.video}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold; display:block; margin-bottom:10px;">📺 Watch Product Video</a>`;
