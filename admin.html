@@ -172,7 +172,18 @@
                 <div class="admin-card">
                     <h3>↕️ Reorder Categories</h3>
                     <div id="categoryOrderList"></div>
-                    <button class="btn-success" onclick="saveCategoryOrder()" style="background:var(--primary); color:var(--accent);">Save New Position 💾</button>
+                    <button class="btn-success" onclick="saveCategoryOrder()" style="background:var(--primary); color:var(--accent); margin-top:10px;">Save New Position 💾</button>
+                </div>
+
+                <!-- 🆕 ↕️ Reorder Products within Category -->
+                <div class="admin-card" style="background: #fffbeb; border-color: #fde68a;">
+                    <h3 style="color: #b45309; border-bottom-color: #f59e0b;">↕️ Reorder Products (প্রোডাক্ট সাজান)</h3>
+                    <div class="input-group">
+                        <label>Select Category</label>
+                        <select id="reorderCategorySelect" onchange="loadProductsForReorder()"></select>
+                    </div>
+                    <div id="productOrderList" style="max-height: 250px; overflow-y: auto; margin-bottom: 10px;"></div>
+                    <button class="btn-success" onclick="saveProductOrder(event)" style="background:#d97706; color:white;">Save Product Position 💾</button>
                 </div>
 
                 <!-- 🗑️ Delete Categories -->
@@ -242,7 +253,6 @@
                     <input type="text" id="prodSizes" placeholder="যেমন: 39, 40, 41, 42">
                 </div>
                 
-                <!-- 🆕 নতুন ভিডিও লিংক সেকশন -->
                 <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 16px;">
                     <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:10px;">🎥 Video Links (ভিডিও লিংক)</label>
                     
@@ -295,6 +305,7 @@
         let policyEditorInstance = null;
         let draggableCategories = [];
         let draggableBillboards = [];
+        let draggableProducts = []; // 🆕 Product reorder array
 
         const billboardURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
         const authConfigURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminCredentials.json";
@@ -325,6 +336,7 @@
             loadBillboardCategoriesDropdown();
             loadAdminBillboards();
             loadCurrentAdminCredentials();
+            loadCategoriesIntoReorderDropdown(); // 🆕 Load categories for product sorting
         }
 
         function addVariantRow(colorName = "", colorPrice = "", colorImage = "") {
@@ -404,6 +416,7 @@
             await loadCategoriesIntoDropdown();
             await loadCategoriesIntoManageList();
             await loadCategoryOrderEditor();
+            await loadCategoriesIntoReorderDropdown();
         }
 
         async function loadCategoriesIntoDropdown() {
@@ -446,6 +459,7 @@
             await loadCategoriesIntoDropdown();
             await loadCategoriesIntoManageList();
             await loadCategoryOrderEditor();
+            await loadCategoriesIntoReorderDropdown();
         }
 
         async function loadCategoryOrderEditor() {
@@ -492,6 +506,106 @@
                 if(res.ok) alert("🎉 ক্যাটাগরির নতুন পজিশন সেভ করা হয়েছে!");
             } catch(err) { alert("সেভ করতে সমস্যা হয়েছে!"); }
         }
+
+        /* 🆕 PRODUCT REORDER LOGIC START */
+        async function loadCategoriesIntoReorderDropdown() {
+            const dropdown = document.getElementById('reorderCategorySelect');
+            if(!dropdown) return;
+            dropdown.innerHTML = '<option value="">ক্যাটাগরি সিলেক্ট করুন</option>';
+            const res = await fetch(catURL);
+            const catData = await res.json();
+            if (catData) {
+                Object.keys(catData).forEach(key => {
+                    dropdown.innerHTML += `<option value="${catData[key].name}">${catData[key].name}</option>`;
+                });
+            }
+        }
+
+        async function loadProductsForReorder() {
+            const category = document.getElementById('reorderCategorySelect').value;
+            const list = document.getElementById('productOrderList');
+            if (!category) {
+                list.innerHTML = "";
+                return;
+            }
+
+            list.innerHTML = "<p style='font-size:12px;'>লোড হচ্ছে...</p>";
+            const res = await fetch(dbURL);
+            const data = await res.json();
+            if (!data) { list.innerHTML = "<p style='font-size:12px;'>কোনো প্রোডাক্ট নেই!</p>"; return; }
+
+            // Filter products by selected category and sort by position
+            draggableProducts = Object.keys(data)
+                .map(key => ({ key, ...data[key] }))
+                .filter(p => p.category === category)
+                .sort((a, b) => {
+                    const posA = a.position !== undefined ? a.position : 9999;
+                    const posB = b.position !== undefined ? b.position : 9999;
+                    return posA - posB;
+                });
+
+            renderProductOrderList();
+        }
+
+        function renderProductOrderList() {
+            const list = document.getElementById('productOrderList');
+            list.innerHTML = "";
+            if(draggableProducts.length === 0) {
+                list.innerHTML = "<p style='font-size:12px;'>এই ক্যাটাগরিতে কোনো প্রোডাক্ট নেই।</p>";
+                return;
+            }
+            draggableProducts.forEach((prod, index) => {
+                list.innerHTML += `
+                    <div class="category-order-item" style="display:flex; justify-content:space-between; align-items:center; background:white; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; margin-bottom:6px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${prod.mainImage || 'logo.JPG'}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; border:1px solid #eee;">
+                            <span style="font-size:12px; font-weight:600; color:#0f2635;">${prod.name}</span>
+                        </div>
+                        <div style="display:flex; gap:4px;">
+                            <button type="button" class="move-btn" onclick="moveProduct(${index}, -1)">⬆ Up</button>
+                            <button type="button" class="move-btn" onclick="moveProduct(${index}, 1)">⬇ Down</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function moveProduct(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= draggableProducts.length) return;
+            const temp = draggableProducts[index];
+            draggableProducts[index] = draggableProducts[newIndex];
+            draggableProducts[newIndex] = temp;
+            renderProductOrderList();
+        }
+
+        async function saveProductOrder(event) {
+            if (draggableProducts.length === 0) return;
+            const btn = event.target;
+            btn.innerText = "Saving Order...";
+            btn.disabled = true;
+
+            try {
+                // Update position index for each product in firebase
+                const promises = draggableProducts.map((prod, index) => {
+                    return fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${prod.key}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ position: index })
+                    });
+                });
+
+                await Promise.all(promises);
+                alert("🎉 প্রোডাক্টের নতুন সিরিয়াল সেভ করা হয়েছে!");
+                loadProductsIntoManageList();
+            } catch(e) { 
+                alert("সমস্যা হয়েছে!"); 
+            } finally {
+                btn.innerText = "Save Product Position 💾";
+                btn.disabled = false;
+            }
+        }
+        /* 🆕 PRODUCT REORDER LOGIC END */
 
         async function loadPageContentToEdit() {
             const pageType = document.getElementById('policyPageType').value;
@@ -697,7 +811,6 @@
             document.getElementById('prodCategory').value = prod.category || "";
             document.getElementById('prodSizes').value = prod.sizes ? prod.sizes.join(', ') : "";
             
-            // 🆕 লোড করার সময় নতুন ফিল্ডটি সেট করা
             document.getElementById('prodVideo').value = prod.video || "";
             document.getElementById('prodYoutubeVideo').value = prod.youtubeVideo || "";
             
@@ -727,7 +840,6 @@
             document.getElementById('prodStockStatus').value = "In Stock";
             document.getElementById('prodStockQty').value = "10";
             
-            // 🆕 রিসেট করার সময় নতুন ফিল্ড ক্লিয়ার করা
             document.getElementById('prodVideo').value = "";
             document.getElementById('prodYoutubeVideo').value = "";
             
@@ -750,7 +862,6 @@
             const category = document.getElementById('prodCategory').value;
             const sizesRaw = document.getElementById('prodSizes').value.trim();
             
-            // 🆕 দুটি ভিডিও লিংক ক্যাপচার করা
             const video = document.getElementById('prodVideo').value.trim();
             const youtubeVideo = document.getElementById('prodYoutubeVideo').value.trim();
             
@@ -792,10 +903,15 @@
                     }
                 }
 
-                // 🆕 ডাটাবেজে youtubeVideo যোগ করা
-                const productData = { name, regularPrice, price, stockStatus, stockQty, category, video, youtubeVideo, details, mainImage, sizes, variants };
+                // 🆕 Save data with original position intact for Edit mode
+                let productData = { name, regularPrice, price, stockStatus, stockQty, category, video, youtubeVideo, details, mainImage, sizes, variants };
 
                 if (isEditMode) {
+                    // Fetch existing position if editing to retain it
+                    const exRes = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`);
+                    const exData = await exRes.json();
+                    if(exData && exData.position !== undefined) productData.position = exData.position;
+
                     await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`, { 
                         method: 'PUT', body: JSON.stringify(productData) 
                     });
