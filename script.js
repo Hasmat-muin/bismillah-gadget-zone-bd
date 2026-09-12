@@ -6,11 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products.json";
-const authURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminSettings.json";
 const catURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categories.json"; 
 const orderURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categoryOrder.json";
 const billboardDataURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
-const couponDataURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/coupons.json";
+const ordersDB_URL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/orders.json"; // 🆕 Orders Database URL
 
 let cart = JSON.parse(localStorage.getItem('bg_cart')) || [];
 let allProductsData = {}; 
@@ -21,6 +20,22 @@ let billboardAutoSlideInterval = null;
 let isUserInteracting = false;
 let visibleCategoryCount = 7;
 
+// --- 📱 SIDE MENU TOGGLE (Hamburger) ---
+function toggleSideMenu() {
+    const menu = document.getElementById('side-menu');
+    const overlay = document.getElementById('side-menu-overlay');
+    if (menu) menu.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+function scrollToCategories() {
+    const catSection = document.querySelector('.category-scroll-container');
+    if (catSection) {
+        window.scrollTo({ top: catSection.offsetTop - 70, behavior: 'smooth' });
+    }
+}
+
+// --- 🛒 CART LOGIC ---
 function saveCartToStorage() {
     localStorage.setItem('bg_cart', JSON.stringify(cart));
 }
@@ -72,6 +87,7 @@ function buyNow(id, name, price, image = "") {
 function updateCartUI() {
     const countIndex = document.getElementById('cart-count');
     const countProduct = document.getElementById('cartCount');
+    
     if (countIndex) countIndex.innerText = cart.length;
     if (countProduct) countProduct.innerText = cart.length;
 
@@ -135,45 +151,105 @@ function closeOrderModal() {
     if (modalIndex) modalIndex.style.display = 'none';
 }
 
-function sendOrderToWhatsApp() {
+// --- 📦 CHECKOUT & FIREBASE SAVING ---
+async function sendOrderToWhatsApp() {
     const name = document.getElementById('customer-name')?.value;
     const phone = document.getElementById('customer-phone')?.value;
     const address = document.getElementById('customer-address')?.value;
     const deliveryCharge = parseFloat(document.getElementById('delivery-charge-select')?.value || 80);
-    const deliveryText = (deliveryCharge === 80) ? "ঢাকার ভেতরে (৳৮০)" : "ঢাকার বাইরে (৳১৫০)";
 
     if (!name || !phone || !address) { alert("সম্পূর্ণ তথ্য দিন!"); return; }
 
+    const orderId = "BGZ" + Math.floor(10000 + Math.random() * 90000);
+    const orderDate = new Date().toLocaleDateString('en-GB');
     let subtotal = 0;
-    let message = `*📦 নতুন অর্ডার (Bismillah Gadget Zone BD)*\n`;
-    message += `👤 *নাম:* ${name}\n`;
-    message += `📞 *মোবাইল:* ${phone}\n`;
-    message += `🏠 *ঠিকানা:* ${address}\n`;
-    message += `🚚 *ডেলিভারি:* ${deliveryText}\n\n`;
-    message += `🛍️ *অর্ডারকৃত প্রোডাক্টসমূহ:*\n`;
+    cart.forEach(item => subtotal += item.price);
+
+    const orderData = {
+        orderId, name, phone, address, items: cart, 
+        subtotal, deliveryCharge, grandTotal: subtotal + deliveryCharge,
+        status: "Processing", trackingLink: "", 
+        date: orderDate, timestamp: Date.now()
+    };
+
+    try {
+        const res = await fetch(ordersDB_URL, { method: 'POST', body: JSON.stringify(orderData) });
+        const data = await res.json();
+        
+        let myOrders = JSON.parse(localStorage.getItem('bg_my_orders')) || [];
+        myOrders.push(data.name);
+        localStorage.setItem('bg_my_orders', JSON.stringify(myOrders));
+    } catch(e) { console.error("Order save error:", e); }
+
+    const deliveryText = (deliveryCharge === 80) ? "ঢাকার ভেতরে" : "ঢাকার বাইরে";
+    let message = `*📦 নতুন অর্ডার (${orderId})*\n👤 *নাম:* ${name}\n📞 *মোবাইল:* ${phone}\n🏠 *ঠিকানা:* ${address}\n🚚 *ডেলিভারি:* ${deliveryText}\n\n🛍️ *অর্ডারকৃত প্রোডাক্টসমূহ:*\n`;
     
-    const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-
-    cart.forEach((item, index) => {
-        const prodLink = `${baseUrl}product.html?id=${item.id}`;
-        message += `\n${index + 1}. *${item.name}*\n`;
-        message += `   - দাম: ৳${item.price}\n`;
-        if (item.variant && item.variant !== 'Standard') message += `   - কালার: ${item.variant}\n`;
-        if (item.size) message += `   - সাইজ: ${item.size}\n`;
-        message += `   - 🔗 প্রোডাক্ট ও ছবি দেখুন: ${prodLink}\n`;
-        subtotal += item.price;
-    });
-
-    const grandTotal = subtotal + deliveryCharge;
-    message += `\n💰 *সর্বমোট বিল:* ৳${grandTotal}`;
+    cart.forEach((item, index) => { message += `${index + 1}. ${item.name} - ৳${item.price}\n`; });
+    message += `\n💰 *সর্বমোট বিল:* ৳${subtotal + deliveryCharge}`;
 
     window.open(`https://wa.me/8801922790663?text=${encodeURIComponent(message)}`, '_blank');
-    cart = [];
-    saveCartToStorage();
-    updateCartUI();
-    closeOrderModal();
+    
+    cart = []; saveCartToStorage(); updateCartUI(); closeOrderModal();
+    alert("অর্ডারটি সফলভাবে প্লেস করা হয়েছে! Orders সেকশন থেকে স্ট্যাটাস দেখতে পারবেন।");
 }
 
+// --- 📦 CUSTOMER ORDERS PANEL ---
+function openCustomerOrders() {
+    const sidebar = document.getElementById('orders-sidebar');
+    if(sidebar) {
+        sidebar.classList.add('open');
+        loadCustomerOrders();
+    }
+}
+
+function closeCustomerOrders() {
+    const sidebar = document.getElementById('orders-sidebar');
+    if(sidebar) sidebar.classList.remove('open');
+}
+
+async function loadCustomerOrders() {
+    const list = document.getElementById('customer-orders-list');
+    let myOrders = JSON.parse(localStorage.getItem('bg_my_orders')) || [];
+    
+    if(myOrders.length === 0) {
+        list.innerHTML = `<p style="text-align:center; font-size:13px; color:#64748b; margin-top:20px;">আপনার কোনো রানিং অর্ডার নেই।</p>`;
+        return;
+    }
+
+    list.innerHTML = `<p style="text-align:center; font-size:13px; color:#64748b;">অর্ডার লোড হচ্ছে...</p>`;
+    
+    try {
+        const res = await fetch(ordersDB_URL);
+        const allOrders = await res.json();
+        list.innerHTML = "";
+
+        myOrders.reverse().forEach(key => {
+            if(allOrders && allOrders[key]) {
+                const order = allOrders[key];
+                let statusClass = order.status === 'Delivered' ? 'status-delivered' : (order.status === 'Shipped' ? 'status-shipped' : 'status-processing');
+                
+                let trackBtn = "";
+                if(order.status === 'Shipped' && order.trackingLink) {
+                    trackBtn = `<a href="${order.trackingLink}" target="_blank" style="display:block; text-align:center; background:#0f2635; color:#c5a059; padding:6px; border-radius:6px; font-size:11px; font-weight:bold; text-decoration:none; margin-top:10px;">📍 Track Pathao Parcel</a>`;
+                }
+
+                list.innerHTML += `
+                    <div class="customer-order-card">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="font-weight:bold; font-size:12px;">ID: #${order.orderId}</span>
+                            <span class="order-status-badge ${statusClass}">${order.status}</span>
+                        </div>
+                        <div style="font-size:11px; color:#475569; margin-bottom:6px;">📅 Date: ${order.date} | 💰 Total: ৳${order.grandTotal}</div>
+                        <div style="font-size:11px; color:#0f2635; font-weight:600;">Items: ${order.items.length} Product(s)</div>
+                        ${trackBtn}
+                    </div>
+                `;
+            }
+        });
+    } catch(e) { list.innerHTML = `<p style="color:red; text-align:center;">সমস্যা হয়েছে!</p>`; }
+}
+
+// --- 🏷️ CATEGORY & PRODUCTS DISPLAY ---
 function getCategoryIcon(catName) {
     const name = catName.toLowerCase();
     if (name.includes('earbud') || name.includes('tws') || name.includes('headphone')) return 'fas fa-headphones-alt';
@@ -263,12 +339,10 @@ function renderCategoryWiseColumns() {
                 </div>
                 <div class="products-grid" id="grid-${safeId}">`;
 
-        // 🆕 NEW LOGIC: Sort products by their custom position
         let productsInCategory = Object.keys(allProductsData)
             .map(key => ({ key, ...allProductsData[key] }))
             .filter(prod => prod.category === category);
 
-        // Sort by position (ascending). If position doesn't exist, use 9999 to put them at the end.
         productsInCategory.sort((a, b) => {
             const posA = a.position !== undefined ? a.position : 9999;
             const posB = b.position !== undefined ? b.position : 9999;
@@ -449,6 +523,7 @@ function searchProducts(query) {
     if(loadMoreBtn) loadMoreBtn.style.display = 'none';
 }
 
+// --- 🎡 BILLBOARD ---
 async function fetchAndRenderBillboards() {
     const container = document.getElementById('billboard-container');
     const track = document.getElementById('billboard-track');

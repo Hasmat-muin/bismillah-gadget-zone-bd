@@ -95,7 +95,6 @@
 </head>
 <body>
 
-    <!-- 🔐 LOGIN FORM -->
     <div class="login-container" id="loginCard">
         <h2>Admin Login Panel</h2>
         <form onsubmit="handleAdminLogin(event);">
@@ -111,7 +110,6 @@
         </form>
     </div>
 
-    <!-- 🛠️ ADMIN MAIN DASHBOARD -->
     <div id="adminPanelMain">
         <div class="admin-header">
             <h1>Bismillah Gadget Zone - Dashboard</h1>
@@ -120,172 +118,161 @@
 
         <div class="admin-sections">
             <div>
-                <!-- 🔑 ADMIN SECURITY -->
+                <!-- 📦 🆕 Manage Customer Orders -->
+                <div class="admin-card" style="background: #f8fafc; border-color: #cbd5e1;">
+                    <h3 style="color: #0f2635; border-bottom-color: #0f2635;">📦 Manage Customer Orders</h3>
+                    <button class="btn-secondary" onclick="loadAdminOrders()" style="margin-bottom:15px; background:#3b82f6;">Refresh Orders 🔄</button>
+                    
+                    <div id="admin-orders-list" style="display:flex; flex-direction:column; gap:15px;">
+                        <!-- Orders will load here -->
+                    </div>
+                </div>
+
                 <div class="admin-card" style="background:#f0fdf4; border-color:#bbf7d0;">
-                    <h3 style="color:#166534; border-bottom-color:#22c55e;">🔑 Admin Security (চেঞ্জ পাসওয়ার্ড)</h3>
+                    <h3 style="color:#166534; border-bottom-color:#22c55e;">🔑 Admin Security</h3>
                     <form onsubmit="updateAdminCredentials(event);">
                         <div class="input-group">
                             <label>New Username</label>
-                            <input type="text" id="newAdminUser" placeholder="ইউজারনেম লিখুন" required>
+                            <input type="text" id="newAdminUser" required>
                         </div>
                         <div class="input-group">
                             <label>New Password</label>
-                            <input type="password" id="newAdminPass" placeholder="পাসওয়ার্ড লিখুন" required>
+                            <input type="password" id="newAdminPass" required>
                         </div>
-                        <button type="submit" class="btn-success" style="background:#16a34a;">Update Login Info 🔒</button>
+                        <button type="submit" class="btn-success" style="background:#16a34a;">Update Info 🔒</button>
                     </form>
                 </div>
 
-                <!-- 🖼️ Billboard -->
                 <div class="admin-card">
-                    <h3>🖼️ Manage Billboard Banners</h3>
+                    <h3>🖼️ Manage Billboards</h3>
                     <div class="input-group">
-                        <label>Upload Banner Image OR MP4 Video</label>
+                        <label>Upload Banner/Video</label>
                         <input type="file" id="billboardImageInput" accept="image/*,video/mp4">
                     </div>
                     <div class="input-group">
                         <label>Target Category</label>
                         <select id="billboardCategorySelect"></select>
                     </div>
-                    <button class="btn-success" onclick="uploadBillboardBanner()" id="uploadBannerBtn" style="background:var(--primary); color:var(--accent);">Add Billboard Media 🚀</button>
-                    
+                    <button class="btn-success" onclick="uploadBillboardBanner()" style="background:var(--primary); color:var(--accent);">Add Billboard 🚀</button>
                     <div style="margin-top: 15px;">
-                        <h4 style="font-size:13px; margin-bottom:8px; color:var(--primary);">Active Billboards:</h4>
                         <div id="adminBillboardList" style="display: flex; flex-direction: column; gap: 6px;"></div>
                         <button class="btn-success" onclick="saveBillboardOrder(event)" style="background:var(--primary); color:var(--accent); margin-top:10px;">Save Billboard Position 💾</button>
                     </div>
                 </div>
 
-                <!-- 📁 Create Category -->
                 <div class="admin-card">
                     <h3>📁 Create Category</h3>
                     <form onsubmit="createNewCategory(event);">
                         <div class="input-group">
                             <label>New Category Name</label>
-                            <input type="text" id="newCategoryName" placeholder="যেমন: Men Shoes" required>
+                            <input type="text" id="newCategoryName" required>
                         </div>
                         <button type="submit" class="btn-success">Save Category ➕</button>
                     </form>
                 </div>
 
-                <!-- ↕️ Reorder Categories -->
                 <div class="admin-card">
                     <h3>↕️ Reorder Categories</h3>
                     <div id="categoryOrderList"></div>
-                    <button class="btn-success" onclick="saveCategoryOrder()" style="background:var(--primary); color:var(--accent); margin-top:10px;">Save New Position 💾</button>
+                    <button class="btn-success" onclick="saveCategoryOrder()" style="background:var(--primary); color:var(--accent); margin-top:10px;">Save Position 💾</button>
                 </div>
 
-                <!-- 🆕 ↕️ Reorder Products within Category -->
                 <div class="admin-card" style="background: #fffbeb; border-color: #fde68a;">
-                    <h3 style="color: #b45309; border-bottom-color: #f59e0b;">↕️ Reorder Products (প্রোডাক্ট সাজান)</h3>
+                    <h3 style="color: #b45309; border-bottom-color: #f59e0b;">↕️ Reorder Products</h3>
                     <div class="input-group">
                         <label>Select Category</label>
                         <select id="reorderCategorySelect" onchange="loadProductsForReorder()"></select>
                     </div>
                     <div id="productOrderList" style="max-height: 250px; overflow-y: auto; margin-bottom: 10px;"></div>
-                    <button class="btn-success" onclick="saveProductOrder(event)" style="background:#d97706; color:white;">Save Product Position 💾</button>
+                    <button class="btn-success" onclick="saveProductOrder(event)" style="background:#d97706; color:white;">Save Position 💾</button>
                 </div>
 
-                <!-- 🗑️ Delete Categories -->
                 <div class="admin-card">
-                    <h3>🗑️ Delete / Manage Categories</h3>
+                    <h3>🗑️ Manage Categories</h3>
                     <div id="adminCategoryList"></div>
                 </div>
 
-                <!-- 📑 POLICY PAGES EDITOR -->
                 <div class="admin-card">
-                    <h3>📑 Edit Footer Policy Pages</h3>
+                    <h3>📑 Edit Policy Pages</h3>
                     <div class="input-group">
                         <label>Select Page</label>
                         <select id="policyPageType" onchange="loadPageContentToEdit()">
-                            <option value="refund">রিফান্ড ও রিটার্ন পলিসি (Refund Policy)</option>
-                            <option value="terms">টার্মস এবং কন্ডিশন (Terms & Conditions)</option>
-                            <option value="delivery">ডেলিভারি সংক্রান্ত তথ্য (Delivery Info)</option>
+                            <option value="refund">Refund Policy</option>
+                            <option value="terms">Terms & Conditions</option>
+                            <option value="delivery">Delivery Info</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <label>Page Text</label>
                         <textarea id="policyDetails" rows="3"></textarea>
                     </div>
-                    <button class="btn-success" onclick="savePageContent()">Save Policy Page 💾</button>
+                    <button class="btn-success" onclick="savePageContent()">Save Page 💾</button>
                 </div>
             </div>
 
-            <!-- 📦 Add/Edit Product -->
             <div class="admin-card" id="formScrollTarget">
                 <h3 id="formActionTitle">📦 Add New Product</h3>
-                
                 <div class="input-group">
                     <label>Product Title</label>
-                    <input type="text" id="prodName" placeholder="যেমন: T900 Ultra Smartwatch">
+                    <input type="text" id="prodName">
                 </div>
                 <div style="display:flex; gap:10px;">
                     <div class="input-group" style="flex:1;">
-                        <label>Regular Price (আসল দাম ৳)</label>
-                        <input type="number" id="prodRegularPrice" placeholder="যেমন: 1500">
+                        <label>Regular Price (৳)</label>
+                        <input type="number" id="prodRegularPrice">
                     </div>
                     <div class="input-group" style="flex:1;">
-                        <label>Offer Price (বিক্রয় মূল্য ৳)</label>
-                        <input type="number" id="prodPrice" placeholder="যেমন: 1200">
+                        <label>Offer Price (৳)</label>
+                        <input type="number" id="prodPrice">
                     </div>
                 </div>
-
                 <div style="display:flex; gap:10px;">
                     <div class="input-group" style="flex:1;">
                         <label>Stock Status</label>
                         <select id="prodStockStatus">
-                            <option value="In Stock">In Stock (স্টকে আছে)</option>
-                            <option value="Out of Stock">Out of Stock (স্টকে নেই)</option>
+                            <option value="In Stock">In Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
                         </select>
                     </div>
                     <div class="input-group" style="flex:1;">
                         <label>Stock Quantity</label>
-                        <input type="number" id="prodStockQty" placeholder="যেমন: 10" value="10">
+                        <input type="number" id="prodStockQty" value="10">
                     </div>
                 </div>
-
                 <div class="input-group">
                     <label>Category</label>
                     <select id="prodCategory"></select>
                 </div>
                 <div class="input-group">
                     <label>Sizes (Optional)</label>
-                    <input type="text" id="prodSizes" placeholder="যেমন: 39, 40, 41, 42">
+                    <input type="text" id="prodSizes" placeholder="e.g. 39, 40, 41">
                 </div>
-                
                 <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 16px;">
-                    <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:10px;">🎥 Video Links (ভিডিও লিংক)</label>
-                    
+                    <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:10px;">🎥 Video Links</label>
                     <div class="input-group" style="margin-bottom: 8px;">
-                        <label>General Video URL (প্রোডাক্ট পেজের জন্য - Optional)</label>
-                        <input type="url" id="prodVideo" placeholder="https://facebook.com/... বা যেকোনো লিংক">
+                        <label>General Video URL</label>
+                        <input type="url" id="prodVideo">
                     </div>
-                    
                     <div class="input-group" style="margin-bottom: 0;">
-                        <label style="color: #ff0000;">YouTube Reels / Shorts Link (শুধুমাত্র Reels সেকশনের জন্য)</label>
-                        <input type="url" id="prodYoutubeVideo" placeholder="https://youtube.com/shorts/...">
+                        <label style="color: #ff0000;">YouTube Shorts Link</label>
+                        <input type="url" id="prodYoutubeVideo">
                     </div>
                 </div>
-
                 <div class="input-group">
-                    <label>Description / Specification</label>
-                    <textarea id="prodDetails" placeholder="প্রোডাক্টের বিবরণ..." rows="3"></textarea>
+                    <label>Description</label>
+                    <textarea id="prodDetails" rows="3"></textarea>
                 </div>
                 <div class="input-group">
-                    <label>Main Showcase Image</label>
+                    <label>Main Image</label>
                     <input type="file" id="prodMainImage" accept="image/*">
                 </div>
-
-                <!-- 🎨 COLOR VARIANTS -->
                 <div style="margin-top:15px; margin-bottom:15px; background:#fff; padding:12px; border-radius:8px; border:1px solid #cbd5e1;">
-                    <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:8px;">🎨 Color Variants & Prices (কালার, দাম ও আলাদা ছবি)</label>
+                    <label style="font-weight:bold; font-size:13px; color:var(--primary); display:block; margin-bottom:8px;">🎨 Color Variants</label>
                     <div id="variantContainer"></div>
-                    <button type="button" class="btn-secondary" style="font-size:11px; margin-top:5px; background:var(--primary); color:var(--accent);" onclick="addVariantRow()">+ Add Color/Variant</button>
+                    <button type="button" class="btn-secondary" style="font-size:11px; margin-top:5px; background:var(--primary); color:var(--accent);" onclick="addVariantRow()">+ Add Color</button>
                 </div>
-
                 <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button class="btn-success" onclick="uploadProductWithImages()" id="publishBtn" style="background:var(--primary); color:var(--accent);">Publish Product 🚀</button>
-                    <button class="btn-secondary" onclick="resetFormToCreateMode()" id="cancelEditBtn" style="display:none; background:#ef4444;">Cancel Edit ✖</button>
+                    <button class="btn-success" onclick="uploadProductWithImages()" id="publishBtn" style="background:var(--primary); color:var(--accent);">Publish 🚀</button>
+                    <button class="btn-secondary" onclick="resetFormToCreateMode()" id="cancelEditBtn" style="display:none; background:#ef4444;">Cancel ✖</button>
                 </div>
             </div>
         </div>
@@ -305,7 +292,7 @@
         let policyEditorInstance = null;
         let draggableCategories = [];
         let draggableBillboards = [];
-        let draggableProducts = []; // 🆕 Product reorder array
+        let draggableProducts = []; 
 
         const billboardURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
         const authConfigURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminCredentials.json";
@@ -336,16 +323,67 @@
             loadBillboardCategoriesDropdown();
             loadAdminBillboards();
             loadCurrentAdminCredentials();
-            loadCategoriesIntoReorderDropdown(); // 🆕 Load categories for product sorting
+            loadCategoriesIntoReorderDropdown(); 
+            loadAdminOrders(); // 🆕 Load orders on startup
         }
 
+        /* 🆕 Admin Orders Logic */
+        async function loadAdminOrders() {
+            const list = document.getElementById('admin-orders-list');
+            list.innerHTML = "<p style='font-size:13px;'>অর্ডার লোড হচ্ছে...</p>";
+            
+            const res = await fetch("https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/orders.json");
+            const orders = await res.json();
+            if(!orders) { list.innerHTML = "<p style='font-size:13px;'>কোনো অর্ডার নেই।</p>"; return; }
+
+            list.innerHTML = "";
+            const sortedKeys = Object.keys(orders).sort((a,b) => orders[b].timestamp - orders[a].timestamp);
+
+            sortedKeys.forEach(key => {
+                const order = orders[key];
+                list.innerHTML += `
+                    <div style="background:white; padding:15px; border-radius:8px; border:1px solid #cbd5e1; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <strong>#${order.orderId}</strong>
+                            <span style="font-size:12px; font-weight:bold; color:var(--primary);">${order.date}</span>
+                        </div>
+                        <div style="font-size:13px; margin-bottom:10px; line-height:1.5;">
+                            👤 ${order.name}<br>📞 ${order.phone}<br>🏠 ${order.address}<br>💰 ৳${order.grandTotal}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <select id="status-${key}" style="padding:6px; font-size:12px; border-radius:4px; border:1px solid #ccc;">
+                                <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                                <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            </select>
+                            <input type="text" id="track-${key}" placeholder="Pathao Tracking Link" value="${order.trackingLink || ''}" style="padding:6px; font-size:12px; border-radius:4px; border:1px solid #ccc;">
+                            <button class="btn-success" onclick="updateOrderStatus('${key}')" style="padding:6px; font-size:12px;">Update Order 💾</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function updateOrderStatus(key) {
+            const newStatus = document.getElementById(`status-${key}`).value;
+            const newTracking = document.getElementById(`track-${key}`).value;
+
+            await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/orders/${key}.json`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus, trackingLink: newTracking })
+            });
+            alert("অর্ডারের স্ট্যাটাস সফলভাবে আপডেট হয়েছে!");
+        }
+
+        /* Remaining Admin Functions */
         function addVariantRow(colorName = "", colorPrice = "", colorImage = "") {
             const container = document.getElementById('variantContainer');
             const rowId = 'vRow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
 
             const rowHTML = `
                 <div class="variant-row" id="${rowId}">
-                    <input type="text" class="v-color-name" placeholder="কালার নাম (যেমন: Black/Red)" value="${colorName}" style="flex:1; min-width:110px;">
+                    <input type="text" class="v-color-name" placeholder="কালার নাম" value="${colorName}" style="flex:1; min-width:110px;">
                     <input type="number" class="v-color-price" placeholder="দাম (৳)" value="${colorPrice}" style="width:80px;">
                     <input type="file" class="v-color-img" accept="image/*" style="flex:1.2; min-width:140px;">
                     ${colorImage ? `<img src="${colorImage}" style="height:30px; width:30px; object-fit:cover; border-radius:4px;" class="v-existing-img" data-src="${colorImage}">` : ''}
@@ -507,7 +545,6 @@
             } catch(err) { alert("সেভ করতে সমস্যা হয়েছে!"); }
         }
 
-        /* 🆕 PRODUCT REORDER LOGIC START */
         async function loadCategoriesIntoReorderDropdown() {
             const dropdown = document.getElementById('reorderCategorySelect');
             if(!dropdown) return;
@@ -534,7 +571,6 @@
             const data = await res.json();
             if (!data) { list.innerHTML = "<p style='font-size:12px;'>কোনো প্রোডাক্ট নেই!</p>"; return; }
 
-            // Filter products by selected category and sort by position
             draggableProducts = Object.keys(data)
                 .map(key => ({ key, ...data[key] }))
                 .filter(p => p.category === category)
@@ -586,7 +622,6 @@
             btn.disabled = true;
 
             try {
-                // Update position index for each product in firebase
                 const promises = draggableProducts.map((prod, index) => {
                     return fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${prod.key}.json`, {
                         method: 'PATCH',
@@ -605,7 +640,6 @@
                 btn.disabled = false;
             }
         }
-        /* 🆕 PRODUCT REORDER LOGIC END */
 
         async function loadPageContentToEdit() {
             const pageType = document.getElementById('policyPageType').value;
@@ -622,7 +656,7 @@
                 method: 'PUT',
                 body: JSON.stringify({ content, updatedAt: Date.now() })
             });
-            alert("🎉 পলিসি পেজের বিষয়বস্তু সেভ করা হয়েছে!");
+            alert("🎉 পেজ সেভ করা হয়েছে!");
         }
 
         async function loadBillboardCategoriesDropdown() {
@@ -738,7 +772,7 @@
                 body: JSON.stringify({ mediaUrl, mediaType, category, createdAt: Date.now() })
             });
 
-            alert("🎉 স্লাইডার ব্যানার সেভ হয়েছে!");
+            alert("🎉 ব্যানার সেভ হয়েছে!");
             fileInput.value = "";
             loadAdminBillboards();
         }
@@ -839,10 +873,8 @@
             document.getElementById('prodPrice').value = "";
             document.getElementById('prodStockStatus').value = "In Stock";
             document.getElementById('prodStockQty').value = "10";
-            
             document.getElementById('prodVideo').value = "";
             document.getElementById('prodYoutubeVideo').value = "";
-            
             document.getElementById('variantContainer').innerHTML = "";
             if (editorInstance) editorInstance.setData("");
         }
@@ -861,10 +893,8 @@
             const stockQty = parseInt(document.getElementById('prodStockQty').value) || 0;
             const category = document.getElementById('prodCategory').value;
             const sizesRaw = document.getElementById('prodSizes').value.trim();
-            
             const video = document.getElementById('prodVideo').value.trim();
             const youtubeVideo = document.getElementById('prodYoutubeVideo').value.trim();
-            
             let details = editorInstance ? editorInstance.getData() : "";
 
             const mainImageFile = document.getElementById('prodMainImage').files[0];
@@ -896,18 +926,13 @@
                     }
 
                     if (cName) {
-                        variants[cName] = {
-                            price: cPrice,
-                            image: cImg || mainImage
-                        };
+                        variants[cName] = { price: cPrice, image: cImg || mainImage };
                     }
                 }
 
-                // 🆕 Save data with original position intact for Edit mode
                 let productData = { name, regularPrice, price, stockStatus, stockQty, category, video, youtubeVideo, details, mainImage, sizes, variants };
 
                 if (isEditMode) {
-                    // Fetch existing position if editing to retain it
                     const exRes = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`);
                     const exData = await exRes.json();
                     if(exData && exData.position !== undefined) productData.position = exData.position;
