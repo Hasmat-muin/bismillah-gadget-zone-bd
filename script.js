@@ -9,7 +9,7 @@ const dbURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/prod
 const catURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categories.json"; 
 const orderURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categoryOrder.json";
 const billboardDataURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
-const ordersDB_URL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/orders.json"; // 🆕 Orders Database URL
+const ordersDB_URL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/orders.json"; 
 
 let cart = JSON.parse(localStorage.getItem('bg_cart')) || [];
 let allProductsData = {}; 
@@ -230,7 +230,7 @@ async function loadCustomerOrders() {
                 
                 let trackBtn = "";
                 if(order.status === 'Shipped' && order.trackingLink) {
-                    trackBtn = `<a href="${order.trackingLink}" target="_blank" style="display:block; text-align:center; background:#0f2635; color:#c5a059; padding:6px; border-radius:6px; font-size:11px; font-weight:bold; text-decoration:none; margin-top:10px;">📍 Track Pathao Parcel</a>`;
+                    trackBtn = `<a href="${order.trackingLink}" target="_blank" style="display:block; text-align:center; background:#0f2635; color:#c5a059; padding:6px; border-radius:6px; font-size:11px; font-weight:bold; text-decoration:none; margin-top:10px;">📍 Track Parcel</a>`;
                 }
 
                 list.innerHTML += `

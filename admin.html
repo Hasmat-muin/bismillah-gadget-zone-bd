@@ -118,7 +118,7 @@
 
         <div class="admin-sections">
             <div>
-                <!-- 📦 🆕 Manage Customer Orders -->
+                <!-- 📦 Manage Customer Orders -->
                 <div class="admin-card" style="background: #f8fafc; border-color: #cbd5e1;">
                     <h3 style="color: #0f2635; border-bottom-color: #0f2635;">📦 Manage Customer Orders</h3>
                     <button class="btn-secondary" onclick="loadAdminOrders()" style="margin-bottom:15px; background:#3b82f6;">Refresh Orders 🔄</button>
@@ -324,7 +324,7 @@
             loadAdminBillboards();
             loadCurrentAdminCredentials();
             loadCategoriesIntoReorderDropdown(); 
-            loadAdminOrders(); // 🆕 Load orders on startup
+            loadAdminOrders(); 
         }
 
         /* 🆕 Admin Orders Logic */
@@ -356,7 +356,7 @@
                                 <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
                                 <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
                             </select>
-                            <input type="text" id="track-${key}" placeholder="Pathao Tracking Link" value="${order.trackingLink || ''}" style="padding:6px; font-size:12px; border-radius:4px; border:1px solid #ccc;">
+                            <input type="text" id="track-${key}" placeholder="Tracking Link" value="${order.trackingLink || ''}" style="padding:6px; font-size:12px; border-radius:4px; border:1px solid #ccc;">
                             <button class="btn-success" onclick="updateOrderStatus('${key}')" style="padding:6px; font-size:12px;">Update Order 💾</button>
                         </div>
                     </div>
@@ -636,7 +636,7 @@
             } catch(e) { 
                 alert("সমস্যা হয়েছে!"); 
             } finally {
-                btn.innerText = "Save Product Position 💾";
+                btn.innerText = "Save Position 💾";
                 btn.disabled = false;
             }
         }
