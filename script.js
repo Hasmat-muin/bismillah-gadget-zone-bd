@@ -412,7 +412,7 @@ function renderCategoryWiseColumns() {
                 `<span class="badge-stock in-stock">In Stock</span>`;
 
             categoryHTML += `
-                <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${category.toLowerCase()}" onclick="window.open('product.html?id=${key}', '_blank')">
+                <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${category.toLowerCase()}" onclick="window.location.href='product.html?id=${key}'">
                     ${discountBadge}
                     <div class="image-wrapper">
                         <img src="${prod.mainImage || 'logo.JPG'}" loading="lazy">
