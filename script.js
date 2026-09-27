@@ -297,10 +297,32 @@ function renderDynamicCategoryTabs() {
     swipeContainer.innerHTML = html;
 }
 
+function cacheReelProducts(products) {
+    try {
+        const reelProducts = Object.entries(products).reduce((result, [key, product]) => {
+            if (!(product.youtubeVideo || product.video)) return result;
+            const thumbnail = product.mainImage || '';
+            result.push({
+                key,
+                name: product.name,
+                price: product.price,
+                youtubeVideo: product.youtubeVideo || '',
+                video: product.video || '',
+                mainImage: thumbnail.startsWith('data:') ? '' : thumbnail
+            });
+            return result;
+        }, []);
+        sessionStorage.setItem('bgz_reel_products_v1', JSON.stringify({ savedAt: Date.now(), products: reelProducts }));
+    } catch (error) {
+        console.warn('রিলস ক্যাশ করা যায়নি:', error);
+    }
+}
+
 async function fetchProducts() {
     try {
         const [prodRes, orderRes] = await Promise.all([fetch(dbURL), fetch(orderURL)]);
         allProductsData = await prodRes.json() || {}; 
+        cacheReelProducts(allProductsData);
         const savedOrder = await orderRes.json() || [];
         productsByCategory = new Map();
         Object.keys(allProductsData).forEach(key => {
@@ -576,19 +598,31 @@ async function fetchAndRenderBillboards() {
             const srcUrl = item.mediaUrl || item.imageUrl || "";
             const isVideo = item.mediaType === "video" || srcUrl.includes('video') || srcUrl.includes('data:video');
             
-            const backdropHTML = isVideo ? "" : `<img class="billboard-backdrop" src="${srcUrl}" alt="" aria-hidden="true">`;
             let mediaHTML = isVideo ? 
-                `<video class="billboard-media" src="${srcUrl}" autoplay loop muted playsinline></video>` : 
+                `<video class="billboard-media" src="${srcUrl}" loop muted playsinline preload="none"></video>` : 
                 `<img class="billboard-media" src="${srcUrl}" alt="${item.category || 'Bismillah Gadget Zone banner'}">`;
 
-            track.innerHTML += `<div class="billboard-slide">${backdropHTML}${mediaHTML}</div>`;
+            track.innerHTML += `<div class="billboard-slide">${mediaHTML}</div>`;
             if (dotsContainer) {
                 dotsContainer.innerHTML += `<span class="billboard-dot ${index === 0 ? 'active' : ''}"></span>`;
             }
         });
 
         const slides = track.querySelectorAll('.billboard-slide');
-        slides[0]?.classList.add('is-active');
+        const activateSlide = activeIndex => {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('is-active', index === activeIndex);
+                const video = slide.querySelector('video');
+                if (!video) return;
+                if (index === activeIndex) {
+                    const playRequest = video.play();
+                    if (playRequest) playRequest.catch(() => {});
+                } else {
+                    video.pause();
+                }
+            });
+        };
+        activateSlide(0);
         slides.forEach((slide, index) => {
             const categoryName = String(data[sortedKeys[index]]?.category || '').trim();
             if (!categoryName) return;
@@ -619,9 +653,7 @@ async function fetchAndRenderBillboards() {
             const slideWidth = track.querySelector('.billboard-slide')?.offsetWidth || track.offsetWidth;
             const activeIndex = Math.min(Math.round(scrollLeft / slideWidth), slides.length - 1);
 
-            slides.forEach((slide, index) => {
-                slide.classList.toggle('is-active', index === activeIndex);
-            });
+            activateSlide(activeIndex);
 
             if (dotsContainer) {
                 const dots = dotsContainer.querySelectorAll('.billboard-dot');

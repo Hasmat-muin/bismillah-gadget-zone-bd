@@ -243,20 +243,48 @@
         async function loadProductReels() {
             const container = document.getElementById('reelsFeedContainer');
             try {
-                const res = await fetch(dbURL);
-                const products = await res.json();
+                let reelProducts;
+                try {
+                    const cached = JSON.parse(sessionStorage.getItem('bgz_reel_products_v1'));
+                    if (cached && Date.now() - cached.savedAt < 300000 && Array.isArray(cached.products)) {
+                        reelProducts = cached.products;
+                    }
+                } catch (error) {
+                    console.warn('রিলস ক্যাশ পড়া যায়নি:', error);
+                }
 
-                if (!products) {
-                    container.innerHTML = `<div class="reels-loading">কোনো প্রোডাক্ট ডাটা পাওয়া যায়নি!</div>`;
-                    return;
+                if (!reelProducts) {
+                    const res = await fetch(dbURL);
+                    const products = await res.json();
+                    if (!products) {
+                        container.innerHTML = `<div class="reels-loading">কোনো প্রোডাক্ট ডাটা পাওয়া যায়নি!</div>`;
+                        return;
+                    }
+                    reelProducts = Object.entries(products).map(([key, product]) => ({ key, ...product }));
+                    const compactProducts = reelProducts
+                        .filter(product => extractYouTubeId(product.youtubeVideo || product.video))
+                        .map(product => ({
+                            key: product.key,
+                            name: product.name,
+                            price: product.price,
+                            youtubeVideo: product.youtubeVideo || '',
+                            video: product.video || '',
+                            mainImage: (product.mainImage || '').startsWith('data:') ? '' : product.mainImage || ''
+                        }));
+                    try {
+                        sessionStorage.setItem('bgz_reel_products_v1', JSON.stringify({ savedAt: Date.now(), products: compactProducts }));
+                    } catch (error) {
+                        console.warn('রিলস ক্যাশ সেভ করা যায়নি:', error);
+                    }
+                    reelProducts = compactProducts;
                 }
 
                 let reelsHTML = "";
                 let count = 0;
                 let reelIndex = 0;
 
-                Object.keys(products).forEach(key => {
-                    const prod = products[key];
+                reelProducts.forEach(prod => {
+                    const key = prod.key;
                     
                     // 🆕 নতুন ফিল্ড youtubeVideo চেক করা হচ্ছে। যদি না থাকে, তাহলে আগের video ফিল্ডটি চেক করবে
                     const targetVideoUrl = prod.youtubeVideo || prod.video;
