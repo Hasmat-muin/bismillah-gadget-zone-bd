@@ -16,9 +16,10 @@
             --text-dark: #1e293b;
             --text-muted: #64748b;
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-main); margin: 0; padding: 20px; color: var(--text-dark); }
+        body { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-main); margin: 0; padding: 20px; color: var(--text-dark); }
         
         header { 
+            flex: 0 0 auto;
             background: var(--primary); 
             border-bottom: 3px solid var(--accent);
             padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;
@@ -41,36 +42,43 @@
         }
 
         .container { 
-            max-width: 1100px; 
+            max-width: 1200px; 
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 0;
             margin: 0 auto; 
             background: white; 
-            padding: 30px 30px 100px 30px; 
-            border-radius: 16px; 
+            padding: 24px; 
+            border-radius: 12px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .main-layout { display: flex; gap: 40px; flex-wrap: wrap; }
-        .left-panel { flex: 1; min-width: 320px; }
-        .right-panel { flex: 1; min-width: 320px; display: flex; flex-direction: column; }
+        .main-layout { flex: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 30px; align-items: start; }
+        .left-panel, .right-panel { min-width: 0; }
+        .right-panel { display: flex; flex-direction: column; }
         
-        .main-image-box { width: 100%; height: 380px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; }
+        .main-image-box { width: 100%; height: min(54vh, 620px); min-height: 180px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; }
         .main-image-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .gallery-thumbnails { display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; padding-bottom: 5px; }
-        .thumb-img { width: 65px; height: 65px; border-radius: 8px; border: 2px solid #e2e8f0; cursor: pointer; object-fit: cover; transition: 0.2s; }
+        .gallery-thumbnails { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding: 2px 2px 6px; }
+        .thumb-img { width: 60px; height: 60px; flex: 0 0 60px; border-radius: 6px; border: 2px solid #e2e8f0; cursor: pointer; object-fit: cover; transition: 0.2s; }
         .thumb-img.active, .thumb-img:hover { border-color: var(--primary); transform: scale(1.05); }
 
-        .product-title { font-size: 24px; font-weight: 700; color: var(--primary); margin: 0 0 10px 0; }
-        .price-tag { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
+        .product-title { font-size: 26px; font-weight: 700; color: var(--primary); margin: 0 0 8px; overflow-wrap: anywhere; }
+        .price-tag { font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 18px; }
+        .selection-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         
-        .variant-section, .size-section { margin-bottom: 20px; }
+        .variant-section, .size-section { min-width: 0; margin-bottom: 16px; }
         .variant-title, .size-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; }
-        .variant-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-        .variant-card { border: 2px solid #e2e8f0; padding: 6px; border-radius: 8px; cursor: pointer; text-align: center; width: 75px; transition: 0.2s; }
-        .variant-card img { width: 100%; height: 60px; object-fit: cover; border-radius: 4px; }
+        .variant-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .variant-card { border: 2px solid #e2e8f0; padding: 5px; border-radius: 6px; cursor: pointer; text-align: center; width: 68px; transition: 0.2s; }
+        .variant-card img { width: 100%; height: 48px; object-fit: cover; border-radius: 3px; }
         .variant-card.active { border-color: var(--primary); background: rgba(15, 38, 53, 0.05); }
 
-        .size-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .size-chip { padding: 6px 16px; border: 1.5px solid #cbd5e1; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; background: #f8fafc; }
+        .size-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .size-chip { padding: 6px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; background: #f8fafc; }
         .size-chip.active { border-color: var(--primary); background: var(--primary); color: var(--accent); }
         
         .btn-group { 
@@ -117,7 +125,7 @@
             box-shadow: inset 3px 3px 6px #08151e, inset -3px -3px 6px #16374c;
         }
         
-        .details-section { margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px; }
+        .details-section { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; margin-top: 20px; border-top: 2px solid #f1f5f9; padding: 18px 4px 100px 0; }
         .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px; }
 
         /* 📋 Product Description Table Styles */
@@ -141,6 +149,25 @@
         }
         #prodDescription tr:nth-child(even) {
             background-color: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            header { padding: 8px 10px; margin-bottom: 12px; border-radius: 8px; }
+            .container { padding: 12px 10px; border-radius: 8px; }
+            .main-layout { grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); gap: 10px; }
+            .main-image-box { height: min(36vh, 280px); min-height: 150px; border-radius: 6px; }
+            .gallery-thumbnails { gap: 5px; margin-top: 7px; }
+            .thumb-img { width: 42px; height: 42px; flex-basis: 42px; border-radius: 5px; }
+            .product-title { font-size: 18px; line-height: 1.25; }
+            .price-tag { font-size: 21px; margin-bottom: 12px; }
+            .selection-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+            .variant-title, .size-title { font-size: 12px; margin-bottom: 7px; }
+            .variant-grid { gap: 5px; }
+            .variant-card { width: 48px; padding: 3px; border-width: 1px; }
+            .variant-card img { height: 34px; }
+            .size-chip { padding: 5px 7px; font-size: 11px; }
+            .details-section { margin-top: 12px; padding-top: 12px; }
         }
 
         .cart-sidebar { position: fixed; top: 0; right: -360px; width: 350px; height: 100%; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); box-shadow: -10px 0 30px rgba(15, 38, 53, 0.1); z-index: 2000; transition: 0.35s; padding: 24px; display: flex; flex-direction: column; box-sizing: border-box; }
@@ -174,7 +201,7 @@
     <div class="main-layout">
         <div class="left-panel">
             <div class="main-image-box">
-                <img id="mainProdImage" src="" alt="Product Image">
+                <img id="mainProdImage" src="" alt="Product Image" decoding="async" fetchpriority="high">
             </div>
             <div class="gallery-thumbnails" id="galleryThumbnails"></div>
         </div>
@@ -182,14 +209,16 @@
             <h1 class="product-title" id="prodTitle">Loading Product...</h1>
             <div class="price-tag">৳ <span id="prodPrice">0.00</span></div>
             
-            <div class="size-section" id="sizeSectionWrapper" style="display:none;">
-                <div class="size-title">Select Size (সাইজ বাছুন):</div>
-                <div class="size-grid" id="sizeGrid"></div>
-            </div>
+            <div class="selection-row">
+                <div class="variant-section" id="variantSectionWrapper" style="display:none;">
+                    <div class="variant-title">Select Color/Variant (কালার পছন্দ করুন):</div>
+                    <div class="variant-grid" id="variantGrid"></div>
+                </div>
 
-            <div class="variant-section" id="variantSectionWrapper" style="display:none;">
-                <div class="variant-title">Select Color/Variant (কালার পছন্দ করুন):</div>
-                <div class="variant-grid" id="variantGrid"></div>
+                <div class="size-section" id="sizeSectionWrapper" style="display:none;">
+                    <div class="size-title">Select Size (সাইজ বাছুন):</div>
+                    <div class="size-grid" id="sizeGrid"></div>
+                </div>
             </div>
 
             <div id="videoContainer" style="margin-bottom: 15px;"></div>
@@ -280,13 +309,13 @@
                 mainImg.src = product.mainImage || "";
 
                 const thumbsContainer = document.getElementById('galleryThumbnails');
-                thumbsContainer.innerHTML = `<img src="${product.mainImage}" class="thumb-img active" onclick="switchMainImage('${product.mainImage}', this)">`;
+                thumbsContainer.innerHTML = `<img src="${product.mainImage}" class="thumb-img active" loading="lazy" decoding="async" onclick="switchMainImage('${product.mainImage}', this)">`;
 
                 if (product.variants) {
                     Object.keys(product.variants).forEach(color => {
                         let vImg = product.variants[color].image;
                         if(vImg) {
-                            thumbsContainer.innerHTML += `<img src="${vImg}" class="thumb-img" onclick="switchMainImage('${vImg}', this)">`;
+                            thumbsContainer.innerHTML += `<img src="${vImg}" class="thumb-img" loading="lazy" decoding="async" onclick="switchMainImage('${vImg}', this)">`;
                         }
                     });
                 }
@@ -315,7 +344,7 @@
 
                         variantGrid.innerHTML += `
                             <div class="variant-card ${idx === 0 ? 'active' : ''}" onclick="changeVariantLocal('${color}', '${vImg}', ${vPrice}, this)">
-                                <img src="${vImg}" alt="${color}">
+                                <img src="${vImg}" alt="${color}" loading="lazy" decoding="async">
                                 <span class="v-name" style="font-size:11px;">${color}</span>
                             </div>
                         `;

@@ -599,8 +599,8 @@ async function fetchAndRenderBillboards() {
             const isVideo = item.mediaType === "video" || srcUrl.includes('video') || srcUrl.includes('data:video');
             
             let mediaHTML = isVideo ? 
-                `<video class="billboard-media" src="${srcUrl}" loop muted playsinline preload="none"></video>` : 
-                `<img class="billboard-media" src="${srcUrl}" alt="${item.category || 'Bismillah Gadget Zone banner'}">`;
+                `<video class="billboard-media" data-src="${srcUrl}" loop muted playsinline preload="none"></video>` : 
+                `<img class="billboard-media" data-src="${srcUrl}" alt="${item.category || 'Bismillah Gadget Zone banner'}" decoding="async">`;
 
             track.innerHTML += `<div class="billboard-slide">${mediaHTML}</div>`;
             if (dotsContainer) {
@@ -612,9 +612,21 @@ async function fetchAndRenderBillboards() {
         const activateSlide = activeIndex => {
             slides.forEach((slide, index) => {
                 slide.classList.toggle('is-active', index === activeIndex);
+                const image = slide.querySelector('img');
+                const isNextSlide = index === (activeIndex + 1) % slides.length;
+                if (image && (index === activeIndex || isNextSlide) && image.dataset.src) {
+                    image.src = image.dataset.src;
+                    image.removeAttribute('data-src');
+                }
+
                 const video = slide.querySelector('video');
                 if (!video) return;
                 if (index === activeIndex) {
+                    if (video.dataset.src) {
+                        video.src = video.dataset.src;
+                        video.removeAttribute('data-src');
+                        video.load();
+                    }
                     const playRequest = video.play();
                     if (playRequest) playRequest.catch(() => {});
                 } else {
