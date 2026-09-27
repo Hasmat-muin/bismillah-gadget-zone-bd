@@ -13,12 +13,21 @@ const ordersDB_URL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.c
 
 let cart = JSON.parse(localStorage.getItem('bg_cart')) || [];
 let allProductsData = {}; 
+let productsByCategory = new Map();
 let selectedVariantsGlobal = {}; 
 let selectedSizesGlobal = {};
 let activeCategories = []; 
 let billboardAutoSlideInterval = null;
 let isUserInteracting = false;
 let visibleCategoryCount = 7;
+let endActiveDrag = null;
+
+window.addEventListener('mouseup', () => {
+    if (endActiveDrag) {
+        endActiveDrag();
+        endActiveDrag = null;
+    }
+});
 
 // --- 📱 SIDE MENU TOGGLE (Hamburger) ---
 function toggleSideMenu() {
@@ -293,6 +302,19 @@ async function fetchProducts() {
         const [prodRes, orderRes] = await Promise.all([fetch(dbURL), fetch(orderURL)]);
         allProductsData = await prodRes.json() || {}; 
         const savedOrder = await orderRes.json() || [];
+        productsByCategory = new Map();
+        Object.keys(allProductsData).forEach(key => {
+            const product = { key, ...allProductsData[key] };
+            if (!productsByCategory.has(product.category)) productsByCategory.set(product.category, []);
+            productsByCategory.get(product.category).push(product);
+        });
+        productsByCategory.forEach(products => {
+            products.sort((a, b) => {
+                const posA = a.position !== undefined ? a.position : 9999;
+                const posB = b.position !== undefined ? b.position : 9999;
+                return posA - posB;
+            });
+        });
 
         let foundCategories = [];
         Object.keys(allProductsData).forEach(key => {
@@ -320,7 +342,7 @@ async function fetchProducts() {
 function renderCategoryWiseColumns() {
     const mainGrid = document.getElementById('products-container'); 
     if (!mainGrid) return;
-    mainGrid.innerHTML = ""; 
+    const renderedHTML = [];
 
     const categoriesToRender = activeCategories.slice(0, visibleCategoryCount);
 
@@ -339,15 +361,7 @@ function renderCategoryWiseColumns() {
                 </div>
                 <div class="products-grid" id="grid-${safeId}">`;
 
-        let productsInCategory = Object.keys(allProductsData)
-            .map(key => ({ key, ...allProductsData[key] }))
-            .filter(prod => prod.category === category);
-
-        productsInCategory.sort((a, b) => {
-            const posA = a.position !== undefined ? a.position : 9999;
-            const posB = b.position !== undefined ? b.position : 9999;
-            return posA - posB;
-        });
+        const productsInCategory = productsByCategory.get(category) || [];
 
         productsInCategory.forEach(prod => {
             categoryProductsCount++;
@@ -392,11 +406,11 @@ function renderCategoryWiseColumns() {
         });
 
         categoryHTML += `</div></div>`;
-        if (categoryProductsCount > 0) mainGrid.innerHTML += categoryHTML;
+        if (categoryProductsCount > 0) renderedHTML.push(categoryHTML);
     });
 
     if (visibleCategoryCount < activeCategories.length) {
-        mainGrid.innerHTML += `
+        renderedHTML.push(`
             <div id="load-more-btn-wrap">
                 <button class="neumorphic-load-btn" onclick="loadMoreCategories()">
                     <span>Load More :</span> 
@@ -404,9 +418,10 @@ function renderCategoryWiseColumns() {
                     <i class="fas fa-chevron-down" style="font-size:12px; margin-left:2px;"></i>
                 </button>
             </div>
-        `;
+        `);
     }
 
+    mainGrid.innerHTML = renderedHTML.join("");
     enableDesktopDragScroll();
 }
 
@@ -415,7 +430,12 @@ function loadMoreCategories() {
     renderCategoryWiseColumns();
 }
 
-function switchCategory(categoryName, element) {
+function switchCategory(categoryName, element, updateHistory = true) {
+    if (updateHistory && history.state?.shopCategory !== categoryName) {
+        const currentState = history.state && typeof history.state === 'object' ? history.state : {};
+        history.pushState({ ...currentState, shopCategory: categoryName }, '', location.href);
+    }
+
     document.querySelectorAll('.products-grid').forEach(grid => grid.classList.remove('full-view'));
     const backWrap = document.getElementById('back-to-all-wrap');
     if (backWrap) backWrap.style.display = 'none';
@@ -450,6 +470,14 @@ function switchCategory(categoryName, element) {
         foundSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
+
+window.addEventListener('popstate', event => {
+    const categoryName = typeof event.state?.shopCategory === 'string' ? event.state.shopCategory : 'All';
+    const categoryTab = Array.from(document.querySelectorAll('.cat-icon-item')).find(tab =>
+        tab.querySelector('span')?.textContent.trim().toLowerCase() === categoryName.toLowerCase()
+    );
+    switchCategory(categoryName, categoryTab, false);
+});
 
 function viewFullCategory(categoryName) {
     const safeId = categoryName.replace(/[^a-zA-Z0-9]/g, '-');
@@ -548,20 +576,52 @@ async function fetchAndRenderBillboards() {
             const srcUrl = item.mediaUrl || item.imageUrl || "";
             const isVideo = item.mediaType === "video" || srcUrl.includes('video') || srcUrl.includes('data:video');
             
+            const backdropHTML = isVideo ? "" : `<img class="billboard-backdrop" src="${srcUrl}" alt="" aria-hidden="true">`;
             let mediaHTML = isVideo ? 
-                `<video src="${srcUrl}" autoplay loop muted playsinline></video>` : 
-                `<img src="${srcUrl}">`;
+                `<video class="billboard-media" src="${srcUrl}" autoplay loop muted playsinline></video>` : 
+                `<img class="billboard-media" src="${srcUrl}" alt="${item.category || 'Bismillah Gadget Zone banner'}">`;
 
-            track.innerHTML += `<div class="billboard-slide">${mediaHTML}</div>`;
+            track.innerHTML += `<div class="billboard-slide">${backdropHTML}${mediaHTML}</div>`;
             if (dotsContainer) {
                 dotsContainer.innerHTML += `<span class="billboard-dot ${index === 0 ? 'active' : ''}"></span>`;
             }
         });
 
+        const slides = track.querySelectorAll('.billboard-slide');
+        slides[0]?.classList.add('is-active');
+        slides.forEach((slide, index) => {
+            const categoryName = String(data[sortedKeys[index]]?.category || '').trim();
+            if (!categoryName) return;
+
+            slide.classList.add('is-clickable');
+            slide.tabIndex = 0;
+            slide.setAttribute('role', 'button');
+            slide.setAttribute('aria-label', `${categoryName} পণ্যের ক্যাটাগরি দেখুন`);
+
+            const showCategory = () => {
+                const categoryTab = Array.from(document.querySelectorAll('.cat-icon-item')).find(tab =>
+                    tab.querySelector('span')?.textContent.trim().toLowerCase() === categoryName.toLowerCase()
+                );
+                switchCategory(categoryName, categoryTab);
+            };
+
+            slide.addEventListener('click', showCategory);
+            slide.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    showCategory();
+                }
+            });
+        });
+
         track.addEventListener('scroll', () => {
             const scrollLeft = track.scrollLeft;
             const slideWidth = track.querySelector('.billboard-slide')?.offsetWidth || track.offsetWidth;
-            const activeIndex = Math.round(scrollLeft / slideWidth);
+            const activeIndex = Math.min(Math.round(scrollLeft / slideWidth), slides.length - 1);
+
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('is-active', index === activeIndex);
+            });
 
             if (dotsContainer) {
                 const dots = dotsContainer.querySelectorAll('.billboard-dot');
@@ -621,13 +681,10 @@ function makeDragScrollable(slider) {
         isUserInteracting = true;
         startX = e.pageX - slider.offsetLeft;
         initialScrollLeft = slider.scrollLeft;
-    });
-
-    window.addEventListener('mouseup', () => { 
-        if (isDown) {
-            isDown = false; 
+        endActiveDrag = () => {
+            isDown = false;
             setTimeout(() => { isUserInteracting = false; }, 1500);
-        }
+        };
     });
 
     slider.addEventListener('mousemove', (e) => {
@@ -637,6 +694,7 @@ function makeDragScrollable(slider) {
         const walk = (x - startX) * 1.5;
         slider.scrollLeft = initialScrollLeft - walk;
     });
+
 }
 
 function enableDesktopDragScroll() {

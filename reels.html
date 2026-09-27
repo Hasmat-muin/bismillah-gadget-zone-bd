@@ -269,7 +269,10 @@
                             const frameId = `reel-frame-${reelIndex}`;
                             reelIndex++;
                             // autoplay=0 rakha hocche - kon video cholbe seta niche IntersectionObserver thik korbe
-                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=0&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`;
+                            const originParam = window.location.protocol === 'http:' || window.location.protocol === 'https:'
+                                ? `&origin=${encodeURIComponent(window.location.origin)}`
+                                : '';
+                            const embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=0&mute=0&controls=1&loop=1&playlist=${ytId}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1${originParam}`;
                             const cleanPrice = prod.price || "0";
                             const waMessage = encodeURIComponent(`হ্যালো, আমি ভিডিও দেখে এই প্রোডাক্টটি কিনতে চাই:\n\n📦 *${prod.name}*\n💰 দাম: ৳${cleanPrice}\n🔗 লিংক: ${window.location.origin}/product.html?id=${key}`);
 
@@ -280,6 +283,8 @@
                                             id="${frameId}"
                                             class="reel-yt-iframe"
                                             src="${embedUrl}" 
+                                            loading="lazy"
+                                            referrerpolicy="strict-origin-when-cross-origin"
                                             title="${prod.name}" 
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                             allowfullscreen>
@@ -287,7 +292,7 @@
                                         
                                         <div class="reel-bottom-overlay">
                                             <div class="prod-meta-box">
-                                                <img src="${prod.mainImage || 'logo.JPG'}" class="prod-thumb" alt="${prod.name}">
+                                                <img src="${prod.mainImage || 'logo.JPG'}" class="prod-thumb" alt="${prod.name}" loading="lazy">
                                                 <div class="prod-info">
                                                     <h3>${prod.name}</h3>
                                                     <div class="prod-price">৳ ${cleanPrice}</div>
