@@ -245,6 +245,10 @@
                         <input type="number" id="prodPrice">
                     </div>
                 </div>
+                <div class="input-group">
+                    <label>Offer Ends (Optional)</label>
+                    <input type="datetime-local" id="prodOfferEndsAt">
+                </div>
                 <div style="display:flex; gap:10px;">
                     <div class="input-group" style="flex:1;">
                         <label>Stock Status</label>
@@ -262,6 +266,10 @@
                     <label>Category</label>
                     <select id="prodCategory"></select>
                 </div>
+                <label style="display:flex; align-items:center; gap:8px; margin:0 0 16px; font-weight:600;">
+                    <input type="checkbox" id="prodFeatured">
+                    জনপ্রিয় পণ্য (হোমপেজের Popular Products-এ দেখান)
+                </label>
                 <div class="input-group">
                     <label>Sizes (Optional)</label>
                     <input type="text" id="prodSizes" placeholder="e.g. 39, 40, 41">
@@ -952,9 +960,19 @@
             document.getElementById('prodName').value = prod.name || "";
             document.getElementById('prodRegularPrice').value = prod.regularPrice || prod.price || "";
             document.getElementById('prodPrice').value = prod.price || "";
+            if (prod.offerEndsAt) {
+                const endTimestamp = Number.isFinite(Number(prod.offerEndsAt)) ? Number(prod.offerEndsAt) : Date.parse(prod.offerEndsAt);
+                const offerEndDate = new Date(endTimestamp);
+                document.getElementById('prodOfferEndsAt').value = Number.isNaN(offerEndDate.getTime())
+                    ? ""
+                    : new Date(offerEndDate.getTime() - offerEndDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            } else {
+                document.getElementById('prodOfferEndsAt').value = "";
+            }
             document.getElementById('prodStockStatus').value = prod.stockStatus || "In Stock";
             document.getElementById('prodStockQty').value = prod.stockQty !== undefined ? prod.stockQty : 10;
             document.getElementById('prodCategory').value = prod.category || "";
+            document.getElementById('prodFeatured').checked = prod.featured === true;
             document.getElementById('prodSizes').value = prod.sizes ? prod.sizes.join(', ') : "";
             
             document.getElementById('prodVideo').value = prod.video || "";
@@ -983,8 +1001,10 @@
             document.getElementById('prodName').value = "";
             document.getElementById('prodRegularPrice').value = "";
             document.getElementById('prodPrice').value = "";
+            document.getElementById('prodOfferEndsAt').value = "";
             document.getElementById('prodStockStatus').value = "In Stock";
             document.getElementById('prodStockQty').value = "10";
+            document.getElementById('prodFeatured').checked = false;
             document.getElementById('prodVideo').value = "";
             document.getElementById('prodYoutubeVideo').value = "";
             document.getElementById('variantContainer').innerHTML = "";
@@ -1001,9 +1021,12 @@
             const name = document.getElementById('prodName').value.trim();
             const regularPrice = parseFloat(document.getElementById('prodRegularPrice').value) || parseFloat(document.getElementById('prodPrice').value);
             const price = parseFloat(document.getElementById('prodPrice').value);
+            const offerEndsAtValue = document.getElementById('prodOfferEndsAt').value;
+            const offerEndsAt = offerEndsAtValue ? new Date(offerEndsAtValue).getTime() : null;
             const stockStatus = document.getElementById('prodStockStatus').value;
             const stockQty = parseInt(document.getElementById('prodStockQty').value) || 0;
             const category = document.getElementById('prodCategory').value;
+            const featured = document.getElementById('prodFeatured').checked;
             const sizesRaw = document.getElementById('prodSizes').value.trim();
             const video = document.getElementById('prodVideo').value.trim();
             const youtubeVideo = document.getElementById('prodYoutubeVideo').value.trim();
@@ -1042,18 +1065,23 @@
                     }
                 }
 
-                let productData = { name, regularPrice, price, stockStatus, stockQty, category, video, youtubeVideo, details, mainImage, sizes, variants };
+                let productData = { name, regularPrice, price, offerEndsAt, stockStatus, stockQty, category, featured, video, youtubeVideo, details, mainImage, sizes, variants };
 
                 if (isEditMode) {
                     const exRes = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`);
+                    if (!exRes.ok) throw new Error(`Product lookup failed (${exRes.status})`);
                     const exData = await exRes.json();
                     if(exData && exData.position !== undefined) productData.position = exData.position;
+                    if(exData && exData.createdAt !== undefined) productData.createdAt = exData.createdAt;
 
-                    await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`, { 
+                    const saveRes = await fetch(`https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/products/${currentEditProductKey}.json`, { 
                         method: 'PUT', body: JSON.stringify(productData) 
                     });
+                    if (!saveRes.ok) throw new Error(`Product update failed (${saveRes.status})`);
                 } else {
-                    await fetch(dbURL, { method: 'POST', body: JSON.stringify(productData) });
+                    productData.createdAt = Date.now();
+                    const saveRes = await fetch(dbURL, { method: 'POST', body: JSON.stringify(productData) });
+                    if (!saveRes.ok) throw new Error(`Product create failed (${saveRes.status})`);
                 }
 
                 alert("🎉 প্রোডাক্ট সেভ করা হয়েছে!");

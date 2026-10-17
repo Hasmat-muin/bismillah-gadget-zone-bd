@@ -66,7 +66,14 @@
         .thumb-img { width: 60px; height: 60px; flex: 0 0 60px; border-radius: 6px; border: 2px solid #e2e8f0; cursor: pointer; object-fit: cover; transition: 0.2s; }
         .thumb-img.active, .thumb-img:hover { border-color: var(--primary); transform: scale(1.05); }
 
+        .product-title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
         .product-title { font-size: 26px; font-weight: 700; color: var(--primary); margin: 0 0 8px; overflow-wrap: anywhere; }
+        .product-wishlist-btn { flex:0 0 auto; width:42px; height:42px; border:1px solid #e2e8f0; border-radius:50%; color:#64748b; background:#fff; cursor:pointer; font-size:18px; }
+        .product-wishlist-btn.saved { color:#e11d48; border-color:#fecdd3; background:#fff1f2; }
+        .product-availability { margin:0 0 14px; font-size:13px; font-weight:700; color:#15803d; }
+        .product-availability.low-stock { color:#b45309; }
+        .product-availability.out-stock { color:#b91c1c; }
+        .product-offer-expiry { margin:-6px 0 12px; color:#b45309; font-size:12px; font-weight:700; }
         .price-tag { font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 18px; }
         .selection-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         
@@ -124,6 +131,7 @@
         .btn-buy:active {
             box-shadow: inset 3px 3px 6px #08151e, inset -3px -3px 6px #16374c;
         }
+        .btn:disabled { cursor:not-allowed; opacity:.55; box-shadow:none; }
         
         .details-section { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; margin-top: 20px; border-top: 2px solid #f1f5f9; padding: 18px 4px 100px 0; }
         .tab-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px; }
@@ -206,8 +214,15 @@
             <div class="gallery-thumbnails" id="galleryThumbnails"></div>
         </div>
         <div class="right-panel">
-            <h1 class="product-title" id="prodTitle">Loading Product...</h1>
-            <div class="price-tag">৳ <span id="prodPrice">0.00</span></div>
+            <div class="product-title-row">
+                <h1 class="product-title" id="prodTitle">Loading Product...</h1>
+                <button class="wishlist-toggle product-wishlist-btn" id="productWishlistBtn" type="button" aria-label="Add to wishlist" aria-pressed="false">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+            <div class="product-availability" id="productAvailability"></div>
+            <div class="product-offer-expiry" id="productOfferExpiry" hidden></div>
+            <div class="price-tag">৳ <span id="prodPrice">0.00</span> <span class="old-price" id="prodRegularPriceDisplay" hidden></span></div>
             
             <div class="selection-row">
                 <div class="variant-section" id="variantSectionWrapper" style="display:none;">
@@ -250,23 +265,33 @@
 </div>
 
 <div class="order-modal-overlay" id="order-modal" style="display:none; position:fixed; inset:0; background:rgba(15,38,53,0.6); z-index:3000; justify-content:center; align-items:center; padding:10px;">
-    <div class="modal-body" style="background:#fff; width:100%; max-width:420px; border-radius:16px; padding:20px;">
+    <div class="modal-body" style="background:#fff; width:100%; max-width:420px; border-radius:16px; padding:20px; max-height:90vh; overflow-y:auto;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
             <h3 style="margin:0; font-size:16px; color:#0f2635;">Confirm Order via WhatsApp</h3>
             <span style="font-size:24px; cursor:pointer;" onclick="closeOrderModal()">&times;</span>
         </div>
+        <div class="checkout-order-summary">
+            <strong>আপনার অর্ডার</strong>
+            <div id="checkout-order-summary"></div>
+            <div class="checkout-summary-totals">
+                Subtotal: ৳<span id="modal-subtotal">0</span>
+                <span>ডেলিভারি: ৳<span id="modal-delivery">80</span></span>
+                <strong>মোট: ৳<span id="modal-final-total">0</span></strong>
+            </div>
+        </div>
+        <p class="checkout-error-message" id="checkout-error-message" role="alert" hidden></p>
         
         <div style="margin-bottom:10px;">
-            <label style="font-size:12px; font-weight:600;">আপনার নাম</label>
-            <input type="text" id="customer-name" placeholder="নাম লিখুন" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
+            <label for="customer-name" style="font-size:12px; font-weight:600;">আপনার নাম</label>
+            <input type="text" id="customer-name" placeholder="নাম লিখুন" autocomplete="name" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
         </div>
         <div style="margin-bottom:10px;">
-            <label style="font-size:12px; font-weight:600;">মোবাইল নম্বর</label>
-            <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের নম্বর" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
+            <label for="customer-phone" style="font-size:12px; font-weight:600;">মোবাইল নম্বর</label>
+            <input type="tel" id="customer-phone" placeholder="১১ ডিজিটের নম্বর" autocomplete="tel" inputmode="tel" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;">
         </div>
         <div style="margin-bottom:10px;">
-            <label style="font-size:12px; font-weight:600;">পূর্ণাঙ্গ ঠিকানা</label>
-            <textarea id="customer-address" placeholder="ঠিকানা উল্লেখ করুন" rows="2" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;"></textarea>
+            <label for="customer-address" style="font-size:12px; font-weight:600;">পূর্ণাঙ্গ ঠিকানা</label>
+            <textarea id="customer-address" placeholder="ঠিকানা উল্লেখ করুন" rows="2" autocomplete="street-address" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:4px;"></textarea>
         </div>
         <div style="margin-bottom:10px;">
             <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
@@ -286,6 +311,9 @@
     let currentSelectedColor = "Standard";
     let currentSelectedSize = "";
     let currentPrice = 0; 
+    let currentRegularPrice = 0;
+    let currentOfferActive = false;
+    let currentOfferExpired = false;
     let globalProductName = ""; 
     let currentProductImage = "";
 
@@ -299,12 +327,44 @@
                 currentProductImage = product.mainImage || "";
                 document.getElementById('prodTitle').innerText = product.name;
                 document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
+                const wishlistButton = document.getElementById('productWishlistBtn');
+                wishlistButton.dataset.productId = productId;
+                wishlistButton.onclick = event => toggleWishlist(productId, event);
+                updateWishlistButtons();
+
+                const isOutOfStock = product.stockStatus === 'Out of Stock' || (product.stockQty !== undefined && parseInt(product.stockQty) <= 0);
+                const stockQuantity = parseInt(product.stockQty);
+                const availability = document.getElementById('productAvailability');
+                const addToCartButton = document.getElementById('pageCartBtn');
+                const buyButton = document.getElementById('pageBuyBtn');
+                if (isOutOfStock) {
+                    availability.innerText = 'Out of Stock';
+                    availability.classList.add('out-stock');
+                    addToCartButton.disabled = true;
+                    buyButton.disabled = true;
+                } else if (Number.isFinite(stockQuantity) && stockQuantity > 0 && stockQuantity <= 5) {
+                    availability.innerText = `স্টক সীমিত — মাত্র ${stockQuantity}টি আছে`;
+                    availability.classList.add('low-stock');
+                } else {
+                    availability.innerText = 'In Stock';
+                }
                 
                 if(product.video){
                     document.getElementById('videoContainer').innerHTML = `<a href="${product.video}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold; display:block; margin-bottom:10px;">📺 Watch Product Video</a>`;
                 }
 
-                currentPrice = product.price;
+                const pricing = getProductPricing(product);
+                currentPrice = pricing.price;
+                currentRegularPrice = pricing.regularPrice;
+                currentOfferActive = pricing.hasOffer;
+                currentOfferExpired = pricing.offerExpired;
+                document.getElementById('prodRegularPriceDisplay').hidden = currentRegularPrice <= currentPrice;
+                document.getElementById('prodRegularPriceDisplay').innerText = currentRegularPrice > currentPrice ? `৳ ${currentRegularPrice}` : '';
+                if (pricing.offerEndsAt) {
+                    const expiry = document.getElementById('productOfferExpiry');
+                    expiry.hidden = false;
+                    expiry.innerText = `Offer ends ${new Date(pricing.offerEndsAt).toLocaleString('en-BD', { dateStyle: 'medium', timeStyle: 'short' })}`;
+                }
                 const mainImg = document.getElementById('mainProdImage');
                 mainImg.src = product.mainImage || "";
 
@@ -389,8 +449,11 @@
             currentProductImage = imageUrl;
         }
         currentSelectedColor = colorName;
-        currentPrice = vPrice; 
-        document.getElementById('prodPrice').innerText = vPrice; 
+        currentPrice = currentOfferExpired ? currentRegularPrice : vPrice;
+        document.getElementById('prodPrice').innerText = currentPrice; 
+        const regularPriceDisplay = document.getElementById('prodRegularPriceDisplay');
+        regularPriceDisplay.hidden = currentRegularPrice <= currentPrice;
+        regularPriceDisplay.innerText = currentRegularPrice > currentPrice ? `৳ ${currentRegularPrice}` : '';
         document.querySelectorAll('.variant-card').forEach(card => card.classList.remove('active'));
         element.classList.add('active');
     }

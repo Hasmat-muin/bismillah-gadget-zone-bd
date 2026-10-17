@@ -1,6 +1,7 @@
 // --- ✨ PAGE LOAD CONTROLLER ---
 document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
+    restoreCheckoutDetails();
     if (document.getElementById('products-container')) { fetchProducts(); }
     fetchAndRenderBillboards();
 });
@@ -14,6 +15,7 @@ const ordersDB_URL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.c
 let cart = JSON.parse(localStorage.getItem('bg_cart')) || [];
 let allProductsData = {}; 
 let productsByCategory = new Map();
+let wishlist = loadWishlist();
 let selectedVariantsGlobal = {}; 
 let selectedSizesGlobal = {};
 let activeCategories = []; 
@@ -47,6 +49,67 @@ function scrollToCategories() {
 // --- 🛒 CART LOGIC ---
 function saveCartToStorage() {
     localStorage.setItem('bg_cart', JSON.stringify(cart));
+}
+
+function loadWishlist() {
+    try {
+        const savedWishlist = JSON.parse(localStorage.getItem('bg_wishlist') || '[]');
+        return Array.isArray(savedWishlist) ? savedWishlist.filter(id => typeof id === 'string') : [];
+    } catch (error) {
+        console.warn('Wishlist লোড করা যায়নি:', error);
+        return [];
+    }
+}
+
+function saveWishlist() {
+    localStorage.setItem('bg_wishlist', JSON.stringify(wishlist));
+}
+
+function toggleWishlist(id, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    const productId = String(id);
+    wishlist = wishlist.includes(productId)
+        ? wishlist.filter(savedId => savedId !== productId)
+        : [...wishlist, productId];
+    saveWishlist();
+    updateWishlistButtons();
+
+    if (document.querySelector('.cat-icon-item.active')?.dataset.category === 'wishlist') {
+        renderWishlistProducts();
+    }
+}
+
+function updateWishlistButtons() {
+    document.querySelectorAll('.wishlist-toggle').forEach(button => {
+        const isSaved = wishlist.includes(button.dataset.productId);
+        button.classList.toggle('saved', isSaved);
+        button.setAttribute('aria-pressed', String(isSaved));
+        button.setAttribute('aria-label', isSaved ? 'Remove from wishlist' : 'Add to wishlist');
+        button.innerHTML = `<i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>`;
+    });
+    document.querySelectorAll('.wishlist-count').forEach(badge => {
+        badge.textContent = String(wishlist.length);
+    });
+}
+
+function restoreCheckoutDetails() {
+    const nameInput = document.getElementById('customer-name');
+    const phoneInput = document.getElementById('customer-phone');
+    const addressInput = document.getElementById('customer-address');
+    if (!nameInput || !phoneInput || !addressInput) return;
+
+    try {
+        const details = JSON.parse(localStorage.getItem('bg_customer_details') || '{}');
+        nameInput.value = details.name || '';
+        phoneInput.value = details.phone || '';
+        addressInput.value = details.address || '';
+    } catch (error) {
+        console.warn('চেকআউটের সংরক্ষিত তথ্য লোড করা যায়নি:', error);
+    }
 }
 
 function toggleCart() {
@@ -140,6 +203,7 @@ function openOrderModal() {
     if (cart.length === 0) { alert("আপনার কার্টটি খালি!"); return; }
     const modalIndex = document.getElementById('order-modal');
     if (modalIndex) modalIndex.style.display = 'flex';
+    restoreCheckoutDetails();
     calculateOrderTotal();
 }
 
@@ -153,6 +217,25 @@ function calculateOrderTotal() {
     if(document.getElementById('modal-subtotal')) document.getElementById('modal-subtotal').innerText = subtotal;
     if(document.getElementById('modal-delivery')) document.getElementById('modal-delivery').innerText = deliveryCharge;
     if(document.getElementById('modal-final-total')) document.getElementById('modal-final-total').innerText = finalTotal;
+    const summary = document.getElementById('checkout-order-summary');
+    if (summary) {
+        summary.innerHTML = cart.map(item => `
+            <div class="checkout-summary-item">
+                <span>${escapeHTML(item.name)}${item.variant && item.variant !== 'Standard' ? ` · ${escapeHTML(item.variant)}` : ''}${item.size ? ` · ${escapeHTML(item.size)}` : ''}</span>
+                <strong>৳${Number(item.price).toLocaleString('en-BD')}</strong>
+            </div>
+        `).join('');
+    }
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[char]);
 }
 
 function closeOrderModal() {
@@ -162,12 +245,44 @@ function closeOrderModal() {
 
 // --- 📦 CHECKOUT & FIREBASE SAVING ---
 async function sendOrderToWhatsApp() {
-    const name = document.getElementById('customer-name')?.value;
-    const phone = document.getElementById('customer-phone')?.value;
-    const address = document.getElementById('customer-address')?.value;
+    const name = document.getElementById('customer-name')?.value.trim();
+    const phoneInput = document.getElementById('customer-phone');
+    const rawPhone = phoneInput?.value.trim() || '';
+    const address = document.getElementById('customer-address')?.value.trim();
     const deliveryCharge = parseFloat(document.getElementById('delivery-charge-select')?.value || 80);
+    const errorMessage = document.getElementById('checkout-error-message');
+    const submitButton = document.querySelector('.submit-order-btn');
+    const showError = message => {
+        if (errorMessage) {
+            errorMessage.textContent = message;
+            errorMessage.hidden = false;
+        } else {
+            alert(message);
+        }
+    };
 
-    if (!name || !phone || !address) { alert("সম্পূর্ণ তথ্য দিন!"); return; }
+    if (errorMessage) errorMessage.hidden = true;
+    if (!name || !rawPhone || !address) {
+        showError("আপনার নাম, মোবাইল নম্বর ও পূর্ণাঙ্গ ঠিকানা দিন।");
+        return;
+    }
+
+    const phoneDigits = rawPhone.replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit))).replace(/\D/g, '');
+    const normalizedPhone = phoneDigits.startsWith('880') && phoneDigits.length === 13
+        ? `0${phoneDigits.slice(3)}`
+        : phoneDigits;
+    if (!/^01[3-9]\d{8}$/.test(normalizedPhone)) {
+        showError("সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর লিখুন।");
+        phoneInput?.focus();
+        return;
+    }
+    if (phoneInput) phoneInput.value = normalizedPhone;
+
+    try {
+        localStorage.setItem('bg_customer_details', JSON.stringify({ name, phone: normalizedPhone, address }));
+    } catch (error) {
+        console.warn('চেকআউটের তথ্য সংরক্ষণ করা যায়নি:', error);
+    }
 
     const orderId = "BGZ" + Math.floor(10000 + Math.random() * 90000);
     const orderDate = new Date().toLocaleDateString('en-GB');
@@ -175,31 +290,62 @@ async function sendOrderToWhatsApp() {
     cart.forEach(item => subtotal += item.price);
 
     const orderData = {
-        orderId, name, phone, address, items: cart, 
+        orderId, name, phone: normalizedPhone, address, items: cart,
         subtotal, deliveryCharge, grandTotal: subtotal + deliveryCharge,
         status: "Processing", trackingLink: "", 
         date: orderDate, timestamp: Date.now()
     };
 
+    const deliveryText = (deliveryCharge === 80) ? "ঢাকার ভেতরে" : "ঢাকার বাইরে";
+    let message = `*📦 নতুন অর্ডার (${orderId})*\n👤 *নাম:* ${name}\n📞 *মোবাইল:* ${normalizedPhone}\n🏠 *ঠিকানা:* ${address}\n🚚 *ডেলিভারি:* ${deliveryText}\n\n🛍️ *অর্ডারকৃত প্রোডাক্টসমূহ:*\n`;
+    cart.forEach((item, index) => {
+        message += `${index + 1}. ${item.name}${item.variant && item.variant !== 'Standard' ? ` (${item.variant})` : ''}${item.size ? ` (${item.size})` : ''} - ৳${item.price}\n`;
+    });
+    message += `\n💰 *সর্বমোট বিল:* ৳${subtotal + deliveryCharge}`;
+    const whatsappUrl = `https://wa.me/8801922790663?text=${encodeURIComponent(message)}`;
+    const whatsappWindow = window.open('about:blank', '_blank');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'অর্ডার নিশ্চিত হচ্ছে...';
+    }
+
+    let orderReference = '';
     try {
         const res = await fetch(ordersDB_URL, { method: 'POST', body: JSON.stringify(orderData) });
+        if (!res.ok) throw new Error(`Order request failed (${res.status})`);
         const data = await res.json();
-        
-        let myOrders = JSON.parse(localStorage.getItem('bg_my_orders')) || [];
-        myOrders.push(data.name);
+        if (!data || typeof data.name !== 'string') throw new Error('অর্ডার রেফারেন্স পাওয়া যায়নি।');
+        orderReference = data.name;
+    } catch(error) {
+        console.error("Order save error:", error);
+        if (whatsappWindow) whatsappWindow.close();
+        showError("অর্ডারটি সংরক্ষণ করা যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।");
+        return;
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Confirm Order on WhatsApp 🚀';
+        }
+    }
+
+    let orderTrackingSaved = true;
+    try {
+        const savedOrders = JSON.parse(localStorage.getItem('bg_my_orders') || '[]');
+        const myOrders = Array.isArray(savedOrders) ? savedOrders : [];
+        myOrders.push(orderReference);
         localStorage.setItem('bg_my_orders', JSON.stringify(myOrders));
-    } catch(e) { console.error("Order save error:", e); }
+    } catch (error) {
+        orderTrackingSaved = false;
+        console.warn('অর্ডার সংরক্ষিত হয়েছে, তবে এই ডিভাইসে ট্র্যাকিং রেফারেন্স রাখা যায়নি:', error);
+    }
 
-    const deliveryText = (deliveryCharge === 80) ? "ঢাকার ভেতরে" : "ঢাকার বাইরে";
-    let message = `*📦 নতুন অর্ডার (${orderId})*\n👤 *নাম:* ${name}\n📞 *মোবাইল:* ${phone}\n🏠 *ঠিকানা:* ${address}\n🚚 *ডেলিভারি:* ${deliveryText}\n\n🛍️ *অর্ডারকৃত প্রোডাক্টসমূহ:*\n`;
-    
-    cart.forEach((item, index) => { message += `${index + 1}. ${item.name} - ৳${item.price}\n`; });
-    message += `\n💰 *সর্বমোট বিল:* ৳${subtotal + deliveryCharge}`;
-
-    window.open(`https://wa.me/8801922790663?text=${encodeURIComponent(message)}`, '_blank');
+    if (!orderTrackingSaved) {
+        alert('অর্ডার সংরক্ষিত হয়েছে, তবে এই ডিভাইসের My Orders তালিকায় দেখা নাও যেতে পারে।');
+    }
+    if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+    else window.location.href = whatsappUrl;
     
     cart = []; saveCartToStorage(); updateCartUI(); closeOrderModal();
-    alert("অর্ডারটি সফলভাবে প্লেস করা হয়েছে! Orders সেকশন থেকে স্ট্যাটাস দেখতে পারবেন।");
 }
 
 // --- 📦 CUSTOMER ORDERS PANEL ---
@@ -277,9 +423,17 @@ function renderDynamicCategoryTabs() {
     if (!swipeContainer) return;
 
     let html = `
-        <div class="cat-icon-item active" onclick="switchCategory('All', this)">
+        <div class="cat-icon-item active" data-category="allproducts" onclick="switchCategory('AllProducts', this)">
+            <i class="fas fa-boxes-stacked"></i>
+            <span>Products</span>
+        </div>
+        <div class="cat-icon-item" data-category="wishlist" onclick="switchCategory('Wishlist', this)">
+            <i class="far fa-heart"></i>
+            <span>Wishlist <b class="wishlist-count">${wishlist.length}</b></span>
+        </div>
+        <div class="cat-icon-item" data-category="all" onclick="switchCategory('All', this)">
             <i class="fas fa-bolt"></i>
-            <span>All</span>
+            <span>All Category</span>
         </div>
     `;
 
@@ -287,7 +441,7 @@ function renderDynamicCategoryTabs() {
         const safeCat = category.replace(/'/g, "\\'");
         const iconClass = getCategoryIcon(category);
         html += `
-            <div class="cat-icon-item" onclick="switchCategory('${safeCat}', this)">
+            <div class="cat-icon-item" data-category="${category.toLowerCase()}" onclick="switchCategory('${safeCat}', this)">
                 <i class="${iconClass}"></i>
                 <span>${category}</span>
             </div>
@@ -295,6 +449,7 @@ function renderDynamicCategoryTabs() {
     });
 
     swipeContainer.innerHTML = html;
+    if (typeof updateCategoryScrollArrows === 'function') updateCategoryScrollArrows();
 }
 
 function cacheReelProducts(products) {
@@ -357,8 +512,152 @@ async function fetchProducts() {
         });
 
         renderDynamicCategoryTabs();
-        renderCategoryWiseColumns(); 
+        renderHomeSections();
     } catch (err) { console.error("ডাটা লোড সমস্যা:", err); }
+}
+
+function getProductPricing(product) {
+    const price = parseFloat(product.price) || 0;
+    const regularPrice = parseFloat(product.regularPrice) || price;
+    const rawEnd = product.offerEndsAt;
+    const offerEndsAt = rawEnd
+        ? (Number.isFinite(Number(rawEnd)) ? Number(rawEnd) : Date.parse(rawEnd))
+        : 0;
+    const hasOffer = regularPrice > price;
+    const offerExpired = hasOffer && offerEndsAt > 0 && offerEndsAt <= Date.now();
+
+    return {
+        price: offerExpired ? regularPrice : price,
+        regularPrice,
+        hasOffer: hasOffer && !offerExpired,
+        offerEndsAt: hasOffer && !offerExpired ? offerEndsAt : 0,
+        offerExpired
+    };
+}
+
+function renderProductCard(prod, category) {
+    const key = prod.key;
+    const pricing = getProductPricing(prod);
+    const salePrice = pricing.price;
+    const regPrice = pricing.regularPrice;
+
+    const isOutOfStock = (prod.stockStatus === 'Out of Stock' || (prod.stockQty !== undefined && parseInt(prod.stockQty) <= 0));
+    const stockQty = Number.parseInt(prod.stockQty, 10);
+    const hasLowStock = !isOutOfStock && Number.isFinite(stockQty) && stockQty > 0 && stockQty <= 5;
+    let discountBadge = "";
+    let priceCutHTML = `<span class="price">৳ ${salePrice}</span>`;
+
+    if (pricing.hasOffer) {
+        const discountPercent = Math.round(((regPrice - salePrice) / regPrice) * 100);
+        discountBadge = `<div class="card-badges-top"><span class="badge-discount">-${discountPercent}% OFF</span></div>`;
+        priceCutHTML = `
+            <div class="price-box">
+                <span class="price">৳ ${salePrice}</span>
+                <span class="old-price">৳ ${regPrice}</span>
+            </div>
+        `;
+    }
+
+    const offerExpiryHTML = pricing.offerEndsAt
+        ? `<span class="offer-expiry">Offer ends ${new Date(pricing.offerEndsAt).toLocaleString('en-BD', { dateStyle: 'medium', timeStyle: 'short' })}</span>`
+        : '';
+    const stockBadgeHTML = isOutOfStock ?
+        `<span class="badge-stock out-stock">Out of Stock</span>` :
+        hasLowStock
+            ? `<span class="badge-stock low-stock">Only ${stockQty} left</span>`
+            : `<span class="badge-stock in-stock">In Stock</span>`;
+    const categoryName = String(category || '');
+    const isSaved = wishlist.includes(String(key));
+
+    return `
+        <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${categoryName.toLowerCase()}" onclick="window.location.href='product.html?id=${key}'">
+            ${discountBadge}
+            ${prod.featured ? `<span class="product-featured-badge">Popular</span>` : ''}
+            <button class="wishlist-toggle ${isSaved ? 'saved' : ''}" type="button" data-product-id="${key}" aria-label="${isSaved ? 'Remove from wishlist' : 'Add to wishlist'}" aria-pressed="${isSaved}" onclick="toggleWishlist('${key}', event)">
+                <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
+            </button>
+            <div class="image-wrapper">
+                <img src="${prod.mainImage || 'logo.JPG'}" loading="lazy">
+            </div>
+            <div class="info-wrapper">
+                <h3 class="product-title">${prod.name}</h3>
+                <div class="card-footer-row">
+                    ${priceCutHTML}
+                    ${stockBadgeHTML}
+                </div>
+                ${offerExpiryHTML}
+            </div>
+        </div>`;
+}
+
+function getOrderedProducts() {
+    const categoryOrder = new Map(activeCategories.map((category, index) => [category, index]));
+    return Object.keys(allProductsData)
+        .map(key => ({ key, ...allProductsData[key] }))
+        .sort((a, b) => {
+            const categoryA = categoryOrder.has(a.category) ? categoryOrder.get(a.category) : activeCategories.length;
+            const categoryB = categoryOrder.has(b.category) ? categoryOrder.get(b.category) : activeCategories.length;
+            if (categoryA !== categoryB) return categoryA - categoryB;
+            return (a.position ?? 9999) - (b.position ?? 9999);
+        });
+}
+
+function renderProductSection(title, products, sectionClass = '') {
+    if (!products.length) return '';
+    return `
+    <section class="category-section storefront-section ${sectionClass}">
+        <div class="category-header">
+            <div class="category-title">${title}</div>
+        </div>
+        <div class="products-grid all-products-view">
+            ${products.map(prod => renderProductCard(prod, prod.category)).join('')}
+        </div>
+    </section>`;
+}
+
+function renderAllProducts() {
+    const mainGrid = document.getElementById('products-container');
+    if (!mainGrid) return;
+    const products = getOrderedProducts();
+    mainGrid.innerHTML = `
+        ${renderProductSection('Products', products, 'all-products-section')}
+    `;
+    enableDesktopDragScroll();
+}
+
+function renderHomeSections() {
+    const mainGrid = document.getElementById('products-container');
+    if (!mainGrid) return;
+    const products = getOrderedProducts();
+    const newestProducts = [...products]
+        .sort((a, b) => {
+            const createdAtDifference = (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0);
+            return createdAtDifference || String(b.key).localeCompare(String(a.key));
+        })
+        .slice(0, 5);
+    const popularProducts = products.filter(product => product.featured === true).slice(0, 5);
+    const offerProducts = products.filter(product => getProductPricing(product).hasOffer).slice(0, 5);
+    const allProductsSection = renderProductSection('Products', products, 'all-products-section');
+
+    mainGrid.innerHTML = [
+        renderProductSection('New Arrivals', newestProducts, 'new-arrivals-section'),
+        renderProductSection('Popular Products', popularProducts, 'popular-products-section'),
+        renderProductSection('Special Offers', offerProducts, 'special-offers-section'),
+        allProductsSection
+    ].join('');
+    enableDesktopDragScroll();
+}
+
+function renderWishlistProducts() {
+    const mainGrid = document.getElementById('products-container');
+    if (!mainGrid) return;
+    const savedProducts = wishlist
+            .map(id => allProductsData[id] ? { key: id, ...allProductsData[id] } : null)
+            .filter(Boolean);
+    mainGrid.innerHTML = savedProducts.length
+            ? renderProductSection('Wishlist', savedProducts, 'wishlist-section')
+            : `<section class="category-section wishlist-empty"><i class="far fa-heart"></i><h2>Your wishlist is empty</h2><p>পছন্দের পণ্যের হার্ট আইকনে চাপ দিলে এখানে দেখতে পাবেন।</p><button type="button" onclick="switchCategory('AllProducts', document.querySelector('[data-category=&quot;allproducts&quot;]'))">Products দেখুন</button></section>`;
+    enableDesktopDragScroll();
 }
 
 function renderCategoryWiseColumns() {
@@ -387,44 +686,7 @@ function renderCategoryWiseColumns() {
 
         productsInCategory.forEach(prod => {
             categoryProductsCount++;
-            const key = prod.key;
-
-            const salePrice = parseFloat(prod.price) || 0;
-            const regPrice = parseFloat(prod.regularPrice) || salePrice;
-            
-            let discountBadge = "";
-            let priceCutHTML = `<span class="price">৳ ${salePrice}</span>`;
-
-            if (regPrice > salePrice) {
-                const discountPercent = Math.round(((regPrice - salePrice) / regPrice) * 100);
-                discountBadge = `<div class="card-badges-top"><span class="badge-discount">-${discountPercent}% OFF</span></div>`;
-                priceCutHTML = `
-                    <div class="price-box">
-                        <span class="price">৳ ${salePrice}</span>
-                        <span class="old-price">৳ ${regPrice}</span>
-                    </div>
-                `;
-            }
-
-            const isOutOfStock = (prod.stockStatus === 'Out of Stock' || (prod.stockQty !== undefined && parseInt(prod.stockQty) <= 0));
-            const stockBadgeHTML = isOutOfStock ? 
-                `<span class="badge-stock out-stock">Out of Stock</span>` : 
-                `<span class="badge-stock in-stock">In Stock</span>`;
-
-            categoryHTML += `
-                <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${category.toLowerCase()}" onclick="window.location.href='product.html?id=${key}'">
-                    ${discountBadge}
-                    <div class="image-wrapper">
-                        <img src="${prod.mainImage || 'logo.JPG'}" loading="lazy">
-                    </div>
-                    <div class="info-wrapper">
-                        <h3 class="product-title">${prod.name}</h3>
-                        <div class="card-footer-row">
-                            ${priceCutHTML}
-                            ${stockBadgeHTML}
-                        </div>
-                    </div>
-                </div>`;
+            categoryHTML += renderProductCard(prod, category);
         });
 
         categoryHTML += `</div></div>`;
@@ -464,7 +726,17 @@ function switchCategory(categoryName, element, updateHistory = true) {
 
     document.querySelectorAll('.cat-icon-item, .header-nav-links a').forEach(el => el.classList.remove('active'));
     if (element) element.classList.add('active');
-    
+
+    if (categoryName === 'AllProducts') {
+        renderAllProducts();
+        return;
+    }
+
+    if (categoryName === 'Wishlist') {
+        renderWishlistProducts();
+        return;
+    }
+
     if (categoryName === 'All') {
         visibleCategoryCount = 7;
         renderCategoryWiseColumns();
@@ -494,11 +766,20 @@ function switchCategory(categoryName, element, updateHistory = true) {
 }
 
 window.addEventListener('popstate', event => {
-    const categoryName = typeof event.state?.shopCategory === 'string' ? event.state.shopCategory : 'All';
+    const categoryName = typeof event.state?.shopCategory === 'string' ? event.state.shopCategory : 'AllProducts';
     const categoryTab = Array.from(document.querySelectorAll('.cat-icon-item')).find(tab =>
-        tab.querySelector('span')?.textContent.trim().toLowerCase() === categoryName.toLowerCase()
+        tab.getAttribute('data-category') === categoryName.toLowerCase()
     );
     switchCategory(categoryName, categoryTab, false);
+});
+
+window.addEventListener('storage', event => {
+    if (event.key !== 'bg_wishlist') return;
+    wishlist = loadWishlist();
+    updateWishlistButtons();
+    if (document.querySelector('.cat-icon-item.active')?.dataset.category === 'wishlist') {
+        renderWishlistProducts();
+    }
 });
 
 function viewFullCategory(categoryName) {
@@ -532,45 +813,26 @@ function exitFullCategoryView() {
     visibleCategoryCount = 7;
     renderCategoryWiseColumns();
 
-    const allTab = document.querySelector('.cat-icon-item');
+    const allTab = document.querySelector('.cat-icon-item[data-category="all"]');
     if (allTab) switchCategory('All', allTab);
 }
 
 function searchProducts(query) {
     query = query.trim().toLowerCase();
-    
-    if (query === "") {
-        visibleCategoryCount = 7;
-        renderCategoryWiseColumns();
-        return;
-    }
+    renderAllProducts();
 
-    visibleCategoryCount = activeCategories.length;
-    renderCategoryWiseColumns();
+    const backWrap = document.getElementById('back-to-all-wrap');
+    if (backWrap) backWrap.style.display = 'none';
 
-    document.querySelectorAll('.category-section').forEach(sec => {
-        let matchingProductsInSec = 0;
-        
-        sec.querySelectorAll('.product-card').forEach(card => {
-            const name = card.getAttribute('data-name') || '';
-            const category = card.getAttribute('data-category') || '';
-            if (name.includes(query) || category.includes(query)) {
-                card.style.display = '';
-                matchingProductsInSec++;
-            } else {
-                card.style.display = 'none';
-            }
-        });
+    const allTab = document.querySelector('.cat-icon-item[data-category="allproducts"]');
+    document.querySelectorAll('.cat-icon-item, .header-nav-links a').forEach(el => el.classList.remove('active'));
+    if (allTab) allTab.classList.add('active');
 
-        if (matchingProductsInSec > 0) {
-            sec.style.display = 'block';
-        } else {
-            sec.style.display = 'none';
-        }
+    document.querySelectorAll('#products-container .product-card').forEach(card => {
+        const name = card.getAttribute('data-name') || '';
+        const category = card.getAttribute('data-category') || '';
+        card.style.display = query === '' || name.includes(query) || category.includes(query) ? '' : 'none';
     });
-
-    const loadMoreBtn = document.getElementById('load-more-btn-wrap');
-    if(loadMoreBtn) loadMoreBtn.style.display = 'none';
 }
 
 // --- 🎡 BILLBOARD ---
@@ -742,6 +1004,6 @@ function makeDragScrollable(slider) {
 }
 
 function enableDesktopDragScroll() {
-    const productGrids = document.querySelectorAll('.products-grid');
+    const productGrids = document.querySelectorAll('.products-grid:not(.all-products-view)');
     productGrids.forEach(grid => makeDragScrollable(grid));
 }
