@@ -102,6 +102,7 @@
             display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; background: #ffffff; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;
         }
         .variant-row input { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
+        .side-menu-game-message-input { width: 100%; min-height: 88px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font: inherit; line-height: 1.5; resize: vertical; }
 
         .ck-editor__editable_inline { min-height: 180px; }
     </style>
@@ -133,6 +134,7 @@
             <button class="admin-tab active" type="button" role="tab" aria-selected="true" onclick="showAdminSection('products', this)" onkeydown="moveAdminTab(event)">Products</button>
             <button class="admin-tab" type="button" role="tab" aria-selected="false" onclick="showAdminSection('orders', this)" onkeydown="moveAdminTab(event)">Orders</button>
             <button class="admin-tab" type="button" role="tab" aria-selected="false" onclick="showAdminSection('store', this)" onkeydown="moveAdminTab(event)">Store Setup</button>
+            <button class="admin-tab" type="button" role="tab" aria-selected="false" onclick="showAdminSection('menu-message', this)" onkeydown="moveAdminTab(event)">Menu Message 🔨</button>
             <button class="admin-tab" type="button" role="tab" aria-selected="false" onclick="showAdminSection('settings', this)" onkeydown="moveAdminTab(event)">Settings</button>
         </nav>
 
@@ -161,6 +163,33 @@
                         </div>
                         <button type="submit" class="btn-success" style="background:#16a34a;">Update Info 🔒</button>
                     </form>
+                </div>
+
+                <div class="admin-card" data-admin-section="menu-message">
+                    <h3>🔨 Side Menu Glass Messages</h3>
+                    <p style="font-size:13px; color:#64748b; margin:0 0 12px;">সর্বোচ্চ ৫টি message লিখুন, প্রতিটিতে সর্বোচ্চ ৪টি লাইন। Hammer চাপলে glass-এ পরের message দেখা যাবে।</p>
+                    <div class="input-group">
+                        <label for="sideMenuGameMessage1">Message 1 (up to 4 lines)</label>
+                        <textarea class="side-menu-game-message-input" id="sideMenuGameMessage1" rows="4" maxlength="220" placeholder="প্রথম message লিখুন..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="sideMenuGameMessage2">Message 2 (up to 4 lines)</label>
+                        <textarea class="side-menu-game-message-input" id="sideMenuGameMessage2" rows="4" maxlength="220" placeholder="দ্বিতীয় message লিখুন..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="sideMenuGameMessage3">Message 3 (up to 4 lines)</label>
+                        <textarea class="side-menu-game-message-input" id="sideMenuGameMessage3" rows="4" maxlength="220" placeholder="তৃতীয় message লিখুন..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="sideMenuGameMessage4">Message 4 (up to 4 lines)</label>
+                        <textarea class="side-menu-game-message-input" id="sideMenuGameMessage4" rows="4" maxlength="220" placeholder="চতুর্থ message লিখুন..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="sideMenuGameMessage5">Message 5 (up to 4 lines)</label>
+                        <textarea class="side-menu-game-message-input" id="sideMenuGameMessage5" rows="4" maxlength="220" placeholder="পঞ্চম message লিখুন..."></textarea>
+                    </div>
+                    <button class="btn-success" onclick="saveSideMenuGameMessage(event)">Save Message 💾</button>
+                    <p id="sideMenuGameMessageStatus" role="status" style="font-size:12px; margin:8px 0 0;"></p>
                 </div>
 
                 <div class="admin-card" data-admin-section="store">
@@ -324,6 +353,7 @@
 
         const billboardURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
         const authConfigURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminCredentials.json";
+        const sideMenuGameMessageURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/sideMenuGameMessage.json";
 
         ClassicEditor.create(document.querySelector('#prodDetails'), {
             toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'insertTable', 'undo', 'redo' ]
@@ -352,6 +382,7 @@
             loadBillboardCategoriesDropdown();
             loadAdminBillboards();
             loadCurrentAdminCredentials();
+            loadSideMenuGameMessage();
             loadCategoriesIntoReorderDropdown(); 
             loadAdminOrders(); 
         }
@@ -726,6 +757,60 @@
                 body: JSON.stringify({ content, updatedAt: Date.now() })
             });
             alert("🎉 পেজ সেভ করা হয়েছে!");
+        }
+
+        async function loadSideMenuGameMessage() {
+            const status = document.getElementById('sideMenuGameMessageStatus');
+            const fields = document.querySelectorAll('.side-menu-game-message-input');
+            if (!fields.length || !status) return;
+            try {
+                const response = await fetch(sideMenuGameMessageURL);
+                if (!response.ok) throw new Error("সাইড মেনুর মেসেজ লোড করা যায়নি।");
+                const data = await response.json();
+                const legacyMessage = typeof data === 'string' ? data : data?.text;
+                const messages = Array.isArray(data?.messages) ? data.messages : (legacyMessage ? [legacyMessage] : []);
+                fields.forEach((field, index) => {
+                    field.value = typeof messages[index] === 'string' ? messages[index] : "";
+                });
+                status.textContent = "";
+            } catch (error) {
+                console.error(error);
+                status.textContent = error.message || "সাইড মেনুর মেসেজ লোড করা যায়নি।";
+                status.style.color = "#dc2626";
+            }
+        }
+
+        async function saveSideMenuGameMessage(event) {
+            const status = document.getElementById('sideMenuGameMessageStatus');
+            const button = event?.currentTarget;
+            const messages = Array.from(document.querySelectorAll('.side-menu-game-message-input'), field => field.value.trim());
+            const invalidIndex = messages.findIndex(text => text.split(/\r?\n/).filter(line => line.trim()).length > 4);
+            if (invalidIndex !== -1) {
+                status.textContent = `Message ${invalidIndex + 1}-এ সর্বোচ্চ ৪টি লাইন লিখুন।`;
+                status.style.color = "#dc2626";
+                return;
+            }
+            const savedMessages = messages.filter(Boolean);
+
+            if (button) button.disabled = true;
+            status.textContent = "Saving...";
+            status.style.color = "#64748b";
+            try {
+                const response = await fetch(sideMenuGameMessageURL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(savedMessages.length ? { messages: savedMessages, updatedAt: Date.now() } : null)
+                });
+                if (!response.ok) throw new Error("মেসেজ সেভ করা যায়নি।");
+                status.textContent = savedMessages.length ? `${savedMessages.length}টি message saved.` : "Messages cleared.";
+                status.style.color = "#16a34a";
+            } catch (error) {
+                console.error(error);
+                status.textContent = error.message || "মেসেজ সেভ করা যায়নি। আবার চেষ্টা করুন।";
+                status.style.color = "#dc2626";
+            } finally {
+                if (button) button.disabled = false;
+            }
         }
 
         async function loadBillboardCategoriesDropdown() {

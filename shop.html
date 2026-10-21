@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bismillah Gadget Zone BD</title>
+    <link rel="preconnect" href="https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="public/favicon.png">
     
@@ -255,6 +257,23 @@
             <a href="page.html?type=delivery"><i class="fas fa-truck"></i> Delivery Info</a>
             <a href="https://wa.me/8801922790663"><i class="fab fa-whatsapp"></i> Contact Us</a>
         </div>
+        <section class="side-menu-game" id="side-menu-game" aria-label="Side menu messages" hidden>
+            <p class="side-menu-game-title">Read the messages and enjoy the flowers</p>
+            <div class="side-menu-game-glass" id="side-menu-game-glass">
+                <span class="side-menu-game-message" id="side-menu-game-message" hidden></span>
+                <div class="side-menu-game-flowers" id="side-menu-game-flowers" aria-hidden="true"></div>
+            </div>
+            <p class="side-menu-game-status" id="side-menu-game-status" aria-live="polite"></p>
+            <div class="side-menu-game-actions">
+                <button type="button" class="side-menu-message-arrow" id="side-menu-message-previous" aria-label="আগের মেসেজ">
+                    <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <span class="side-menu-message-count" id="side-menu-message-count" aria-live="polite"></span>
+                <button type="button" class="side-menu-message-arrow" id="side-menu-message-next" aria-label="পরের মেসেজ">
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </button>
+            </div>
+        </section>
     </div>
 
     <div class="top-info-bar">
@@ -269,6 +288,10 @@
     </div>
 
     <header class="premium-header">
+        <button type="button" class="banner-view-toggle" aria-label="Show full banner" title="Show full banner" aria-expanded="false">
+            <i class="fas fa-expand-alt" aria-hidden="true"></i>
+        </button>
+        <div class="header-overlay-controls">
         <div class="header-top-row">
             
             <!-- 🆕 Mobile Hamburger Menu Button -->
@@ -314,42 +337,48 @@
             </div>
         </div>
 
-        <div class="category-scroll-container">
-            <a href="reels.html" class="pinned-reels-badge" title="Watch Shorts Reels">
-                <div class="reels-story-ring">
-                    <div class="reels-story-inner">
-                        <i class="fas fa-play" style="font-size: 8px;"></i>
+        <div class="header-feature-row">
+            <div class="header-category-column">
+                <div class="category-scroll-container">
+                    <a href="reels.html" class="pinned-reels-badge" title="Watch Shorts Reels">
+                        <div class="reels-story-ring">
+                            <div class="reels-story-inner">
+                                <i class="fas fa-play" style="font-size: 8px;"></i>
+                            </div>
+                        </div>
+                        <span class="reels-badge-title">Reels</span>
+                    </a>
+                    <div class="category-tabs-viewport">
+                        <div class="icon-category-swipe-wrapper" id="swipeCategoryBar"></div>
+                        <button type="button" class="category-scroll-arrow swipe-back-arrow" id="category-scroll-left"
+                                onclick="scrollCategoryLeft()" title="আগের ক্যাটাগরি" aria-label="আগের ক্যাটাগরি" hidden>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="category-scroll-arrow swipe-hint-arrow" id="category-scroll-right"
+                                onclick="scrollCategoryRight()" title="আরও ক্যাটাগরি" aria-label="আরও ক্যাটাগরি" hidden>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
-                <span class="reels-badge-title">Reels</span>
-            </a>
-            <div class="category-tabs-viewport">
-                <div class="icon-category-swipe-wrapper" id="swipeCategoryBar"></div>
-                <button type="button" class="category-scroll-arrow swipe-back-arrow" id="category-scroll-left"
-                        onclick="scrollCategoryLeft()" title="আগের ক্যাটাগরি" aria-label="আগের ক্যাটাগরি" hidden>
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button type="button" class="category-scroll-arrow swipe-hint-arrow" id="category-scroll-right"
-                        onclick="scrollCategoryRight()" title="আরও ক্যাটাগরি" aria-label="আরও ক্যাটাগরি" hidden>
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
 
-        <div class="header-search-box-mobile">
-            <div class="mobile-search-inner">
-                <input type="text" id="mobile-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'desktop-search')">
-                <div class="search-icon-badge">
-                    <i class="fas fa-search"></i>
+                <div class="header-search-box-mobile">
+                    <div class="mobile-search-inner">
+                        <input type="text" id="mobile-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'desktop-search')">
+                        <div class="search-icon-badge">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+        </div>
+        </div>
+
+        <div class="billboard-container" id="billboard-container" style="display: none;">
+            <div class="billboard-track" id="billboard-track"></div>
+            <div class="billboard-dots" id="billboard-dots"></div>
         </div>
     </header>
-
-    <div class="billboard-container" id="billboard-container" style="display: none;">
-        <div class="billboard-track" id="billboard-track"></div>
-        <div class="billboard-dots" id="billboard-dots"></div>
-    </div>
 
     <div id="back-to-all-wrap">
         <button class="back-to-all-btn" onclick="exitFullCategoryView()">⬅ সব ক্যাটাগরি দেখুন</button>

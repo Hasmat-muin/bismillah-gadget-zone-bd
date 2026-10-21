@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
     restoreCheckoutDetails();
     if (document.getElementById('products-container')) { fetchProducts(); }
+    enableBannerExpandedView();
+    enableDelayedSideMenuGame();
     fetchAndRenderBillboards();
 });
 
@@ -37,6 +39,92 @@ function toggleSideMenu() {
     const overlay = document.getElementById('side-menu-overlay');
     if (menu) menu.classList.toggle('open');
     if (overlay) overlay.classList.toggle('active');
+}
+
+function enableDelayedSideMenuGame() {
+    const game = document.getElementById('side-menu-game');
+    const flowers = document.getElementById('side-menu-game-flowers');
+    const previous = document.getElementById('side-menu-message-previous');
+    const next = document.getElementById('side-menu-message-next');
+    const message = document.getElementById('side-menu-game-message');
+    const status = document.getElementById('side-menu-game-status');
+    const counter = document.getElementById('side-menu-message-count');
+    if (!game || !flowers || !previous || !next || !message || !status || !counter) return;
+
+    let messages = [];
+    let currentMessageIndex = 0;
+    const messageURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/sideMenuGameMessage.json";
+
+    const showerFlowers = () => {
+        const bloomTypes = [
+            { symbol: '✿', color: 'red' },
+            { symbol: '❀', color: 'white' },
+            { symbol: '✿', color: 'yellow' }
+        ];
+        const fragment = document.createDocumentFragment();
+
+        for (let index = 0; index < 24; index += 1) {
+            const bloom = bloomTypes[Math.floor(Math.random() * bloomTypes.length)];
+            const flower = document.createElement('span');
+            flower.className = `side-menu-falling-flower is-${bloom.color}`;
+            flower.textContent = bloom.symbol;
+            flower.style.left = `${Math.random() * 100}%`;
+            flower.style.setProperty('--flower-drift', `${Math.round((Math.random() - 0.5) * 100)}px`);
+            flower.style.setProperty('--flower-duration', `${2.2 + Math.random() * 1.8}s`);
+            flower.style.setProperty('--flower-delay', `${Math.random() * 0.65}s`);
+            fragment.appendChild(flower);
+        }
+
+        flowers.appendChild(fragment);
+    };
+
+    const showMessage = index => {
+        if (!messages.length) {
+            status.textContent = 'Admin message is not set yet.';
+            showerFlowers();
+            return;
+        }
+        currentMessageIndex = (index + messages.length) % messages.length;
+        message.textContent = messages[currentMessageIndex];
+        message.hidden = false;
+        message.classList.remove('is-revealed');
+        void message.offsetWidth;
+        message.classList.add('is-revealed');
+        counter.textContent = `${currentMessageIndex + 1} / ${messages.length}`;
+        status.textContent = '';
+        showerFlowers();
+    };
+
+    previous.addEventListener('click', () => showMessage(currentMessageIndex - 1));
+    next.addEventListener('click', () => showMessage(currentMessageIndex + 1));
+    flowers.addEventListener('animationend', event => {
+        if (event.target instanceof HTMLElement && event.target.classList.contains('side-menu-falling-flower')) {
+            event.target.remove();
+        }
+    });
+
+    setTimeout(async () => {
+        game.hidden = false;
+        try {
+            const response = await fetch(messageURL);
+            if (!response.ok) throw new Error(`Side-menu message request failed: ${response.status}`);
+            const data = await response.json();
+            const legacyMessage = typeof data === 'string' ? data : data?.text;
+            const savedMessages = Array.isArray(data?.messages) ? data.messages : (legacyMessage ? [legacyMessage] : []);
+            messages = savedMessages.filter(item => typeof item === 'string' && item.trim()).map(item => item.trim());
+            if (messages.length) {
+                currentMessageIndex = 0;
+                message.textContent = messages[0];
+                message.hidden = false;
+                counter.textContent = `1 / ${messages.length}`;
+            } else {
+                status.textContent = 'Admin message is not set yet.';
+            }
+        } catch (error) {
+            console.error('Side-menu message could not be loaded:', error);
+            status.textContent = 'Message could not be loaded. Please try again later.';
+        }
+    }, 10000);
 }
 
 function scrollToCategories() {
@@ -577,7 +665,7 @@ function renderProductCard(prod, category) {
                 <i class="${isSaved ? 'fas' : 'far'} fa-heart"></i>
             </button>
             <div class="image-wrapper">
-                <img src="${prod.mainImage || 'logo.JPG'}" loading="lazy">
+                <img src="${prod.mainImage || 'logo.JPG'}" loading="lazy" decoding="async" fetchpriority="low" alt="${prod.name}">
             </div>
             <div class="info-wrapper">
                 <h3 class="product-title">${prod.name}</h3>
@@ -836,6 +924,44 @@ function searchProducts(query) {
 }
 
 // --- 🎡 BILLBOARD ---
+function enableBannerExpandedView() {
+    const header = document.querySelector('header.premium-header');
+    const toggle = header?.querySelector('.banner-view-toggle');
+    if (!header || !toggle) return;
+
+    const setView = (expanded, controlsHidden) => {
+        header.classList.toggle('is-banner-expanded', expanded);
+        header.classList.toggle('is-controls-hidden', expanded && controlsHidden);
+        toggle.setAttribute('aria-expanded', String(expanded && !controlsHidden));
+        const label = expanded
+            ? (controlsHidden ? 'Restore header layout' : 'Hide header controls')
+            : 'Show full banner';
+        toggle.setAttribute('aria-label', label);
+        toggle.title = label;
+        const icon = expanded
+            ? (controlsHidden ? 'fa-bars' : 'fa-eye-slash')
+            : 'fa-expand-alt';
+        toggle.innerHTML = `<i class="fas ${icon}" aria-hidden="true"></i>`;
+    };
+
+    toggle.addEventListener('click', () => {
+        const expanded = header.classList.contains('is-banner-expanded');
+        const controlsHidden = header.classList.contains('is-controls-hidden');
+        if (!expanded) {
+            setView(true, true);
+        } else {
+            setView(controlsHidden ? false : true, false);
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && header.classList.contains('is-banner-expanded')) {
+            setView(false, false);
+            toggle.focus();
+        }
+    });
+}
+
 async function fetchAndRenderBillboards() {
     const container = document.getElementById('billboard-container');
     const track = document.getElementById('billboard-track');
@@ -871,7 +997,10 @@ async function fetchAndRenderBillboards() {
         });
 
         const slides = track.querySelectorAll('.billboard-slide');
+        let currentActiveIndex = -1;
         const activateSlide = activeIndex => {
+            if (activeIndex === currentActiveIndex) return;
+            currentActiveIndex = activeIndex;
             slides.forEach((slide, index) => {
                 slide.classList.toggle('is-active', index === activeIndex);
                 const image = slide.querySelector('img');
@@ -948,6 +1077,41 @@ async function fetchAndRenderBillboards() {
 function startBillboardAutoSlide(track) {
     if (billboardAutoSlideInterval) clearInterval(billboardAutoSlideInterval);
 
+    const originalScrollSnapType = track.style.scrollSnapType;
+    let scrollAnimationFrame = null;
+
+    const stopAutoScrollAnimation = () => {
+        if (scrollAnimationFrame === null) return;
+        cancelAnimationFrame(scrollAnimationFrame);
+        scrollAnimationFrame = null;
+        track.style.scrollSnapType = originalScrollSnapType;
+    };
+
+    const animateTo = (target, duration = 10000) => {
+        stopAutoScrollAnimation();
+        const start = track.scrollLeft;
+        const distance = target - start;
+        const startTime = performance.now();
+        track.style.scrollSnapType = 'none';
+
+        const animate = now => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const easedProgress = progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+            track.scrollLeft = start + distance * easedProgress;
+
+            if (progress < 1) {
+                scrollAnimationFrame = requestAnimationFrame(animate);
+            } else {
+                scrollAnimationFrame = null;
+                track.style.scrollSnapType = originalScrollSnapType;
+            }
+        };
+
+        scrollAnimationFrame = requestAnimationFrame(animate);
+    };
+
     const slideNext = () => {
         if (isUserInteracting) return;
         const slideWidth = track.querySelector('.billboard-slide')?.offsetWidth || track.offsetWidth;
@@ -956,17 +1120,24 @@ function startBillboardAutoSlide(track) {
         const maxScroll = track.scrollWidth - track.clientWidth;
 
         if (currentScroll >= maxScroll - 5) {
-            track.scrollTo({ left: 0, behavior: 'smooth' });
+            animateTo(0);
         } else {
-            track.scrollBy({ left: slideWidth + gap, behavior: 'smooth' });
+            animateTo(Math.min(currentScroll + slideWidth + gap, maxScroll));
         }
     };
 
-    billboardAutoSlideInterval = setInterval(slideNext, 3500);
+    billboardAutoSlideInterval = setInterval(slideNext, 18000);
 
     track.addEventListener('mouseenter', () => { isUserInteracting = true; });
     track.addEventListener('mouseleave', () => { isUserInteracting = false; });
-    track.addEventListener('touchstart', () => { isUserInteracting = true; }, { passive: true });
+    track.addEventListener('mousedown', () => {
+        stopAutoScrollAnimation();
+        isUserInteracting = true;
+    });
+    track.addEventListener('touchstart', () => {
+        stopAutoScrollAnimation();
+        isUserInteracting = true;
+    }, { passive: true });
     track.addEventListener('touchend', () => {
         setTimeout(() => { isUserInteracting = false; }, 2000);
     }, { passive: true });
