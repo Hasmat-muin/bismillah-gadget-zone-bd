@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (() => {
+            const viewport = document.querySelector('meta[name="viewport"]');
+            const screenWidth = window.innerWidth;
+            if (screenWidth > 0 && screenWidth < 360) {
+                viewport.content = `width=360, initial-scale=${screenWidth / 360}`;
+            }
+        })();
+    </script>
     <title>Bismillah Gadget Zone BD</title>
     <link rel="preconnect" href="https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -434,7 +443,14 @@
             <div class="checkout-order-summary">
                 <strong>আপনার অর্ডার</strong>
                 <div id="checkout-order-summary"></div>
+                <div class="checkout-summary-totals">
+                    <strong>Detail Explain :</strong>
+                    <span>পণ্যের দাম : ৳<span id="modal-subtotal">0</span></span>
+                    <span>ডেলিভারি : ৳<span id="modal-delivery">60</span></span>
+                    <strong>মোট : ৳<span id="modal-final-total">0</span></strong>
+                </div>
             </div>
+            <p id="delivery-charge-settings-warning" role="status" hidden style="font-size:12px; color:#b45309;">ডেলিভারি চার্জের সেটিংস লোড করা যায়নি; ডিফল্ট চার্জ প্রযোজ্য হবে।</p>
             <p class="checkout-error-message" id="checkout-error-message" role="alert" hidden></p>
             <div style="margin-bottom:10px;">
                 <label for="customer-name" style="font-size:12px; font-weight:600;">আপনার নাম</label>
@@ -451,14 +467,9 @@
             <div style="margin-bottom:10px;">
                 <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
                 <select id="delivery-charge-select" onchange="calculateOrderTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
-                    <option value="80">ঢাকার ভেতরে (৳৮০)</option>
-                    <option value="150">ঢাকার বাইরে (৳১৫0)</option>
+                    <option value="inside">ঢাকার ভেতরে (৳৬০)</option>
+                    <option value="outside">ঢাকার বাইরে (৳১২০)</option>
                 </select>
-            </div>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 14px; color: #0f2635; font-weight: bold;">
-                Subtotal: ৳<span id="modal-subtotal">0</span><br>
-                Delivery: ৳<span id="modal-delivery">80</span><br>
-                Total: <span style="color: #c5a059; font-size: 16px;">৳<span id="modal-final-total">0</span></span>
             </div>
             <button class="submit-order-btn" onclick="sendOrderToWhatsApp()" style="background:#25d366; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">Confirm Order on WhatsApp 🚀</button>
         </div>

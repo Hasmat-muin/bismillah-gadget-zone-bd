@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (() => {
+            const viewport = document.querySelector('meta[name="viewport"]');
+            const screenWidth = window.innerWidth;
+            if (screenWidth > 0 && screenWidth < 360) {
+                viewport.content = `width=360, initial-scale=${screenWidth / 360}`;
+            }
+        })();
+    </script>
     <title>Admin Dashboard - Bismillah Gadget Zone BD</title>
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <style>
@@ -163,6 +172,21 @@
                         </div>
                         <button type="submit" class="btn-success" style="background:#16a34a;">Update Info 🔒</button>
                     </form>
+                </div>
+
+                <div class="admin-card" data-admin-section="settings" style="background:#fffbeb; border-color:#fde68a;">
+                    <h3 style="color:#92400e; border-bottom-color:#f59e0b;">🚚 Delivery Charges</h3>
+                    <p style="font-size:13px; color:#64748b; margin:0 0 12px;">Checkout-এ ঢাকার ভেতরে ও বাইরের ডেলিভারি চার্জ এখান থেকে পরিবর্তন করুন।</p>
+                    <div class="input-group">
+                        <label for="deliveryChargeInside">ঢাকার ভেতরে (৳)</label>
+                        <input type="number" id="deliveryChargeInside" min="0" step="1" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="deliveryChargeOutside">ঢাকার বাইরে (৳)</label>
+                        <input type="number" id="deliveryChargeOutside" min="0" step="1" required>
+                    </div>
+                    <button type="button" class="btn-success" onclick="saveDeliveryCharges()">ডেলিভারি চার্জ সেভ করুন 💾</button>
+                    <p id="deliveryChargesStatus" role="status" style="font-size:12px; margin:8px 0 0;"></p>
                 </div>
 
                 <div class="admin-card" data-admin-section="menu-message">
@@ -354,6 +378,7 @@
         const billboardURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
         const authConfigURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/adminCredentials.json";
         const sideMenuGameMessageURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/sideMenuGameMessage.json";
+        const adminDeliveryChargesURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/deliveryCharges.json";
 
         ClassicEditor.create(document.querySelector('#prodDetails'), {
             toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'insertTable', 'undo', 'redo' ]
@@ -383,8 +408,66 @@
             loadAdminBillboards();
             loadCurrentAdminCredentials();
             loadSideMenuGameMessage();
+            loadAdminDeliveryCharges();
             loadCategoriesIntoReorderDropdown(); 
             loadAdminOrders(); 
+        }
+
+        async function loadAdminDeliveryCharges() {
+            const status = document.getElementById('deliveryChargesStatus');
+            try {
+                const response = await fetch(adminDeliveryChargesURL);
+                if (!response.ok) throw new Error(`Delivery charge settings request failed (${response.status})`);
+                const savedCharges = await response.json();
+                const charges = savedCharges === null ? { inside: 60, outside: 120 } : savedCharges;
+                const inside = Number(charges.inside);
+                const outside = Number(charges.outside);
+                if (!Number.isFinite(inside) || inside < 0 || !Number.isFinite(outside) || outside < 0) {
+                    throw new Error('ডেলিভারি চার্জ সেটিংসে বৈধ পরিমাণ নেই।');
+                }
+
+                document.getElementById('deliveryChargeInside').value = inside;
+                document.getElementById('deliveryChargeOutside').value = outside;
+                status.textContent = '';
+            } catch (error) {
+                console.error('ডেলিভারি চার্জ লোড করা যায়নি:', error);
+                status.textContent = 'চার্জ লোড করা যায়নি। আবার চেষ্টা করুন।';
+                status.style.color = '#b91c1c';
+            }
+        }
+
+        async function saveDeliveryCharges() {
+            const insideInput = document.getElementById('deliveryChargeInside');
+            const outsideInput = document.getElementById('deliveryChargeOutside');
+            const status = document.getElementById('deliveryChargesStatus');
+            const inside = Number(insideInput.value);
+            const outside = Number(outsideInput.value);
+
+            if (!insideInput.value || !outsideInput.value ||
+                !Number.isFinite(inside) || inside < 0 ||
+                !Number.isFinite(outside) || outside < 0) {
+                status.textContent = 'দুইটি চার্জই শূন্য বা তার বেশি বৈধ সংখ্যা হতে হবে।';
+                status.style.color = '#b91c1c';
+                return;
+            }
+
+            try {
+                const response = await fetch(adminDeliveryChargesURL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inside, outside })
+                });
+                if (!response.ok) throw new Error(`Delivery charge settings save failed (${response.status})`);
+
+                deliveryCharges = { inside, outside };
+                updateDeliveryChargeOptions();
+                status.textContent = 'ডেলিভারি চার্জ সফলভাবে সেভ হয়েছে।';
+                status.style.color = '#15803d';
+            } catch (error) {
+                console.error('ডেলিভারি চার্জ সেভ করা যায়নি:', error);
+                status.textContent = 'ডেলিভারি চার্জ সেভ করা যায়নি। আবার চেষ্টা করুন।';
+                status.style.color = '#b91c1c';
+            }
         }
 
         function showAdminSection(sectionName, activeTab) {
@@ -430,7 +513,10 @@
                             <span style="font-size:12px; font-weight:bold; color:var(--primary);">${order.date}</span>
                         </div>
                         <div style="font-size:13px; margin-bottom:10px; line-height:1.5;">
-                            👤 ${order.name}<br>📞 ${order.phone}<br>🏠 ${order.address}<br>💰 ৳${order.grandTotal}
+                            👤 ${order.name}<br>📞 ${order.phone}<br>🏠 ${order.address}<br>
+                            ${order.subtotal !== undefined
+                                ? `পণ্যের দাম: ৳${order.subtotal}<br>ডেলিভারি: ৳${order.deliveryCharge ?? 0}<br><strong>মোট: ৳${order.grandTotal ?? 0}</strong>`
+                                : `💰 ৳${order.grandTotal ?? 0}`}
                         </div>
                         <div style="display:flex; flex-direction:column; gap:8px;">
                             <select id="status-${key}" style="padding:6px; font-size:12px; border-radius:4px; border:1px solid #ccc;">

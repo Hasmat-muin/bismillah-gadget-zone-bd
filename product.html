@@ -3,9 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (() => {
+            const viewport = document.querySelector('meta[name="viewport"]');
+            const screenWidth = window.innerWidth;
+            if (screenWidth > 0 && screenWidth < 360) {
+                viewport.content = `width=360, initial-scale=${screenWidth / 360}`;
+            }
+        })();
+    </script>
     <title>Product Details - Bismillah Gadget Zone BD</title>
     <link class="icon" type="image/jpeg" href="logo.JPG">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #0f2635;
@@ -55,9 +65,10 @@
             flex-direction: column;
             overflow: hidden;
         }
-        .main-layout { flex: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 30px; align-items: start; }
+        .main-layout { flex: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); grid-template-rows: auto auto; grid-template-areas: "image details" "title details"; gap: 10px 30px; align-items: start; }
         .left-panel, .right-panel { min-width: 0; }
-        .right-panel { display: flex; flex-direction: column; }
+        .left-panel { grid-area: image; }
+        .right-panel { grid-area: details; display: flex; flex-direction: column; }
         
         .main-image-box { width: 100%; height: min(54vh, 620px); min-height: 180px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0; }
         .main-image-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -66,9 +77,10 @@
         .thumb-img { width: 60px; height: 60px; flex: 0 0 60px; border-radius: 6px; border: 2px solid #e2e8f0; cursor: pointer; object-fit: cover; transition: 0.2s; }
         .thumb-img.active, .thumb-img:hover { border-color: var(--primary); transform: scale(1.05); }
 
-        .product-title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
-        .product-title { font-size: 26px; font-weight: 700; color: var(--primary); margin: 0 0 8px; overflow-wrap: anywhere; }
-        .product-wishlist-btn { flex:0 0 auto; width:42px; height:42px; border:1px solid #e2e8f0; border-radius:50%; color:#64748b; background:#fff; cursor:pointer; font-size:18px; }
+        .product-title-row { grid-area:title; display:flex; align-items:center; gap:8px; min-width:0; padding:6px 8px; border:1.5px solid var(--accent); border-radius:12px; background:linear-gradient(135deg, #fffdf8, #fff8e8); box-shadow:0 2px 8px rgba(197,160,89,.12); }
+        .product-detail-title { flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 18px; font-weight: 700; color: var(--primary); margin: 0; line-height: 1.2; white-space: nowrap; }
+        .product-wishlist-btn { flex:0 0 auto; width:36px; height:36px; border:1px solid rgba(197,160,89,.55); border-radius:50%; color:#64748b; background:#fff; cursor:pointer; font-size:16px; }
+        .product-wishlist-btn i { display: inline-block; line-height: 1; }
         .product-wishlist-btn.saved { color:#e11d48; border-color:#fecdd3; background:#fff1f2; }
         .product-availability { margin:0 0 14px; font-size:13px; font-weight:700; color:#15803d; }
         .product-availability.low-stock { color:#b45309; }
@@ -160,14 +172,24 @@
         }
 
         @media (max-width: 600px) {
-            body { padding: 10px; }
-            header { padding: 8px 10px; margin-bottom: 12px; border-radius: 8px; }
-            .container { padding: 12px 10px; border-radius: 8px; }
-            .main-layout { grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr); gap: 10px; }
+            body { height: auto; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; overflow-y: auto; padding: 10px 10px 90px; }
+            header { gap: 8px; padding: 8px; margin-bottom: 12px; border-radius: 8px; }
+            .product-header-start { gap: 5px !important; min-width: 0; }
+            .product-header-start > .nav-arrow-btn:nth-child(2) { display: none; }
+            .product-header-brand { gap: 6px !important; margin-left: 2px !important; min-width: 0; }
+            .product-header-brand img { width: 34px !important; height: 34px !important; }
+            .product-header-brand .brand-top-line { font-size: 16px !important; }
+            .product-header-brand > div { white-space: nowrap; }
+            .nav-arrow-btn { width: 26px; height: 26px; }
+            .cart-btn { flex: 0 0 auto; gap: 3px; padding: 6px 8px; }
+            .container { flex: 0 0 auto; overflow: visible; padding: 12px 10px; border-radius: 8px; }
+            .main-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; grid-template-areas: "image" "title" "details"; gap: 8px; }
             .main-image-box { height: min(36vh, 280px); min-height: 150px; border-radius: 6px; }
             .gallery-thumbnails { gap: 5px; margin-top: 7px; }
             .thumb-img { width: 42px; height: 42px; flex-basis: 42px; border-radius: 5px; }
-            .product-title { font-size: 18px; line-height: 1.25; }
+            .product-title-row { padding: 5px 7px; }
+            .product-detail-title { font-size: 18px; line-height: 1.2; }
+            .product-wishlist-btn { width:32px; height:32px; font-size:14px; }
             .price-tag { font-size: 21px; margin-bottom: 12px; }
             .selection-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
             .variant-title, .size-title { font-size: 12px; margin-bottom: 7px; }
@@ -175,7 +197,7 @@
             .variant-card { width: 48px; padding: 3px; border-width: 1px; }
             .variant-card img { height: 34px; }
             .size-chip { padding: 5px 7px; font-size: 11px; }
-            .details-section { margin-top: 12px; padding-top: 12px; }
+            .details-section { flex: 0 0 auto; min-height: auto; overflow: visible; margin-top: 12px; padding: 12px 4px 24px 0; }
         }
 
         .cart-sidebar { position: fixed; top: 0; right: -360px; width: 350px; height: 100%; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); box-shadow: -10px 0 30px rgba(15, 38, 53, 0.1); z-index: 2000; transition: 0.35s; padding: 24px; display: flex; flex-direction: column; box-sizing: border-box; }
@@ -189,10 +211,10 @@
 <body>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div class="product-header-start" style="display: flex; align-items: center; gap: 8px;">
         <button class="nav-arrow-btn" onclick="goBackPage()" title="আগের পেজে যান">←</button>
         <button class="nav-arrow-btn" onclick="goForwardPage()" title="পরের পেজে যান">→</button>
-        <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-left: 6px;" onclick="window.location.href='shop.html'">
+        <div class="product-header-brand" style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-left: 6px;" onclick="window.location.href='shop.html'">
             <img src="logo.JPG" alt="Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);">
             <div style="display:flex; flex-direction:column; line-height:1.2;">
                 <span class="brand-top-line" style="font-size:18px; font-weight:800; color:var(--accent);">Bismillah</span>
@@ -213,13 +235,13 @@
             </div>
             <div class="gallery-thumbnails" id="galleryThumbnails"></div>
         </div>
+        <div class="product-title-row">
+            <h1 class="product-detail-title" id="prodTitle">Loading Product...</h1>
+            <button class="wishlist-toggle product-wishlist-btn" id="productWishlistBtn" type="button" aria-label="Add to wishlist" aria-pressed="false">
+                <i class="far fa-heart"></i>
+            </button>
+        </div>
         <div class="right-panel">
-            <div class="product-title-row">
-                <h1 class="product-title" id="prodTitle">Loading Product...</h1>
-                <button class="wishlist-toggle product-wishlist-btn" id="productWishlistBtn" type="button" aria-label="Add to wishlist" aria-pressed="false">
-                    <i class="far fa-heart"></i>
-                </button>
-            </div>
             <div class="product-availability" id="productAvailability"></div>
             <div class="product-offer-expiry" id="productOfferExpiry" hidden></div>
             <div class="price-tag">৳ <span id="prodPrice">0.00</span> <span class="old-price" id="prodRegularPriceDisplay" hidden></span></div>
@@ -274,11 +296,13 @@
             <strong>আপনার অর্ডার</strong>
             <div id="checkout-order-summary"></div>
             <div class="checkout-summary-totals">
-                Subtotal: ৳<span id="modal-subtotal">0</span>
-                <span>ডেলিভারি: ৳<span id="modal-delivery">80</span></span>
-                <strong>মোট: ৳<span id="modal-final-total">0</span></strong>
+                <strong>Detail Explain :</strong>
+                <span>পণ্যের দাম : ৳<span id="modal-subtotal">0</span></span>
+                <span>ডেলিভারি : ৳<span id="modal-delivery">60</span></span>
+                <strong>মোট : ৳<span id="modal-final-total">0</span></strong>
             </div>
         </div>
+        <p id="delivery-charge-settings-warning" role="status" hidden style="font-size:12px; color:#b45309;">ডেলিভারি চার্জের সেটিংস লোড করা যায়নি; ডিফল্ট চার্জ প্রযোজ্য হবে।</p>
         <p class="checkout-error-message" id="checkout-error-message" role="alert" hidden></p>
         
         <div style="margin-bottom:10px;">
@@ -296,8 +320,8 @@
         <div style="margin-bottom:10px;">
             <label style="font-size:12px; font-weight:600;">ডেলিভারি এরিয়া</label>
             <select id="delivery-charge-select" onchange="calculateOrderTotal()" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <option value="80">ঢাকার ভেতরে (৳৮০)</option>
-                <option value="150">ঢাকার বাইরে (৳১৫০)</option>
+                <option value="inside">ঢাকার ভেতরে (৳৬০)</option>
+                <option value="outside">ঢাকার বাইরে (৳১২০)</option>
             </select>
         </div>
         <button class="submit-order-btn" onclick="sendOrderToWhatsApp()" style="background:#25d366; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">Confirm Order on WhatsApp 🚀</button>
@@ -317,6 +341,20 @@
     let globalProductName = ""; 
     let currentProductImage = "";
 
+    function fitProductTitle() {
+        const title = document.getElementById('prodTitle');
+        if (!title || !title.textContent.trim()) return;
+
+        title.style.fontSize = '';
+        let fontSize = parseFloat(getComputedStyle(title).fontSize);
+        while (title.scrollWidth > title.clientWidth && fontSize > 6) {
+            fontSize = Math.max(6, fontSize - 0.5);
+            title.style.fontSize = `${fontSize}px`;
+        }
+    }
+
+    window.addEventListener('resize', fitProductTitle);
+
     if (productId) {
         const productUrl = dbURL.replace(/\.json$/, `/${encodeURIComponent(productId)}.json`);
         fetch(productUrl)
@@ -326,6 +364,8 @@
                 globalProductName = product.name;
                 currentProductImage = product.mainImage || "";
                 document.getElementById('prodTitle').innerText = product.name;
+                document.getElementById('prodTitle').title = product.name;
+                requestAnimationFrame(fitProductTitle);
                 document.getElementById('prodDescription').innerHTML = product.details || "কোনো বিবরণ দেওয়া নেই।";
                 const wishlistButton = document.getElementById('productWishlistBtn');
                 wishlistButton.dataset.productId = productId;

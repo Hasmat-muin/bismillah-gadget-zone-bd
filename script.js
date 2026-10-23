@@ -2,7 +2,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
     restoreCheckoutDetails();
-    if (document.getElementById('products-container')) { fetchProducts(); }
+    if (document.getElementById('products-container')) {
+        enableShopScrollRestoration();
+        fetchProducts();
+    }
     enableBannerExpandedView();
     enableDelayedSideMenuGame();
     fetchAndRenderBillboards();
@@ -13,8 +16,11 @@ const catURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/cat
 const orderURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/categoryOrder.json";
 const billboardDataURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/billboards.json";
 const ordersDB_URL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/orders.json"; 
+const deliveryChargesURL = "https://bismillah-gadget-zone-bd-default-rtdb.firebaseio.com/deliveryCharges.json";
+const defaultDeliveryCharges = { inside: 60, outside: 120 };
 
 let cart = JSON.parse(localStorage.getItem('bg_cart')) || [];
+let deliveryCharges = { ...defaultDeliveryCharges };
 let allProductsData = {}; 
 let productsByCategory = new Map();
 let wishlist = loadWishlist();
@@ -25,6 +31,44 @@ let billboardAutoSlideInterval = null;
 let isUserInteracting = false;
 let visibleCategoryCount = 7;
 let endActiveDrag = null;
+let shopProductsReady = false;
+
+function enableShopScrollRestoration() {
+    history.scrollRestoration = 'manual';
+
+    document.addEventListener('click', event => {
+        if (!(event.target instanceof Element) || event.target.closest('.wishlist-toggle')) return;
+        if (!event.target.closest('#products-container .product-card')) return;
+
+        const currentState = history.state && typeof history.state === 'object' ? history.state : {};
+        history.replaceState({
+            ...currentState,
+            shopReturnScrollY: window.scrollY
+        }, '', window.location.href);
+    }, true);
+
+    window.addEventListener('pageshow', event => {
+        if (event.persisted) restoreShopScrollPosition();
+    });
+}
+
+function restoreShopScrollPosition() {
+    const state = history.state;
+    if (!shopProductsReady || !state || !Number.isFinite(state.shopReturnScrollY)) return;
+
+    if (typeof state.shopCategory === 'string') {
+        const categoryTab = Array.from(document.querySelectorAll('.cat-icon-item')).find(tab =>
+            tab.getAttribute('data-category') === state.shopCategory.toLowerCase()
+        );
+        switchCategory(state.shopCategory, categoryTab, false);
+    }
+
+    requestAnimationFrame(() => {
+        window.scrollTo(0, state.shopReturnScrollY);
+        const { shopReturnScrollY, ...cleanState } = history.state;
+        history.replaceState(cleanState, '', window.location.href);
+    });
+}
 
 window.addEventListener('mouseup', () => {
     if (endActiveDrag) {
@@ -287,24 +331,62 @@ function removeCartItem(index) {
     updateCartUI();
 }
 
-function openOrderModal() {
+async function loadDeliveryCharges() {
+    try {
+        const response = await fetch(deliveryChargesURL);
+        if (!response.ok) throw new Error(`Delivery charge settings request failed (${response.status})`);
+        const savedCharges = await response.json();
+
+        if (savedCharges === null) {
+            deliveryCharges = { ...defaultDeliveryCharges };
+        } else {
+            const inside = Number(savedCharges.inside);
+            const outside = Number(savedCharges.outside);
+            if (!Number.isFinite(inside) || inside < 0 || !Number.isFinite(outside) || outside < 0) {
+                throw new Error('ডেলিভারি চার্জ সেটিংসে বৈধ পরিমাণ নেই।');
+            }
+            deliveryCharges = { inside, outside };
+        }
+        return true;
+    } catch (error) {
+        deliveryCharges = { ...defaultDeliveryCharges };
+        console.error('ডেলিভারি চার্জ লোড করা যায়নি; ডিফল্ট চার্জ ব্যবহার হচ্ছে:', error);
+        return false;
+    }
+}
+
+function updateDeliveryChargeOptions() {
+    const select = document.getElementById('delivery-charge-select');
+    if (!select) return;
+
+    select.querySelector('[value="inside"]').textContent = `ঢাকার ভেতরে (৳${deliveryCharges.inside.toLocaleString('en-BD')})`;
+    select.querySelector('[value="outside"]').textContent = `ঢাকার বাইরে (৳${deliveryCharges.outside.toLocaleString('en-BD')})`;
+}
+
+async function openOrderModal() {
     if (cart.length === 0) { alert("আপনার কার্টটি খালি!"); return; }
+    const settingsLoaded = await loadDeliveryCharges();
+    updateDeliveryChargeOptions();
     const modalIndex = document.getElementById('order-modal');
     if (modalIndex) modalIndex.style.display = 'flex';
+    const warning = document.getElementById('delivery-charge-settings-warning');
+    if (warning) warning.hidden = settingsLoaded;
     restoreCheckoutDetails();
     calculateOrderTotal();
 }
 
 function calculateOrderTotal() {
     let subtotal = 0;
-    cart.forEach(item => subtotal += item.price);
+    cart.forEach(item => subtotal += Number(item.price) || 0);
 
-    const deliveryCharge = parseFloat(document.getElementById('delivery-charge-select')?.value || 80);
+    const deliveryArea = document.getElementById('delivery-charge-select')?.value || 'inside';
+    const deliveryCharge = deliveryCharges[deliveryArea] ?? deliveryCharges.inside;
     const finalTotal = subtotal + deliveryCharge;
+    const formatPrice = amount => Number(amount).toLocaleString('en-BD');
 
-    if(document.getElementById('modal-subtotal')) document.getElementById('modal-subtotal').innerText = subtotal;
-    if(document.getElementById('modal-delivery')) document.getElementById('modal-delivery').innerText = deliveryCharge;
-    if(document.getElementById('modal-final-total')) document.getElementById('modal-final-total').innerText = finalTotal;
+    if(document.getElementById('modal-subtotal')) document.getElementById('modal-subtotal').innerText = formatPrice(subtotal);
+    if(document.getElementById('modal-delivery')) document.getElementById('modal-delivery').innerText = formatPrice(deliveryCharge);
+    if(document.getElementById('modal-final-total')) document.getElementById('modal-final-total').innerText = formatPrice(finalTotal);
     const summary = document.getElementById('checkout-order-summary');
     if (summary) {
         summary.innerHTML = cart.map(item => `
@@ -337,7 +419,10 @@ async function sendOrderToWhatsApp() {
     const phoneInput = document.getElementById('customer-phone');
     const rawPhone = phoneInput?.value.trim() || '';
     const address = document.getElementById('customer-address')?.value.trim();
-    const deliveryCharge = parseFloat(document.getElementById('delivery-charge-select')?.value || 80);
+    const settingsLoaded = await loadDeliveryCharges();
+    updateDeliveryChargeOptions();
+    const deliveryArea = document.getElementById('delivery-charge-select')?.value || 'inside';
+    const deliveryCharge = deliveryCharges[deliveryArea] ?? deliveryCharges.inside;
     const errorMessage = document.getElementById('checkout-error-message');
     const submitButton = document.querySelector('.submit-order-btn');
     const showError = message => {
@@ -350,6 +435,9 @@ async function sendOrderToWhatsApp() {
     };
 
     if (errorMessage) errorMessage.hidden = true;
+    const settingsWarning = document.getElementById('delivery-charge-settings-warning');
+    if (settingsWarning) settingsWarning.hidden = settingsLoaded;
+    calculateOrderTotal();
     if (!name || !rawPhone || !address) {
         showError("আপনার নাম, মোবাইল নম্বর ও পূর্ণাঙ্গ ঠিকানা দিন।");
         return;
@@ -375,21 +463,22 @@ async function sendOrderToWhatsApp() {
     const orderId = "BGZ" + Math.floor(10000 + Math.random() * 90000);
     const orderDate = new Date().toLocaleDateString('en-GB');
     let subtotal = 0;
-    cart.forEach(item => subtotal += item.price);
+    cart.forEach(item => subtotal += Number(item.price) || 0);
+    const grandTotal = subtotal + deliveryCharge;
 
     const orderData = {
         orderId, name, phone: normalizedPhone, address, items: cart,
-        subtotal, deliveryCharge, grandTotal: subtotal + deliveryCharge,
+        subtotal, deliveryCharge, deliveryArea, grandTotal,
         status: "Processing", trackingLink: "", 
         date: orderDate, timestamp: Date.now()
     };
 
-    const deliveryText = (deliveryCharge === 80) ? "ঢাকার ভেতরে" : "ঢাকার বাইরে";
+    const deliveryText = deliveryArea === 'inside' ? "ঢাকার ভেতরে" : "ঢাকার বাইরে";
     let message = `*📦 নতুন অর্ডার (${orderId})*\n👤 *নাম:* ${name}\n📞 *মোবাইল:* ${normalizedPhone}\n🏠 *ঠিকানা:* ${address}\n🚚 *ডেলিভারি:* ${deliveryText}\n\n🛍️ *অর্ডারকৃত প্রোডাক্টসমূহ:*\n`;
     cart.forEach((item, index) => {
         message += `${index + 1}. ${item.name}${item.variant && item.variant !== 'Standard' ? ` (${item.variant})` : ''}${item.size ? ` (${item.size})` : ''} - ৳${item.price}\n`;
     });
-    message += `\n💰 *সর্বমোট বিল:* ৳${subtotal + deliveryCharge}`;
+    message += `\n\n*Detail Explain :*\nপণ্যের দাম : ৳${subtotal}\nডেলিভারি : ৳${deliveryCharge}\nমোট : ৳${grandTotal}`;
     const whatsappUrl = `https://wa.me/8801922790663?text=${encodeURIComponent(message)}`;
     const whatsappWindow = window.open('about:blank', '_blank');
     if (submitButton) {
@@ -601,6 +690,8 @@ async function fetchProducts() {
 
         renderDynamicCategoryTabs();
         renderHomeSections();
+        shopProductsReady = true;
+        restoreShopScrollPosition();
     } catch (err) { console.error("ডাটা লোড সমস্যা:", err); }
 }
 
