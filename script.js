@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     restoreCheckoutDetails();
     if (document.getElementById('products-container')) {
         enableShopScrollRestoration();
+        enableCompactHeaderOnScroll();
         fetchProducts();
     }
     enableBannerExpandedView();
@@ -50,6 +51,66 @@ function enableShopScrollRestoration() {
     window.addEventListener('pageshow', event => {
         if (event.persisted) restoreShopScrollPosition();
     });
+}
+
+function enableCompactHeaderOnScroll() {
+    const header = document.querySelector('.premium-header');
+    const featureRow = header?.querySelector('.header-feature-row');
+    if (!header || !featureRow) return;
+
+    let scrollEndTimeout;
+    let isPointerDown = false;
+    let isTouchActive = false;
+
+    const isInteractionActive = () => isPointerDown || isTouchActive;
+
+    const restoreFeatureRow = () => {
+        window.clearTimeout(scrollEndTimeout);
+        scrollEndTimeout = window.setTimeout(() => {
+            if (isInteractionActive()) return;
+
+            header.classList.remove('is-scroll-active');
+            featureRow.inert = false;
+            featureRow.removeAttribute('aria-hidden');
+        }, 360);
+    };
+
+    window.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'touch') isPointerDown = true;
+    }, { passive: true });
+
+    const releasePointer = event => {
+        if (event.pointerType === 'touch') return;
+        isPointerDown = false;
+        if (header.classList.contains('is-scroll-active')) restoreFeatureRow();
+    };
+
+    window.addEventListener('pointerup', releasePointer, { passive: true });
+    window.addEventListener('pointercancel', releasePointer, { passive: true });
+    window.addEventListener('touchstart', () => {
+        isTouchActive = true;
+    }, { passive: true });
+
+    const releaseTouch = event => {
+        isTouchActive = event.touches.length > 0;
+        if (!isTouchActive && header.classList.contains('is-scroll-active')) restoreFeatureRow();
+    };
+
+    window.addEventListener('touchend', releaseTouch, { passive: true });
+    window.addEventListener('touchcancel', releaseTouch, { passive: true });
+    window.addEventListener('blur', () => {
+        isPointerDown = false;
+        isTouchActive = false;
+        if (header.classList.contains('is-scroll-active')) restoreFeatureRow();
+    });
+
+    window.addEventListener('scroll', () => {
+        header.classList.add('is-scroll-active');
+        featureRow.inert = true;
+        featureRow.setAttribute('aria-hidden', 'true');
+
+        restoreFeatureRow();
+    }, { passive: true });
 }
 
 function restoreShopScrollPosition() {
