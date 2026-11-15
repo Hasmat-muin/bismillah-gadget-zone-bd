@@ -876,13 +876,11 @@ function renderHomeSections() {
         })
         .slice(0, 5);
     const popularProducts = products.filter(product => product.featured === true).slice(0, 5);
-    const offerProducts = products.filter(product => getProductPricing(product).hasOffer).slice(0, 5);
     const allProductsSection = renderProductSection('Products', products, 'all-products-section');
 
     mainGrid.innerHTML = [
         renderProductSection('New Arrivals', newestProducts, 'new-arrivals-section'),
         renderProductSection('Popular Products', popularProducts, 'popular-products-section'),
-        renderProductSection('Special Offers', offerProducts, 'special-offers-section'),
         allProductsSection
     ].join('');
     enableDesktopDragScroll();

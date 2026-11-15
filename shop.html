@@ -35,7 +35,7 @@
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: var(--bg-main); 
-            margin: 0; padding: 0; color: var(--text-dark);
+            margin: 0; padding: 0 0 calc(130px + env(safe-area-inset-bottom)); color: var(--text-dark);
             position: relative;
             overflow-anchor: none;
         }
@@ -210,8 +210,8 @@
         }
 
         .header-search-box-mobile {
-            display: none; width: 95%; max-width: 480px; margin-top: 8px; margin-bottom: 2px;
-            position: relative; background: #ebf0f5; border-radius: 40px; padding: 2.5px;
+            display: none; width: 82%; max-width: 480px; margin: 3px auto 0;
+            position: relative; background: #ebf0f5; border-radius: 40px; padding: 1.5px;
             box-shadow: 4px 4px 10px rgba(4, 18, 28, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.08); box-sizing: border-box;
         }
         .mobile-search-inner {
@@ -220,7 +220,7 @@
             box-shadow: inset 1.5px 1.5px 4px rgba(166, 175, 186, 0.4), inset -1.5px -1.5px 4px rgba(255, 255, 255, 0.9);
         }
         .mobile-search-inner input {
-            width: 100%; background: transparent; border: none; padding: 7px 38px 7px 16px;
+            width: 100%; background: transparent; border: none; padding: 2px 38px 2px 16px;
             color: #475569; font-size: 13.5px; font-weight: 500; outline: none; box-sizing: border-box;
         }
         .search-icon-badge {
