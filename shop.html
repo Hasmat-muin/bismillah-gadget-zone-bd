@@ -141,7 +141,12 @@
             padding: 6px 30px 6px 12px; color: white; font-size: 12.5px; outline: none;
         }
         .header-search-box-desktop input::placeholder { color: rgba(255, 255, 255, 0.6); }
-        .header-search-box-desktop i { position: absolute; right: 10px; color: var(--accent); font-size: 12px; }
+        .header-search-box-desktop .search-submit-button {
+            position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+            display: flex; align-items: center; justify-content: center;
+            border: 0; padding: 4px; background: transparent; color: var(--accent); cursor: pointer;
+        }
+        .header-search-box-desktop .search-submit-button i { font-size: 12px; }
 
         /* 📱 FIXED REELS + SWIPEABLE CATEGORIES CONTAINER */
         .category-scroll-container {
@@ -224,7 +229,8 @@
             color: #475569; font-size: 13.5px; font-weight: 500; outline: none; box-sizing: border-box;
         }
         .search-icon-badge {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; justify-content: center; align-items: center; pointer-events: none;
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; justify-content: center; align-items: center;
+            border: 0; padding: 0; background: transparent; cursor: pointer;
         }
         .search-icon-badge i { color: #7b8a97; font-size: 15px; }
 
@@ -328,8 +334,10 @@
             <!-- 📦 Header Actions (Orders & Cart) -->
             <div class="header-right-actions">
                 <div class="header-search-box-desktop">
-                    <input type="text" id="desktop-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'mobile-search')">
-                    <i class="fas fa-search"></i>
+                    <input type="text" id="desktop-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'mobile-search')" onkeydown="if (event.key === 'Enter') { event.preventDefault(); submitSearch(this, 'mobile-search'); }">
+                    <button type="button" class="search-submit-button" aria-label="Search" onclick="submitSearch(document.getElementById('desktop-search'), 'mobile-search')">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    </button>
                 </div>
                 
                 <button class="header-action-btn" onclick="openCustomerOrders()">
@@ -373,10 +381,10 @@
 
                 <div class="header-search-box-mobile">
                     <div class="mobile-search-inner">
-                        <input type="text" id="mobile-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'desktop-search')">
-                        <div class="search-icon-badge">
-                            <i class="fas fa-search"></i>
-                        </div>
+                        <input type="text" id="mobile-search" placeholder="Search..." oninput="syncAndSearch(this.value, 'desktop-search')" onkeydown="if (event.key === 'Enter') { event.preventDefault(); submitSearch(this, 'desktop-search'); }">
+                        <button type="button" class="search-icon-badge" aria-label="Search" onclick="submitSearch(document.getElementById('mobile-search'), 'desktop-search')">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -498,6 +506,9 @@
             const target = document.getElementById(targetId);
             if (target) target.value = value;
             searchProducts(value);
+        }
+        function submitSearch(input, targetId) {
+            syncAndSearch(input.value, targetId);
         }
         function scrollCategoryRight() {
             const bar = document.getElementById('swipeCategoryBar');

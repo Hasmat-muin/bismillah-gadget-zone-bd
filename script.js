@@ -39,12 +39,18 @@ function enableShopScrollRestoration() {
 
     document.addEventListener('click', event => {
         if (!(event.target instanceof Element) || event.target.closest('.wishlist-toggle')) return;
-        if (!event.target.closest('#products-container .product-card')) return;
+        const productCard = event.target.closest('#products-container .product-card');
+        if (!productCard) return;
 
         const currentState = history.state && typeof history.state === 'object' ? history.state : {};
+        const productCards = Array.from(document.querySelectorAll('#products-container .product-card'));
+        const matchingProducts = productCards.filter(card => card.dataset.productId === productCard.dataset.productId);
         history.replaceState({
             ...currentState,
-            shopReturnScrollY: window.scrollY
+            shopReturnScrollY: window.scrollY,
+            shopReturnProductId: productCard.dataset.productId,
+            shopReturnProductOccurrence: matchingProducts.indexOf(productCard),
+            shopReturnProductOffsetY: productCard.getBoundingClientRect().top
         }, '', window.location.href);
     }, true);
 
@@ -125,8 +131,25 @@ function restoreShopScrollPosition() {
     }
 
     requestAnimationFrame(() => {
-        window.scrollTo(0, state.shopReturnScrollY);
-        const { shopReturnScrollY, ...cleanState } = history.state;
+        const matchingProducts = Array.from(document.querySelectorAll('#products-container .product-card'))
+            .filter(card => card.dataset.productId === state.shopReturnProductId);
+        const productOccurrence = Number.isInteger(state.shopReturnProductOccurrence)
+            ? state.shopReturnProductOccurrence
+            : 0;
+        const productCard = matchingProducts[productOccurrence] || matchingProducts[0];
+
+        if (productCard && Number.isFinite(state.shopReturnProductOffsetY)) {
+            const productDocumentTop = productCard.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo(0, Math.max(0, productDocumentTop - state.shopReturnProductOffsetY));
+        } else {
+            window.scrollTo(0, state.shopReturnScrollY);
+        }
+
+        const cleanState = { ...history.state };
+        delete cleanState.shopReturnScrollY;
+        delete cleanState.shopReturnProductId;
+        delete cleanState.shopReturnProductOccurrence;
+        delete cleanState.shopReturnProductOffsetY;
         history.replaceState(cleanState, '', window.location.href);
     });
 }
@@ -661,6 +684,10 @@ function renderDynamicCategoryTabs() {
     if (!swipeContainer) return;
 
     let html = `
+        <a href="shop.html" class="cat-icon-item home-page-category-item" aria-label="Home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
         <div class="cat-icon-item active" data-category="allproducts" onclick="switchCategory('AllProducts', this)">
             <i class="fas fa-boxes-stacked"></i>
             <span>Products</span>
@@ -810,7 +837,7 @@ function renderProductCard(prod, category) {
     const isSaved = wishlist.includes(String(key));
 
     return `
-        <div class="product-card" data-name="${prod.name.toLowerCase()}" data-category="${categoryName.toLowerCase()}" onclick="window.location.href='product.html?id=${key}'">
+        <div class="product-card" data-product-id="${key}" data-name="${prod.name.toLowerCase()}" data-category="${categoryName.toLowerCase()}" onclick="window.location.href='product.html?id=${key}'">
             ${discountBadge}
             ${prod.featured ? `<span class="product-featured-badge">Popular</span>` : ''}
             <button class="wishlist-toggle ${isSaved ? 'saved' : ''}" type="button" data-product-id="${key}" aria-label="${isSaved ? 'Remove from wishlist' : 'Add to wishlist'}" aria-pressed="${isSaved}" onclick="toggleWishlist('${key}', event)">

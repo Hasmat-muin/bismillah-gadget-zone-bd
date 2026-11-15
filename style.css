@@ -658,7 +658,8 @@ body {
         font-size: 13px;
     }
 
-    .header-search-box-desktop i { right: 14px; font-size: 14px; }
+    .header-search-box-desktop .search-submit-button { right: 14px; }
+    .header-search-box-desktop .search-submit-button i { font-size: 14px; }
 
     .header-action-btn {
         min-width: 76px;
