@@ -563,7 +563,7 @@ async function sendOrderToWhatsApp() {
         message += `${index + 1}. ${item.name}${item.variant && item.variant !== 'Standard' ? ` (${item.variant})` : ''}${item.size ? ` (${item.size})` : ''} - ৳${item.price}\n`;
     });
     message += `\n\n*Detail Explain :*\nপণ্যের দাম : ৳${subtotal}\nডেলিভারি : ৳${deliveryCharge}\nমোট : ৳${grandTotal}`;
-    const whatsappUrl = `https://wa.me/8801922790663?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/8801577299398?text=${encodeURIComponent(message)}`;
     const whatsappWindow = window.open('about:blank', '_blank');
     if (submitButton) {
         submitButton.disabled = true;
